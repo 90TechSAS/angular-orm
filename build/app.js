@@ -42,7 +42,7 @@ var User = (function () {
             if (this._id) {
                 return this.$http.put(this.rootUrl + '/' + this._id, this);
             } else {
-                return this.$http.post(this);
+                return this.$http.post(this.rootUrl, this);
             }
         }
     }]);
