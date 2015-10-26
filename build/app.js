@@ -80,6 +80,11 @@ var UserManager = (function () {
     }
 
     _createClass(UserManager, [{
+        key: 'getNew',
+        value: function getNew() {
+            return new _user2['default'](self.$http, self.rootUrl);
+        }
+    }, {
         key: 'getList',
         value: function getList() {
             var self = this;

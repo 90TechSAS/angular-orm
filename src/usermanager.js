@@ -10,6 +10,10 @@ class UserManager {
         this.rootUrl = url;
     }
 
+    getNew(){
+        return new User(self.$http, self.rootUrl);
+    }
+
     getList(){
         var self = this;
         return this.$http.get(this.rootUrl).then(function(data){
