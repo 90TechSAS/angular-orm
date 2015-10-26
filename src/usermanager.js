@@ -11,7 +11,7 @@ class UserManager {
     }
 
     getNew(){
-        return new User(self.$http, self.rootUrl);
+        return new User(this.$http, this.rootUrl);
     }
 
     getList(){

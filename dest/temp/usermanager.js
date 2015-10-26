@@ -27,7 +27,7 @@ var UserManager = (function () {
     _createClass(UserManager, [{
         key: 'getNew',
         value: function getNew() {
-            return new _user2['default'](self.$http, self.rootUrl);
+            return new _user2['default'](this.$http, this.rootUrl);
         }
     }, {
         key: 'getList',
