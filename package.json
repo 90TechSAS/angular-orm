@@ -1,11 +1,12 @@
 {
   "author": "flogou <florent.gouget@gmail.com>",
   "name": "UserManager",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "homepage": "",
   "dependencies": {},
   "files": [
+    "bower.json",
     "build/app.js"
   ],
   "devDependencies": {
