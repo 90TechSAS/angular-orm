@@ -31,12 +31,12 @@ var UserManager = (function () {
         }
     }, {
         key: 'getList',
-        value: function getList() {
+        value: function getList(params) {
             var self = this;
-            return this.$http.get(this.rootUrl).then(function (data) {
-                return _.map(data.data, function (user) {
-                    return new _user2['default'](self.$http, self.rootUrl, user);
-                });
+            return this.$http.get(this.rootUrl, { params: params }).then(function (data) {
+                return { data: _.map(data.data, function (user) {
+                        return new _user2['default'](self.$http, self.rootUrl, user);
+                    }), meta: { total: data.headers('X-Total-Count') } };
             });
         }
     }, {

@@ -66,7 +66,7 @@
             it('should retrieve the list', function(){
                 httpBackend.expectGET(fakeUrl).respond([fakeUser]);
                 UserManager.getList().then(function(userList){
-                    expect(userList.length).toEqual(1);
+                    expect(userList.data.length).toEqual(1);
                 });
                 httpBackend.flush();
             });

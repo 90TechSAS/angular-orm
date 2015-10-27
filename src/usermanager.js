@@ -14,10 +14,12 @@ class UserManager {
         return new User(this.$http, this.rootUrl);
     }
 
-    getList(){
+    getList(params){
         var self = this;
-        return this.$http.get(this.rootUrl).then(function(data){
-            return _.map(data.data, (user)=>{return new User(self.$http, self.rootUrl, user)});
+        return this.$http.get(this.rootUrl, {params: params}).then(function (data) {
+            return {data: _.map(data.data, function (user) {
+                return new User(self.$http, self.rootUrl, user);
+            }), meta: {total: data.headers('X-Total-Count')}};
         });
     }
 
