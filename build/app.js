@@ -16,7 +16,7 @@ var User = (function () {
     _createClass(User, null, [{
         key: 'getModel',
         value: function getModel() {
-            return [{ field: '_id', type: 'string' }, { field: '__v', type: 'int' }, { field: 'createdAt', type: 'datetime' }, { field: 'email', type: 'string' }, { field: 'firstname', type: 'string' }, { field: 'lastname', type: 'string' }, { field: 'isArchived', type: 'boolean' }, { field: 'windowsDevices', type: 'array' }, { field: 'iOSDevices', type: 'array' }, { field: 'androidDevices', type: 'array' }, { field: 'companies', type: 'array' }, { field: 'recoveryEmails', type: '[]' }, { field: 'id', type: 'string' }];
+            return [{ field: '_id', type: 'string' }, { field: '__v', type: 'int' }, { field: 'createdAt', type: 'datetime' }, { field: 'email', type: 'string' }, { field: 'firstname', type: 'string' }, { field: 'lastname', type: 'string' }, { field: 'isArchived', type: 'boolean' }, { field: 'windowsDevices', type: 'array' }, { field: 'iOSDevices', type: 'array' }, { field: 'androidDevices', type: 'array' }, { field: 'companies', type: 'array' }, { field: 'recoveryEmails', type: 'array' }, { field: 'permissions', type: 'array' }, { field: 'id', type: 'string' }];
         }
     }]);
 
@@ -32,6 +32,8 @@ var User = (function () {
         _.each(User.getModel(), function (field) {
             if (options && options[field.field]) {
                 _this[field.field] = _.clone(options[field.field]);
+            } else if (field.type === 'array') {
+                _this[field.field] = [];
             }
         });
     }
