@@ -12,13 +12,13 @@
     </style>
 </head>
 <body>
-<div class="header high">
+<div class="header medium">
     <h1>Code coverage report for <span class="entity">build/app.js</span></h1>
     <h2>
-        Statements: <span class="metric">83.33% <small>(90 / 108)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Statements: <span class="metric">79.65% <small>(90 / 113)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
         Branches: <span class="metric">68% <small>(34 / 50)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
-        Functions: <span class="metric">84.38% <small>(27 / 32)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
-        Lines: <span class="metric">80.36% <small>(45 / 56)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Functions: <span class="metric">77.14% <small>(27 / 35)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Lines: <span class="metric">73.77% <small>(45 / 61)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
         Ignored: <span class="metric">3 statements, 7 branches</span> &nbsp;&nbsp;&nbsp;&nbsp;
     </h2>
     <div class="path"><a href="../index.html">All files</a> &#187; <a href="index.html">build/</a> &#187; app.js</div>
@@ -169,7 +169,29 @@
 142
 143
 144
-145</td><td class="line-coverage"><span class="cline-any cline-yes">2</span>
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167</td><td class="line-coverage"><span class="cline-any cline-yes">2</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1</span>
@@ -230,7 +252,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6</span>
+<span class="cline-any cline-yes">7</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -263,6 +285,7 @@
 <span class="cline-any cline-yes">2</span>
 <span class="cline-any cline-yes">2</span>
 <span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -270,6 +293,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -277,6 +301,26 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -406,9 +450,11 @@ var UserManager = (function () {
         value: function getList(params) {
             var self = this;
             return this.$http.get(this.rootUrl, { params: params }).then(function (data) {
-                return { data: _.map(data.data, function (user) {
+                return {
+                    data: _.map(data.data, function (user) {
                         return new _user2['default'](self.$http, self.rootUrl, user);
-                    }), meta: { total: data.headers('X-Total-Count') } };
+                    }), meta: { total: data.headers('X-Total-Count') }
+                };
             });
         }
     }, {
@@ -421,6 +467,26 @@ var UserManager = (function () {
             }
 <span class="cstat-no" title="statement not covered" >            return this.$http.get(this.rootUrl + '/' + id, params).then(<span class="fstat-no" title="function not covered" >function (data) {</span></span>
 <span class="cstat-no" title="statement not covered" >                return new _user2['default'](self.$http, self.rootUrl, data.data);</span>
+            });
+        }
+    }, {
+        key: 'searchByName',
+        value: <span class="fstat-no" title="function not covered" >function searchByName(query) {</span>
+<span class="cstat-no" title="statement not covered" >            var self = this;</span>
+<span class="cstat-no" title="statement not covered" >            var params = {</span>
+                conditions: {
+                    $or: {
+                        firstname: { $regex: '.*' + query + '.*', $options: 'i' },
+                        lastname: { $regex: '.*' + query + '.*', $options: 'i' }
+                    }
+                }
+            };
+<span class="cstat-no" title="statement not covered" >            return this.$http.get(this.rootUrl, { params: params }).then(<span class="fstat-no" title="function not covered" >function (data) {</span></span>
+<span class="cstat-no" title="statement not covered" >                return {</span>
+                    data: _.map(data.data, <span class="fstat-no" title="function not covered" >function (user) {</span>
+<span class="cstat-no" title="statement not covered" >                        return new _user2['default'](self.$http, self.rootUrl, user);</span>
+                    }), meta: { total: data.headers('X-Total-Count') }
+                };
             });
         }
     }, {
@@ -462,7 +528,7 @@ angular.module('90Tech.user-manager', []).provider('UserManager', UserManagerPro
 
 </div>
 <div class="footer">
-    <div class="meta">Generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Tue Oct 27 2015 16:28:21 GMT+0100 (CET)</div>
+    <div class="meta">Generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Wed Oct 28 2015 10:29:40 GMT+0100 (CET)</div>
 </div>
 <script src="../prettify.js"></script>
 <script>

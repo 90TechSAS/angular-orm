@@ -16,22 +16,44 @@ class UserManager {
 
     getList(params){
         var self = this;
-        return this.$http.get(this.rootUrl, {params: params}).then(function (data) {
-            return {data: _.map(data.data, function (user) {
-                return new User(self.$http, self.rootUrl, user);
-            }), meta: {total: data.headers('X-Total-Count')}};
+        return this.$http.get(this.rootUrl, {params: params}).then(function(data){
+            return {
+                data    : _.map(data.data, function(user){
+                    return new User(self.$http, self.rootUrl, user);
+                }), meta: {total: data.headers('X-Total-Count')}
+            };
         });
     }
 
     getById(id, populate){
-        var self = this;
+        var self   = this;
         var params = null;
         if (populate){
             params = {params: {populate: populate}}
         }
-        return this.$http.get(this.rootUrl + '/' + id, params ).then(function(data){
+        return this.$http.get(this.rootUrl + '/' + id, params).then(function(data){
             return new User(self.$http, self.rootUrl, data.data);
         })
+    }
+
+    searchByName(query){
+        var self   = this;
+        var params = {
+            conditions: {
+                $or: {
+                    firstname: {$regex: '.*' + query + '.*',  $options: 'i'},
+                    lastname : {$regex: '.*' + query + '.*',  $options: 'i'}
+                }
+            }
+        };
+        return this.$http.get(this.rootUrl, {params: params}).then(function(data){
+            return {
+                data    : _.map(data.data, function(user){
+                    return new User(self.$http, self.rootUrl, user);
+                }), meta: {total: data.headers('X-Total-Count')}
+            };
+        });
+
     }
 
     getProfile(){

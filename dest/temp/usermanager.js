@@ -34,9 +34,11 @@ var UserManager = (function () {
         value: function getList(params) {
             var self = this;
             return this.$http.get(this.rootUrl, { params: params }).then(function (data) {
-                return { data: _.map(data.data, function (user) {
+                return {
+                    data: _.map(data.data, function (user) {
                         return new _user2['default'](self.$http, self.rootUrl, user);
-                    }), meta: { total: data.headers('X-Total-Count') } };
+                    }), meta: { total: data.headers('X-Total-Count') }
+                };
             });
         }
     }, {
@@ -49,6 +51,26 @@ var UserManager = (function () {
             }
             return this.$http.get(this.rootUrl + '/' + id, params).then(function (data) {
                 return new _user2['default'](self.$http, self.rootUrl, data.data);
+            });
+        }
+    }, {
+        key: 'searchByName',
+        value: function searchByName(query) {
+            var self = this;
+            var params = {
+                conditions: {
+                    $or: {
+                        firstname: { $regex: '.*' + query + '.*', $options: 'i' },
+                        lastname: { $regex: '.*' + query + '.*', $options: 'i' }
+                    }
+                }
+            };
+            return this.$http.get(this.rootUrl, { params: params }).then(function (data) {
+                return {
+                    data: _.map(data.data, function (user) {
+                        return new _user2['default'](self.$http, self.rootUrl, user);
+                    }), meta: { total: data.headers('X-Total-Count') }
+                };
             });
         }
     }, {
