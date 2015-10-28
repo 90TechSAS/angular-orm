@@ -116,10 +116,7 @@ var UserManager = (function () {
             var self = this;
             var params = {
                 conditions: {
-                    $or: {
-                        firstname: { $regex: '.*' + query + '.*', $options: 'i' },
-                        lastname: { $regex: '.*' + query + '.*', $options: 'i' }
-                    }
+                    $or: [{ firstname: { $regex: '.*' + query + '.*', $options: 'i' } }, { lastname: { $regex: '.*' + query + '.*', $options: 'i' } }]
                 }
             };
             return this.$http.get(this.rootUrl, { params: params }).then(function (data) {
