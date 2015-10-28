@@ -7,7 +7,7 @@ class UserManager extends GenericDao{
 
 
     constructor($http, url){
-        super($http, url);
+        super($http, url, User);
         this.$http   = $http;
         this.rootUrl = url;
     }

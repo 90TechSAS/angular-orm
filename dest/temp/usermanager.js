@@ -34,7 +34,7 @@ var UserManager = (function (_GenericDao) {
     function UserManager($http, url) {
         _classCallCheck(this, UserManager);
 
-        _get(Object.getPrototypeOf(UserManager.prototype), 'constructor', this).call(this, $http, url);
+        _get(Object.getPrototypeOf(UserManager.prototype), 'constructor', this).call(this, $http, url, _user2['default']);
         this.$http = $http;
         this.rootUrl = url;
     }

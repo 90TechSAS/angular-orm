@@ -14,11 +14,12 @@ var _createClass = (function () { function defineProperties(target, props) { for
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 var GenericDao = (function () {
-    function GenericDao($http, url) {
+    function GenericDao($http, url, model) {
         _classCallCheck(this, GenericDao);
 
         this.$http = $http;
         this.url = url;
+        this.model = model;
     }
 
     _createClass(GenericDao, [{
@@ -90,10 +91,10 @@ var GenericDao = (function () {
         value: function get() {
             var self = this;
             return this.$http.get(this.rootUrl, { params: this.opts }).then(function (data) {
-                delete this.opts;
+                delete self.opts;
                 return {
-                    data: _.map(data.data, function (user) {
-                        return new User(self.$http, self.rootUrl, user);
+                    data: _.map(data.data, function (d) {
+                        return new self.model(self.$http, self.rootUrl, d);
                     }), meta: { total: data.headers('X-Total-Count') }
                 };
             });

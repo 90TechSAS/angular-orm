@@ -2,9 +2,10 @@
 
 export default class GenericDao {
 
-    constructor($http, url){
+    constructor($http, url, model){
         this.$http = $http;
         this.url   = url;
+        this.model = model
 
     }
 
@@ -72,10 +73,10 @@ export default class GenericDao {
     get(){
         var self = this;
         return this.$http.get(this.rootUrl, {params: this.opts}).then(function(data){
-            delete this.opts;
+            delete self.opts;
             return {
-                data    : _.map(data.data, function(user){
-                    return new User(self.$http, self.rootUrl, user);
+                data    : _.map(data.data, function(d){
+                    return new self.model(self.$http, self.rootUrl, d);
                 }), meta: {total: data.headers('X-Total-Count')}
             };
         });
