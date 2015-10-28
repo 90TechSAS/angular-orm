@@ -1,14 +1,17 @@
 'use strict';
 
 import User from './user';
+import GenericDao from './GenericDao'
 
-class UserManager {
+class UserManager extends GenericDao{
 
 
     constructor($http, url){
+        super($http, url);
         this.$http   = $http;
         this.rootUrl = url;
     }
+
 
     getNew(){
         return new User(this.$http, this.rootUrl);

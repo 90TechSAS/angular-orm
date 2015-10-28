@@ -70,6 +70,52 @@
                 });
                 httpBackend.flush();
             });
+
+
+            it ('should make complex query', function(){
+                var expectedQuery = {
+                    "limit": 100,
+                    "skip": 10,
+                    "conditions": {
+                        "_id": {
+                            "$in": [
+                                1,
+                                2,
+                                3
+                            ]
+                        },
+                        "$or": [
+                            {
+                                "firstname": {
+                                    "$regex": ".*toto.*",
+                                    "$options": "i"
+                                }
+                            },
+                            {
+                                "lastname": {
+                                    "$regex": ".*toto.*",
+                                    "$options": "i"
+                                }
+                            }
+                        ]
+                    },
+                    "populate": '["titi","toto"]',
+                    "archived": true,
+                    "sort": "toto"
+                } ;
+
+                httpBackend.expectGET(new RegExp(fakeUrl + '\?' + '(.*)')).respond();
+
+                UserManager.paginate({limit: 100, skip:10})
+                .select([1,2,3])
+                .populate(['titi', 'toto'])
+                .archived(true)
+                .sort('toto')
+                .search('toto')
+                .get();
+
+                expect(UserManager.opts).toEqual(expectedQuery);
+            });
         });
     });
 })();
