@@ -29,7 +29,7 @@ function ActiveRecord(model) {
             this.$injector = $injector;
             this.$http = $injector.get('$http');
             this.rootUrl = rootUrl;
-            _.each(this.model, function (field, key) {
+            _.each(model, function (field, key) {
                 if (options && options[key]) {
                     _this[key] = _.clone(options[key]);
                 } else if (_.isArray(field)) {

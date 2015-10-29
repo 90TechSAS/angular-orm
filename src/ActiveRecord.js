@@ -9,7 +9,7 @@ export default function ActiveRecord(model){
             this.$injector = $injector;
             this.$http     = $injector.get('$http');
             this.rootUrl   = rootUrl;
-            _.each(this.model, (field, key)=>{
+            _.each(model, (field, key)=>{
                 if (options && options[key]){
                     this[key] = _.clone(options[key]);
                 } else if (_.isArray(field)){
