@@ -1,3 +1,5 @@
+_ = require('lodash');
+
 /**
  *
  * @param Object Mongoose Style Model

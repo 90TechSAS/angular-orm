@@ -1,13 +1,14 @@
 {
   "author": "flogou <florent.gouget@gmail.com>",
-  "name": "UserManager",
-  "version": "0.1.2",
+  "name": "AngularDAO",
+  "version": "1.0.1",
   "description": "",
   "homepage": "",
-  "dependencies": {},
+  "dependencies": {
+    "lodash": "^3.10.1"
+  },
   "files": [
-    "bower.json",
-    "build/app.js"
+    "src/**/*.js"
   ],
   "devDependencies": {
     "angular-mocks": "^1.4.6",

@@ -91,7 +91,7 @@ export default function GenericDao(model){
             }
             return this.$http.get(this.url + '/' + id, params).then(function(data){
                 delete self.opts;
-                return new User(self.$http, self.url, data.data);
+                return new self.model(self.$http, self.url, data.data);
             })
         }
 
