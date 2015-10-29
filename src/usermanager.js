@@ -2,86 +2,16 @@
 
 import User from './user';
 import GenericDao from './GenericDao'
+import DaoHelper from './DaoHelper'
 
-class UserManager extends GenericDao{
-
-
-    constructor($http, url){
-        super($http, url, User);
-        this.$http   = $http;
-        this.rootUrl = url;
-    }
-
-
-    getNew(){
-        return new User(this.$http, this.rootUrl);
-    }
-
-    getList(params){
-        var self = this;
-        return this.$http.get(this.rootUrl, {params: params}).then(function(data){
-            return {
-                data    : _.map(data.data, function(user){
-                    return new User(self.$http, self.rootUrl, user);
-                }), meta: {total: data.headers('X-Total-Count')}
-            };
-        });
-    }
-
-    getById(id, populate){
-        var self   = this;
-        var params = null;
-        if (populate){
-            params = {params: {populate: populate}}
-        }
-        return this.$http.get(this.rootUrl + '/' + id, params).then(function(data){
-            return new User(self.$http, self.rootUrl, data.data);
-        })
-    }
-
-    searchByName(query){
-        var self   = this;
-        var params = {
-            conditions: {
-                $or: [
-                    {firstname: {$regex: '.*' + query + '.*', $options: 'i'}},
-                    {lastname: {$regex: '.*' + query + '.*', $options: 'i'}}
-                ]
-            }
-        };
-        return this.$http.get(this.rootUrl, {params: params}).then(function(data){
-            return {
-                data    : _.map(data.data, function(user){
-                    return new User(self.$http, self.rootUrl, user);
-                }), meta: {total: data.headers('X-Total-Count')}
-            };
-        });
-
-    }
-
+var dao = GenericDao(User);
+class UserManager extends dao {
     getProfile(){
-        return this.$http.get(this.rootUrl + '/profile')
+        return this.$http.get(this.url + '/profile')
     }
-
 }
-
-class UserManagerProvider {
-
-
-    setRootUrl(url){
-        this.rootUrl = url;
-    }
-
-    /*@ngInject*/
-    $get($http){
-        return new UserManager($http, this.rootUrl);
-    }
-
-
-}
-
 
 angular
     .module('90Tech.user-manager', [])
-    .provider('UserManager', UserManagerProvider);
+    .provider('UserManager', DaoHelper.getProvider(UserManager));
 

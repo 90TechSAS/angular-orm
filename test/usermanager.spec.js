@@ -2,7 +2,7 @@
     'use strict';
 
 
-    describe('AuthService', function(){
+    describe('UserManager', function(){
 
         var fakeUrl = 'http://fakeurl/users';
 
@@ -55,17 +55,22 @@
             });
 
             it('should have set rootUrl', function(){
-                expect(UserManager.rootUrl).toEqual(fakeUrl);
+                expect(UserManager.url).toEqual(fakeUrl);
+            });
+
+            it('should get by id', function(){
+                httpBackend.expectGET(fakeUrl + '/ididid').respond();
+                UserManager.getById('ididid');
             });
 
             it('should query usersList', function(){
                 httpBackend.expectGET(fakeUrl).respond();
-                UserManager.getList();
+                UserManager.get();
             });
 
             it('should retrieve the list', function(){
                 httpBackend.expectGET(fakeUrl).respond([fakeUser]);
-                UserManager.getList().then(function(userList){
+                UserManager.get().then(function(userList){
                     expect(userList.data.length).toEqual(1);
                 });
                 httpBackend.flush();

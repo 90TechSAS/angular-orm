@@ -5,51 +5,121 @@ Object.defineProperty(exports, '__esModule', {
 });
 // istanbul ignore next
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+// istanbul ignore next
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 // istanbul ignore next
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-var User = (function () {
-    _createClass(User, null, [{
-        key: 'getModel',
-        value: function getModel() {
-            return [{ field: '_id', type: 'string' }, { field: '__v', type: 'int' }, { field: 'createdAt', type: 'datetime' }, { field: 'email', type: 'string' }, { field: 'firstname', type: 'string' }, { field: 'lastname', type: 'string' }, { field: 'isArchived', type: 'boolean' }, { field: 'windowsDevices', type: 'array' }, { field: 'iOSDevices', type: 'array' }, { field: 'androidDevices', type: 'array' }, { field: 'companies', type: 'array' }, { field: 'recoveryEmails', type: 'array' }, { field: 'permissions', type: 'array' }, { field: 'id', type: 'string' }];
-        }
-    }]);
+// istanbul ignore next
 
-    function User($http, rootUrl, options) {
-        // istanbul ignore next
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-        var _this = this;
+var _ActiveRecord2 = require('./ActiveRecord');
 
+var _ActiveRecord3 = _interopRequireDefault(_ActiveRecord2);
+
+var User = (function (_ActiveRecord) {
+    _inherits(User, _ActiveRecord);
+
+    function User() {
         _classCallCheck(this, User);
 
-        this.$http = $http;
-        this.rootUrl = rootUrl;
-        _.each(User.getModel(), function (field) {
-            if (options && options[field.field]) {
-                _this[field.field] = _.clone(options[field.field]);
-            } else if (field.type === 'array') {
-                _this[field.field] = [];
-            }
-        });
+        _get(Object.getPrototypeOf(User.prototype), 'constructor', this).apply(this, arguments);
     }
 
-    _createClass(User, [{
-        key: 'save',
-        value: function save() {
-            if (this._id) {
-                return this.$http.put(this.rootUrl + '/' + this._id, this);
-            } else {
-                return this.$http.post(this.rootUrl, this);
-            }
-        }
-    }]);
-
     return User;
-})();
+})(_ActiveRecord3['default']);
 
 exports['default'] = User;
+
+User.model = {
+
+    _id: {
+        type: String,
+        unique: true
+    },
+
+    //private: true
+    email: {
+        type: String,
+        unique: true,
+        required: true
+    },
+
+    recoveryEmails: [{
+        type: String
+    }],
+
+    password: {
+        type: String,
+        required: true,
+        'private': true,
+        select: false
+    },
+
+    salt: {
+        type: String,
+        required: true,
+        'private': true,
+        select: false
+    },
+
+    firstname: {
+        type: String,
+        required: true
+    },
+
+    lastname: {
+        type: String,
+        required: true
+    },
+
+    photo: {
+        type: String,
+        ref: 'Object'
+    },
+
+    permissions: {
+        type: ['Object'],
+        'private': true
+    },
+
+    companies: [{
+        type: String,
+        ref: 'Company',
+        required: true
+    }],
+
+    androidDevices: [{
+        type: String
+    }],
+
+    iOSDevices: [{
+        type: String
+    }],
+
+    windowsDevices: {
+        type: ['Object']
+    },
+
+    isDeleted: {
+        type: Boolean,
+        'default': false,
+        required: true,
+        'private': true
+    },
+
+    isArchived: {
+        type: Boolean,
+        'default': false,
+        es_indexed: true,
+        required: true
+    }
+
+};
 module.exports = exports['default'];

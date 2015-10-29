@@ -24,97 +24,33 @@ var _user = require('./user');
 
 var _user2 = _interopRequireDefault(_user);
 
-var _GenericDao2 = require('./GenericDao');
+var _GenericDao = require('./GenericDao');
 
-var _GenericDao3 = _interopRequireDefault(_GenericDao2);
+var _GenericDao2 = _interopRequireDefault(_GenericDao);
 
-var UserManager = (function (_GenericDao) {
-    _inherits(UserManager, _GenericDao);
+var _DaoHelper = require('./DaoHelper');
 
-    function UserManager($http, url) {
+var _DaoHelper2 = _interopRequireDefault(_DaoHelper);
+
+var dao = (0, _GenericDao2['default'])(_user2['default']);
+
+var UserManager = (function (_dao) {
+    _inherits(UserManager, _dao);
+
+    function UserManager() {
         _classCallCheck(this, UserManager);
 
-        _get(Object.getPrototypeOf(UserManager.prototype), 'constructor', this).call(this, $http, url, _user2['default']);
-        this.$http = $http;
-        this.rootUrl = url;
+        _get(Object.getPrototypeOf(UserManager.prototype), 'constructor', this).apply(this, arguments);
     }
 
     _createClass(UserManager, [{
-        key: 'getNew',
-        value: function getNew() {
-            return new _user2['default'](this.$http, this.rootUrl);
-        }
-    }, {
-        key: 'getList',
-        value: function getList(params) {
-            var self = this;
-            return this.$http.get(this.rootUrl, { params: params }).then(function (data) {
-                return {
-                    data: _.map(data.data, function (user) {
-                        return new _user2['default'](self.$http, self.rootUrl, user);
-                    }), meta: { total: data.headers('X-Total-Count') }
-                };
-            });
-        }
-    }, {
-        key: 'getById',
-        value: function getById(id, populate) {
-            var self = this;
-            var params = null;
-            if (populate) {
-                params = { params: { populate: populate } };
-            }
-            return this.$http.get(this.rootUrl + '/' + id, params).then(function (data) {
-                return new _user2['default'](self.$http, self.rootUrl, data.data);
-            });
-        }
-    }, {
-        key: 'searchByName',
-        value: function searchByName(query) {
-            var self = this;
-            var params = {
-                conditions: {
-                    $or: [{ firstname: { $regex: '.*' + query + '.*', $options: 'i' } }, { lastname: { $regex: '.*' + query + '.*', $options: 'i' } }]
-                }
-            };
-            return this.$http.get(this.rootUrl, { params: params }).then(function (data) {
-                return {
-                    data: _.map(data.data, function (user) {
-                        return new _user2['default'](self.$http, self.rootUrl, user);
-                    }), meta: { total: data.headers('X-Total-Count') }
-                };
-            });
-        }
-    }, {
         key: 'getProfile',
         value: function getProfile() {
-            return this.$http.get(this.rootUrl + '/profile');
+            return this.$http.get(this.url + '/profile');
         }
     }]);
 
     return UserManager;
-})(_GenericDao3['default']);
+})(dao);
 
-var UserManagerProvider = (function () {
-    function UserManagerProvider() {
-        _classCallCheck(this, UserManagerProvider);
-    }
-
-    _createClass(UserManagerProvider, [{
-        key: 'setRootUrl',
-        value: function setRootUrl(url) {
-            this.rootUrl = url;
-        }
-
-        /*@ngInject*/
-    }, {
-        key: '$get',
-        value: function $get($http) {
-            return new UserManager($http, this.rootUrl);
-        }
-    }]);
-
-    return UserManagerProvider;
-})();
-
-angular.module('90Tech.user-manager', []).provider('UserManager', UserManagerProvider);
+angular.module('90Tech.user-manager', []).provider('UserManager', _DaoHelper2['default'].getProvider(UserManager));
