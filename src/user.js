@@ -3,12 +3,8 @@
 
 import ActiveRecord from './ActiveRecord'
 
-export default class User extends ActiveRecord {
 
-}
-
-
-User.model = {
+var model = {
 
     _id: {
         type: String,
@@ -94,4 +90,8 @@ User.model = {
 
 };
 
+
+var User = ActiveRecord(model);
+
+export default User;
 
