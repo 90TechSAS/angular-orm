@@ -59,15 +59,10 @@ export default function GenericDao(model){
 
         search(term){
             if (term){
-                this.setQuery({
-                    $or: [
-                        {firstname: {$regex: '.*' + term + '.*', $options: 'i'}},
-                        {lastname: {$regex: '.*' + term + '.*', $options: 'i'}}
-                    ]
-                })
+                this.setQuery({name: {$regex: '.*' + term + '.*', $options: 'i'}})
             }
             return this;
-        }
+        };
 
 
         get(){
