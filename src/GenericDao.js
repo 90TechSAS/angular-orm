@@ -10,7 +10,7 @@ export default function GenericDao(model){
         }
 
         getNew(){
-            return new self.model();
+            return new this.model(this.$injector, this.url);
         }
 
         setQuery(query){
