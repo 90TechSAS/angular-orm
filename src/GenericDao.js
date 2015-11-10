@@ -9,6 +9,10 @@ export default function GenericDao(model){
 
         }
 
+        getNew(){
+            return new self.model();
+        }
+
         setQuery(query){
             this.opts            = this.opts || {};
             this.opts.conditions = this.opts.conditions || {};
