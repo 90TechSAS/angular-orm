@@ -86,7 +86,7 @@ export default function GenericDao(model){
             var self   = this;
             var params = null;
             if (this.opts && this.opts.populate){
-                params = {params: {populate: populate}}
+                params = {params: {populate: this.opts.populate}}
             }
             return this.$http.get(this.url + '/' + id, params).then(function(data){
                 delete self.opts;
