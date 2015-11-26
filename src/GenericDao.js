@@ -1,102 +1,127 @@
-export default function GenericDao(model){
+import ServiceLocator from './ServiceLocator';
+import QueryBuilder from './QueryBuilder';
 
-    return class {
-        constructor($injector, url){
+export default function GenericDao(model, qb){
+    let myClass = class {
+        constructor(url){
+            //  this.$injector = $injector;
+            //   this.$http     = $injector.get('$http');
+            this.url   = url;
+            this.model = model
+        }
+
+        get $http(){
+            return this.$injector.get('$http');
+        }
+
+        setInjector($injector){
             this.$injector = $injector;
-            this.$http     = $injector.get('$http');
-            this.url       = url;
-            this.model     = model
-
         }
 
-        getNew(){
-            return new this.model(this.$injector, this.url);
+        getModel(){
+            return model;
         }
 
-        setQuery(query){
-            this.opts            = this.opts || {};
-            this.opts.conditions = this.opts.conditions || {};
-            _.merge(this.opts.conditions, query);
+
+        createModel(options){
+            return this.create(options);
         }
 
-        select(ids, key){
-            var k = key || '_id';
-            if (ids && ids.length){
-                var obj = {};
-                obj[k]  = {$in: ids};
-                this.setQuery(obj);
-            }
-            return this;
+        query(q){
+            return qb ? new qb(this, q) : new QueryBuilder(this, q);
         }
 
-        populate(populateArray){
-            if (populateArray){
-                this.opts          = this.opts || {};
-                this.opts.populate = JSON.stringify(populateArray);
-            }
-            return this;
-        }
-
-        archived(isArchived){
-            this.opts = this.opts || {};
-            if (isArchived){
-                this.opts.archived = isArchived;
-            }
-            return this;
-        }
-
-        paginate(pagination){
-            this.opts = this.opts || {};
-            if (pagination){
-                this.opts = _.merge(this.opts, pagination);
-            }
-            return this;
-        }
-
-        sort(sortField){
-            this.opts = this.opts || {};
-            if (sortField){
-                this.opts = _.merge(this.opts, {sort: sortField});
-            }
-            return this;
-        }
-
-        search(term){
-            if (term){
-                this.setQuery({name: {$regex: '.*' + term + '.*', $options: 'i'}})
-            }
-            return this;
-        };
-
-
-        get(){
+        get(qb = this.query()){
             var self = this;
-            return this.$http.get(this.url, {params: this.opts}).then(function(data){
-                delete self.opts;
+            return this.$http.get(this.url, {params: qb.opts}).then((data)=>{
                 return {
-                    data    : _.map(data.data, function(d){
-                        return new self.model(self.$injector, self.url, d);
-                    }), meta: {total: data.headers('X-Total-Count')}
+                    data: data.data.map(this.build, this), meta: {total: data.headers('X-Total-Count')}
                 };
-            });
+            })
         }
 
-
-        getById(id){
-            var self   = this;
-            var params = null;
-            if (this.opts && this.opts.populate){
-                params = {params: {populate: this.opts.populate}}
+        build(data){
+            if (!data) return;
+            if (typeof(data) === 'string'){
+                return data;
             }
-            return this.$http.get(this.url + '/' + id, params).then(function(data){
-                delete self.opts;
-                return new self.model(self.$injector, self.url, data.data);
+            if (Array.isArray(data)){
+                return data.map(this.build, this);
+            }
+            return new model(this.$injector, this.url, data);
+        }
+
+        post(qb = this.query()){
+            var options = _.clone(qb.opts) || {};
+            var condition;
+            switch (options.archived){
+                case 'both':
+                    condition = '(this.isArchived == false || this.isArchived == true) && (this.isDeleted == false)';
+                    break;
+                case 'true':
+                    condition = '(this.isArchived == true) && (this.isDeleted == false)';
+                    break;
+                default:
+                    condition = '(this.isArchived == false) && (this.isDeleted == false)';
+            }
+            _.set(options, ['conditions', '$where'], condition);
+            return this.$http.post(this.url + '/filters', options).then((response)=>{
+                return {meta: {total: response.headers('X-Total-Count')}, data: response.data.map(this.build, this)};
             })
         }
 
         create(params){
             return new this.model(this.$injector, this.url, params);
         }
+    };
+
+
+    function extractId(obj){
+        if (Array.isArray(obj))
+            return obj.map(extractId);
+        if (typeof obj === 'string')
+            return obj;
+        /* TODO good idea ?
+         if (!obj._id)
+         throw 'Cannot find property id of object'; */
+        return obj._id;
     }
+
+    _.forIn(model.getModel(), function(value, key){
+        var v = Array.isArray(value) ? value[0] : value;
+        if (key === '_id'){
+            myClass.prototype['findById'] = myClass.prototype['getById'] = function(value, qb = this.query){
+                return this.$http.get(this.url + '/' + value, {params: qb.opts}).then((data)=>{
+                    return new model(this.$injector, this.url, data.data);
+                })
+            }
+        } else{
+            myClass.prototype['selectBy' + _.capitalize(key)] = function(toSelect, qb = this.query()){
+                if (toSelect && toSelect.length){
+                    if (value.ref){
+                        toSelect = extractId(toSelect);
+                    }
+                    var obj = {};
+                    if (typeof toSelect === 'string'){
+                        obj[key] = toSelect;
+                    } else if (Array.isArray(toSelect)){
+                        obj[key] = (toSelect.length === 1) ? toSelect[0] : {$in: toSelect};
+                    } else{
+                        obj[key] = toSelect;
+                    }
+                    qb.setQuery(obj);
+                }
+                return this.$http.get(this.url, {params: qb.opts}).then((data)=>{
+                    return {
+                        data: data.data.map(this.build, this), meta: {total: data.headers('X-Total-Count')}
+                    };
+                })
+            }
+
+        }
+        //myClass.prototype
+    })
+
+    return myClass;
 }
 

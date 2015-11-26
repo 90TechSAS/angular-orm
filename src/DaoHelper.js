@@ -1,3 +1,4 @@
+import ServiceLocator from './ServiceLocator'
 
 export default class DaoHelper{
 
@@ -9,18 +10,33 @@ export default class DaoHelper{
      * @returns {$ES6_ANONYMOUS_CLASS$}
      */
     static getProvider(dao){
+        let sl      = ServiceLocator.instance;
+
         return class {
+
+            constructor(){
+               this.dao = new dao();
+                sl.registerDao(this.dao.getModel().getName(), this.dao)
+            }
 
 
             setRootUrl(url){
-                this.rootUrl = url;
+                this.dao.url = url;
             }
 
-            /*@ngInject*/
-            $get($injector){
-                return new dao($injector, this.rootUrl);
+            $get(){
+                return this.dao;
             }
         }
+    }
+
+
+    static registerService(module, name, dao){
+        module
+            .provider(name, DaoHelper.getProvider(dao))
+            .run([name, '$injector', function(service, $injector){
+                service.setInjector($injector);
+            }])
     }
 
 
