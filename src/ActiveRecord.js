@@ -20,9 +20,9 @@ export default function ActiveRecord(model, name){
             this.rootUrl = rootUrl;
             _.each(model, (field, key)=>{
                 if (options && options[key]){
-                    var name = _.isArray(field) ? field[0].ref : field.ref;
-                    var dao =   sl.getDao(name);
-                    this[key] = dao ? dao.build( _.clone(options[key])) : this.buildField(field, options[key]);
+                    var name  = _.isArray(field) ? field[0].ref : field.ref;
+                    var dao   = sl.getDao(name);
+                    this[key] = dao ? dao.build(_.clone(options[key])) : this.buildField(field, options[key]);
                 } else if (_.isArray(field)){
                     this[key] = [];
                 }
@@ -68,7 +68,27 @@ export default function ActiveRecord(model, name){
             var $q       = this.$injector.get('$q');
             var deferred = $q.defer();
             var self     = this;
-            if (!this[field] || typeof this[field] === 'object'){
+            if (Array.isArray(model[field]) && Array.isArray(this[field]) && this[field].length){
+                var ids  = this[field].map((i)=>{
+                    return (typeof i === 'string') ? i : i._id;
+                })
+                var name = model[field].ref;
+                if (!name)
+                    deferred.reject('Cannot Populate: unknown model');
+                else{
+                    var dao = sl.getDao(name);
+                    if (!dao){
+                        deferred.reject('Cannot Populate: unknown DAO');
+                    } else{
+                        return dao.select(i).then((d)=>{
+                            this[field] = d.data;
+                            return this;
+                        })
+                    }
+                }
+            }
+
+            if (!this[field] || (typeof this[field] === 'object')){
                 // The field is empty or already populated. return.
                 deferred.resolve(this[field]);
             } else{
@@ -97,16 +117,17 @@ export default function ActiveRecord(model, name){
         beforeSave(obj){
             obj = obj || _.cloneDeep(this);
             _.each(model, (field, key)=>{
-                if (obj[key] && (field.ref || (_.isArray(field) && field[0].ref))){
+                if (obj[key] && (field.ref || (_.isArray(field) && field[0].ref))){
 
                     if (_.isArray(obj[key])){
-                        obj[key] = obj[key].map((val) => {
-                            return val._id || val;})
-                    } else {
+                        obj[key] = obj[key].map((val) =>{
+                            return val._id || val;
+                        })
+                    } else{
                         obj[key] = obj[key]._id || obj[key];
                     }
-                } else if (obj[key] && (field.type=== Date || (_.isArray(field) && field[0].type === Date))){
-                    obj[key] =  new Date(moment(obj[key])).toISOString();
+                } else if (obj[key] && (field.type === Date || (_.isArray(field) && field[0].type === Date))){
+                    obj[key] = new Date(moment(obj[key])).toISOString();
                 }
             });
             return obj;
@@ -114,7 +135,7 @@ export default function ActiveRecord(model, name){
         }
 
         save(){
-            var toSave =  this.beforeSave();
+            var toSave = this.beforeSave();
             if (this._id){
                 return this.$http.put(this.rootUrl + '/' + this._id, toSave)
             } else{
@@ -128,7 +149,7 @@ export default function ActiveRecord(model, name){
 
         static makePopObject(pop){
             return _.map(pop, function(p, k){
-                p = Array.isArray(p) ? p[0] : p;
+                p       = Array.isArray(p) ? p[0] : p;
                 var ob  = {path: k};
                 var sub = ActiveRecord.findSubPopulates(p.ref);
                 if (sub && sub.length){

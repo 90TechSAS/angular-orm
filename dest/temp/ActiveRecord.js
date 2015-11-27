@@ -84,9 +84,31 @@ function ActiveRecord(model, name) {
         }, {
             key: 'populate',
             value: function populate(field) {
+                // istanbul ignore next
+
+                var _this2 = this;
+
                 var $q = this.$injector.get('$q');
                 var deferred = $q.defer();
                 var self = this;
+                if (Array.isArray(model[field]) && Array.isArray(this[field]) && this[field].length) {
+                    var ids = this[field].map(function (i) {
+                        return typeof i === 'string' ? i : i._id;
+                    });
+                    var name = model[field].ref;
+                    if (!name) deferred.reject('Cannot Populate: unknown model');else {
+                        var dao = sl.getDao(name);
+                        if (!dao) {
+                            deferred.reject('Cannot Populate: unknown DAO');
+                        } else {
+                            return dao.select(i).then(function (d) {
+                                _this2[field] = d.data;
+                                return _this2;
+                            });
+                        }
+                    }
+                }
+
                 if (!this[field] || typeof this[field] === 'object') {
                     // The field is empty or already populated. return.
                     deferred.resolve(this[field]);
