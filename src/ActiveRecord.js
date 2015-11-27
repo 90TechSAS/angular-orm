@@ -29,6 +29,10 @@ export default function ActiveRecord(model, name){
             });
         }
 
+        clone(){
+            return new ActiveRecord(this.$injector, this.$rootUrl, this);
+        }
+
         get $injector(){
             return this._injector;
         }
@@ -72,7 +76,7 @@ export default function ActiveRecord(model, name){
                 var ids  = this[field].map((i)=>{
                     return (typeof i === 'string') ? i : i._id;
                 })
-                var name = model[field].ref;
+                var name = model[field][Ø].ref;
                 if (!name)
                     deferred.reject('Cannot Populate: unknown model');
                 else{
@@ -80,7 +84,7 @@ export default function ActiveRecord(model, name){
                     if (!dao){
                         deferred.reject('Cannot Populate: unknown DAO');
                     } else{
-                        return dao.select(i).then((d)=>{
+                        return dao.get(dao.query().select(id)).then((d)=>{
                             this[field] = d.data;
                             return this;
                         })
