@@ -30,7 +30,8 @@ export default function ActiveRecord(model, name){
         }
 
         clone(){
-            return new ActiveRecord(this.$injector, this.$rootUrl, this);
+            var m = sl.getModel(name);
+            return new m(this.$injector, this.$rootUrl, this);
         }
 
         get $injector(){
@@ -76,7 +77,7 @@ export default function ActiveRecord(model, name){
                 var ids  = this[field].map((i)=>{
                     return (typeof i === 'string') ? i : i._id;
                 })
-                var name = model[field][Ø].ref;
+                var name = model[field][0].ref;
                 if (!name)
                     deferred.reject('Cannot Populate: unknown model');
                 else{
@@ -84,7 +85,7 @@ export default function ActiveRecord(model, name){
                     if (!dao){
                         deferred.reject('Cannot Populate: unknown DAO');
                     } else{
-                        return dao.get(dao.query().select(id)).then((d)=>{
+                        return dao.get(dao.query().select(ids)).then((d)=>{
                             this[field] = d.data;
                             return this;
                         })
