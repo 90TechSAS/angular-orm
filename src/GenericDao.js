@@ -2,6 +2,8 @@ import ServiceLocator from './ServiceLocator';
 import QueryBuilder from './QueryBuilder';
 
 export default function GenericDao(model, qb){
+    let sl           = ServiceLocator.instance;
+    sl.registerModel(model.getName(), model);
     let myClass = class {
         constructor(url){
             //  this.$injector = $injector;

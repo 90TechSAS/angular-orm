@@ -31,7 +31,9 @@ export default function ActiveRecord(model, name){
 
         clone(){
             var m = sl.getModel(name);
-            return new m(this.$injector, this.$rootUrl, this);
+            var ob = new m(this.$injector, this.rootUrl, this);
+            delete ob._id;
+            return ob;
         }
 
         get $injector(){
@@ -199,6 +201,6 @@ export default function ActiveRecord(model, name){
         }
 
     };
-    sl.registerModel(name, ActiveRecord);
+ //   sl.registerModel(name, ActiveRecord);
     return ActiveRecord;
 }
