@@ -146,7 +146,10 @@ export default function ActiveRecord(model, name){
             if (this._id){
                 return this.$http.put(this.rootUrl + '/' + this._id, toSave)
             } else{
-                return this.$http.post(this.rootUrl, toSave);
+                return this.$http.post(this.rootUrl, toSave).then((data)=>{
+                    this._id = data.data._id;
+                    return data;
+                });
             }
         }
 

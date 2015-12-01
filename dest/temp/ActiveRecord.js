@@ -57,6 +57,14 @@ function ActiveRecord(model, name) {
         }
 
         _createClass(ActiveRecord, [{
+            key: 'clone',
+            value: function clone() {
+                var m = sl.getModel(name);
+                var ob = new m(this.$injector, this.rootUrl, this);
+                delete ob._id;
+                return ob;
+            }
+        }, {
             key: 'buildField',
             value: function buildField(model, value) {
                 return _.clone(value);
@@ -95,13 +103,13 @@ function ActiveRecord(model, name) {
                     var ids = this[field].map(function (i) {
                         return typeof i === 'string' ? i : i._id;
                     });
-                    var name = model[field].ref;
+                    var name = model[field][0].ref;
                     if (!name) deferred.reject('Cannot Populate: unknown model');else {
                         var dao = sl.getDao(name);
                         if (!dao) {
                             deferred.reject('Cannot Populate: unknown DAO');
                         } else {
-                            return dao.select(i).then(function (d) {
+                            return dao.get(dao.query().select(ids)).then(function (d) {
                                 _this2[field] = d.data;
                                 return _this2;
                             });
@@ -228,7 +236,7 @@ function ActiveRecord(model, name) {
 
         return ActiveRecord;
     })();
-    sl.registerModel(name, ActiveRecord);
+    //   sl.registerModel(name, ActiveRecord);
     return ActiveRecord;
 }
 

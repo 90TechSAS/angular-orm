@@ -25,6 +25,8 @@ var _QueryBuilder = require('./QueryBuilder');
 var _QueryBuilder2 = _interopRequireDefault(_QueryBuilder);
 
 function GenericDao(model, qb) {
+    var sl = _ServiceLocator2['default'].instance;
+    sl.registerModel(model.getName(), model);
     var myClass = (function () {
         function myClass(url) {
             _classCallCheck(this, myClass);
