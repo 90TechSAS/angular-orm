@@ -42,6 +42,11 @@ export default function GenericDao(model, qb){
             })
         }
 
+        count(qb= this.query()){
+            var params = _.merge(qb.opts, {count:true});
+            return this.$http.get(this.url, {params: params});
+        }
+
         build(data){
             if (!data) return;
             if (typeof(data) === 'string'){

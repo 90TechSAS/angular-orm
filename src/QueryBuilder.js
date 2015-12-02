@@ -27,14 +27,6 @@ export default class QueryBuilder {
         return this;
     }
 
-    count(bool){
-        this.opts = this.opts || {};
-        if (bool){
-            this.opts.count = bool;
-        }
-        return this;
-    }
-
     populate(populateArray){
         if (populateArray){
             this.opts          = this.opts || {};
