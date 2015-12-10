@@ -31,6 +31,7 @@ export default function ActiveRecord(model, name){
                     this[key] = [];
                 }
             });
+            return this;
 
         }
 
@@ -150,11 +151,13 @@ export default function ActiveRecord(model, name){
             var toSave = this.beforeSave();
             if (this._id){
                 return this.$http.put(this.rootUrl + '/' + this._id, toSave).then((data)=>{
-                    return this.build(data);
+                    this.build(data.data);
+                    return data;
                 })
             } else{
                 return this.$http.post(this.rootUrl, toSave).then((data)=>{
-                    return this.build(data);
+                    this.build(data.data);
+                    return data;
                 });
             }
         }
