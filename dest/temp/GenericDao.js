@@ -74,6 +74,14 @@ function GenericDao(model, qb) {
                 });
             }
         }, {
+            key: 'count',
+            value: function count() {
+                var qb = arguments.length <= 0 || arguments[0] === undefined ? this.query() : arguments[0];
+
+                var params = _.merge(qb.opts, { count: true });
+                return this.$http.get(this.url, { params: params });
+            }
+        }, {
             key: 'build',
             value: function build(data) {
                 if (!data) return;

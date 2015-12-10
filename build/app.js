@@ -37,27 +37,32 @@ function ActiveRecord(model, name) {
     var sl = _ServiceLocator2['default'].instance;
     var ActiveRecord = (function () {
         function ActiveRecord($injector, rootUrl, options) {
-            // istanbul ignore next
-
-            var _this = this;
-
             _classCallCheck(this, ActiveRecord);
 
             this.$injector = $injector;
             //  this.$http     = $injector.get('$http');
             this.rootUrl = rootUrl;
-            _.each(model, function (field, key) {
-                if (options && options[key]) {
-                    var name = _.isArray(field) ? field[0].ref : field.ref;
-                    var dao = sl.getDao(name);
-                    _this[key] = dao ? dao.build(_.clone(options[key])) : _this.buildField(field, options[key]);
-                } else if (_.isArray(field)) {
-                    _this[key] = [];
-                }
-            });
+            this.build(options);
         }
 
         _createClass(ActiveRecord, [{
+            key: 'build',
+            value: function build(options) {
+                // istanbul ignore next
+
+                var _this = this;
+
+                _.each(model, function (field, key) {
+                    if (options && options[key]) {
+                        var name = _.isArray(field) ? field[0].ref : field.ref;
+                        var dao = sl.getDao(name);
+                        _this[key] = dao ? dao.build(_.clone(options[key])) : _this.buildField(field, options[key]);
+                    } else if (_.isArray(field)) {
+                        _this[key] = [];
+                    }
+                });
+            }
+        }, {
             key: 'clone',
             value: function clone() {
                 var m = sl.getModel(name);
@@ -161,11 +166,19 @@ function ActiveRecord(model, name) {
         }, {
             key: 'save',
             value: function save() {
+                // istanbul ignore next
+
+                var _this3 = this;
+
                 var toSave = this.beforeSave();
                 if (this._id) {
-                    return this.$http.put(this.rootUrl + '/' + this._id, toSave);
+                    return this.$http.put(this.rootUrl + '/' + this._id, toSave).then(function (data) {
+                        return _this3.build(data);
+                    });
                 } else {
-                    return this.$http.post(this.rootUrl, toSave);
+                    return this.$http.post(this.rootUrl, toSave).then(function (data) {
+                        return _this3.build(data);
+                    });
                 }
             }
         }, {
@@ -393,6 +406,14 @@ function GenericDao(model, qb) {
                         data: data.data.map(_this.build, _this), meta: { total: data.headers('X-Total-Count') }
                     };
                 });
+            }
+        }, {
+            key: 'count',
+            value: function count() {
+                var qb = arguments.length <= 0 || arguments[0] === undefined ? this.query() : arguments[0];
+
+                var params = _.merge(qb.opts, { count: true });
+                return this.$http.get(this.url, { params: params });
             }
         }, {
             key: 'build',

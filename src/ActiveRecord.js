@@ -18,6 +18,10 @@ export default function ActiveRecord(model, name){
             this.$injector = $injector;
             //  this.$http     = $injector.get('$http');
             this.rootUrl = rootUrl;
+            this.build(options);
+        }
+
+        build(options){
             _.each(model, (field, key)=>{
                 if (options && options[key]){
                     var name  = _.isArray(field) ? field[0].ref : field.ref;
@@ -27,6 +31,7 @@ export default function ActiveRecord(model, name){
                     this[key] = [];
                 }
             });
+
         }
 
         clone(){
@@ -144,11 +149,12 @@ export default function ActiveRecord(model, name){
         save(){
             var toSave = this.beforeSave();
             if (this._id){
-                return this.$http.put(this.rootUrl + '/' + this._id, toSave)
+                return this.$http.put(this.rootUrl + '/' + this._id, toSave).then((data)=>{
+                    return this.build(data);
+                })
             } else{
                 return this.$http.post(this.rootUrl, toSave).then((data)=>{
-                    this._id = data.data._id;
-                    return data;
+                    return this.build(data);
                 });
             }
         }
