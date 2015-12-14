@@ -55,11 +55,20 @@ function ActiveRecord(model, name) {
                     if (options && options[key]) {
                         var name = _.isArray(field) ? field[0].ref : field.ref;
                         var dao = sl.getDao(name);
-                        _this[key] = dao ? dao.build(_.clone(options[key])) : _this.buildField(field, options[key]);
+                        if (dao) {
+                            if (!_this[key] || typeof _this[key] === 'string' || typeof options[key] === 'object') {
+                                // If new object contains unpopulated fields, but previous object had the info, don't delete it.
+                                // Happens a lot during savings, since you can't specify populates on save.
+                                _this[key] = dao.build(_.clone(options[key]));
+                            }
+                        } else {
+                            _this[key] = _this.buildField(field, options[key]);
+                        }
                     } else if (_.isArray(field)) {
                         _this[key] = [];
                     }
                 });
+                return this;
             }
         }, {
             key: 'clone',
@@ -172,11 +181,13 @@ function ActiveRecord(model, name) {
                 var toSave = this.beforeSave();
                 if (this._id) {
                     return this.$http.put(this.rootUrl + '/' + this._id, toSave).then(function (data) {
-                        return _this3.build(data);
+                        _this3.build(data.data);
+                        return data;
                     });
                 } else {
                     return this.$http.post(this.rootUrl, toSave).then(function (data) {
-                        return _this3.build(data);
+                        _this3.build(data.data);
+                        return data;
                     });
                 }
             }

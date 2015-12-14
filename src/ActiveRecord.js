@@ -24,9 +24,17 @@ export default function ActiveRecord(model, name){
         build(options){
             _.each(model, (field, key)=>{
                 if (options && options[key]){
-                    var name  = _.isArray(field) ? field[0].ref : field.ref;
-                    var dao   = sl.getDao(name);
-                    this[key] = dao ? dao.build(_.clone(options[key])) : this.buildField(field, options[key]);
+                    var name = _.isArray(field) ? field[0].ref : field.ref;
+                    var dao = sl.getDao(name);
+                    if (dao){
+                        if (!this[key] || typeof(this[key])==='string' || (typeof(options[key]) === 'object')){
+                            // If new object contains unpopulated fields, but previous object had the info, don't delete it.
+                            // Happens a lot during savings, since you can't specify populates on save.
+                            this[key] = dao.build(_.clone(options[key]));
+                        }
+                    } else {
+                        this[key] = this.buildField(field, options[key])
+                    }
                 } else if (_.isArray(field)){
                     this[key] = [];
                 }

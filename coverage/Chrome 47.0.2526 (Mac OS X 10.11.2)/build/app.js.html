@@ -20,14 +20,14 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">90.98% </span>
+        <span class="strong">90.91% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>555/610</span>
+        <span class='fraction'>560/616</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">78.37% </span>
+        <span class="strong">77.84% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>279/356</span>
+        <span class='fraction'>281/361</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">90.85% </span>
@@ -35,9 +35,9 @@
         <span class='fraction'>129/142</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">88.2% </span>
+        <span class="strong">88.13% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>329/373</span>
+        <span class='fraction'>334/379</span>
       </div>
       <div class='fl pad1y'>
         <span class="strong">71 statements, 71 branches</span>
@@ -1003,7 +1003,18 @@
 954
 955
 956
-957</td><td class="line-coverage quiet"><span class="cline-any cline-yes">16×</span>
+957
+958
+959
+960
+961
+962
+963
+964
+965
+966
+967
+968</td><td class="line-coverage quiet"><span class="cline-any cline-yes">16×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1062,10 +1073,19 @@
 <span class="cline-any cline-yes">5×</span>
 <span class="cline-any cline-yes">5×</span>
 <span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">9×</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1179,8 +1199,10 @@
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -2017,11 +2039,20 @@ function ActiveRecord(model, name) {
                     if (options &amp;&amp; options[key]) {
                         var name = _.isArray(field) ? <span class="branch-0 cbranch-no" title="branch not covered" >field[0].ref </span>: field.ref;
                         var dao = sl.getDao(name);
-                        _this[key] = dao ? dao.build(_.clone(options[key])) : _this.buildField(field, options[key]);
+                        if (dao) {
+                            <span class="missing-if-branch" title="else path not taken" >E</span>if (!_this[key] || <span class="branch-1 cbranch-no" title="branch not covered" >typeof _this[key] === 'string' </span>|| <span class="branch-2 cbranch-no" title="branch not covered" >typeof options[key] === 'object')</span> {
+                                // If new object contains unpopulated fields, but previous object had the info, don't delete it.
+                                // Happens a lot during savings, since you can't specify populates on save.
+                                _this[key] = dao.build(_.clone(options[key]));
+                            }
+                        } else {
+                            _this[key] = _this.buildField(field, options[key]);
+                        }
                     } else <span class="missing-if-branch" title="if path not taken" >I</span>if (_.isArray(field)) {
 <span class="cstat-no" title="statement not covered" >                        _this[key] = [];</span>
                     }
                 });
+                return this;
             }
         }, {
             key: 'clone',
@@ -2134,11 +2165,13 @@ function ActiveRecord(model, name) {
                 var toSave = this.beforeSave();
                 <span class="missing-if-branch" title="else path not taken" >E</span>if (this._id) {
                     return this.$http.put(this.rootUrl + '/' + this._id, toSave).then(function (data) {
-                        return _this3.build(data);
+                        _this3.build(data.data);
+                        return data;
                     });
                 } else {
 <span class="cstat-no" title="statement not covered" >                    return this.$http.post(this.rootUrl, toSave).then(<span class="fstat-no" title="function not covered" >function (data) {</span></span>
-<span class="cstat-no" title="statement not covered" >                        return _this3.build(data);</span>
+<span class="cstat-no" title="statement not covered" >                        _this3.build(data.data);</span>
+<span class="cstat-no" title="statement not covered" >                        return data;</span>
                     });
                 }
             }
@@ -2921,7 +2954,7 @@ module.exports = exports['default'];
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Thu Dec 10 2015 11:11:14 GMT+0100 (CET)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Mon Dec 14 2015 15:12:30 GMT+0100 (CET)
 </div>
 </div>
 <script src="../prettify.js"></script>
