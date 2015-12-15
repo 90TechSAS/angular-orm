@@ -210,7 +210,7 @@ export default function ActiveRecord(model, name){
             var toPopulate = populateArray ? _.pick(pop, function(p, k){
                 return _.contains(populateArray, k);
             }) : _.pick(pop, function(v){
-                return v.populateDefault
+                return v.populateDefault || (v[0] && v[0].populateDefault);
             });
             return ActiveRecord.makePopObject(toPopulate);
 
