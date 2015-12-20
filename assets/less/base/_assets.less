@@ -1,0 +1,243 @@
+// ==========================================================================
+// Base – Assets
+// ==========================================================================
+
+// Custom Buttons
+.menu-toggle {
+    width: 26px;
+    height: 30px;
+    position: fixed;
+    top: 20px;
+    left: 25px;
+    cursor: pointer;
+    z-index: 11;
+    &:before{
+      content:'menu';
+      font-weight:900;
+      font-family: @link-font-family;
+      position:absolute;
+      text-transform: uppercase;
+      margin-left:35px;
+      display: inline-block;
+    }
+}
+
+.menu-toggle.on {
+    .one,.two,.three{
+      background:@base-background-color;
+    }
+    .one {
+        .transform(rotate(45deg) translate(6px, 6px));
+    }
+    .two {
+        opacity: 0;
+    }
+    .three {
+        .transform(rotate(-45deg) translate(3px, -4px));
+    }
+    &:before{
+      content:'close';
+      color:@base-background-color;
+    }
+}
+.one,.two,.three {
+    width: 100%;
+    height: 3px;
+    background: @base-font-color;
+    margin: 4px auto;
+    backface-visibility: hidden;
+    .transition(0.6s);
+
+}
+
+.menu-section{
+    position: fixed;
+    width: 280px;
+    height: 100%;
+    margin-left:-280px;
+    background-color: @menu-background-color;
+    .transition(0.6s);
+}
+.on-menu {
+    opacity:1;
+    z-index:10;
+}
+.menu-section.on-menu{
+    .transform(translate(280px, 0px));
+}
+
+.off-menu{
+    opacity:0;
+    z-index:-10;
+}
+.menu-section.off-menu{
+    .transform(translate(-280px, 0px));
+}
+
+nav {
+    ul {
+        margin: 70px 0px 0px 0px;
+        padding: 0px;
+        font-family: @link-font-family;
+        font-weight:300;
+        list-style: none;
+        position: absolute;
+        width: 100%;
+        .animate-delay(0.6s);
+        .transition(0.6s);
+
+        a {
+            text-decoration: none;
+            color: @base-background-color;
+            font-size: 1.1rem;
+            line-height: 2.2rem;
+            width: 100%;
+            padding: 0px 0px 0px 50px;
+            display:block;
+            box-shadow:none;
+            &:hover, &:focus{
+              background-color: fadeout(@base-background-color, 80%);
+              .box-shadow(inset 0 -1px 0 lighten(@menu-background-color, 10%));
+            }
+            &:active{
+              .box-shadow(inset 0 1px 0 lighten(@menu-background-color, 10%));
+            }
+            &.active{
+              background-color: rgba(254,254,254,0.1);
+            }
+        }
+        a.active{
+            background-color: rgba(254,254,254,0.1);
+        }
+
+    }
+
+}
+
+.footer{
+  margin: 0 auto;
+  width: 530px;
+  ul{
+    margin:0px;
+  }
+  ul li{
+    float:left;
+    list-style-type:none;
+    padding:10px;
+    text-align:center;
+
+  }
+}
+.main_div h1{
+  font-weight: 900;
+  font-family: @base-font-family;
+  font-size:3rem;
+  text-align: center;
+  margin-bottom: 4rem;
+  text-transform: uppercase;
+
+}
+.space {
+    width: 100%;
+    background:url(../img/love.jpg);
+    opacity: .6;
+    height: 100vh;
+    position: fixed;
+    .cover();
+}
+
+.main-content {
+  margin-top:160px;
+}
+
+.sublime {
+  list-style: none;
+  font-size: 0.8rem;
+  position:fixed;
+  width:35%;
+  font-family: 'Source Code Pro';
+  background-color:#262728;
+  margin:0px;
+  right: 0px;
+  bottom:0px;
+  font-weight: 600;
+  padding-left:20px;
+  border-top: 25px solid #b4b4b4;
+  .box-shadow(-1px -1px 3px 0 rgba(0,0,0,.6));
+  li {
+    line-height: 20px;    
+  }
+  .blue {
+    color: #66d9ef;
+  }
+
+  .purple {
+    color: #8a7bff;
+  }
+
+  .red {
+    color: #e92772;
+  }
+
+  .green {
+    color: #a6e22d;
+  }
+
+  .orange {
+    color: #fd9720;
+  }
+
+  .yellow {
+    color: #e6db74;
+  }
+
+  .gray {
+    color: #8f908a;
+  }
+
+  .cursor:before {
+    opacity: 0;
+    content: "|";
+    color: #f1f1f1;
+    animation: blink 1.2s infinite;
+  }
+  .buttons {
+    min-height: 0;
+    position: absolute;
+    margin-top: -18px;
+    border-radius: 100%;
+    width: 13px;
+    height: 13px;
+    background-color: #ff5d5b;
+    border: 1px solid #e64344;
+
+    &:before,
+    &:after {
+      position: absolute;
+      content: "";
+      width: 13px;
+      height: 13px;  
+      border-radius: 100%;
+      top: -1px;
+    }
+
+    &:before {
+      left: 20px;
+      border: 1px solid #e3a041;
+      background-color: #ffbc4c;
+    } 
+
+    &:after {
+      left: 40px;
+      border: 1px solid #13ad46;
+      background-color: #00c956;
+    }   
+  }
+}
+.main_div{
+  padding:40px 20px 0px 20px;
+}
+
+#sublime_content{
+  min-height:65px;
+}

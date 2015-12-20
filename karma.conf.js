@@ -20,7 +20,7 @@ module.exports = function(config){
           //  'node_modules/**/*.min.js',
             'node_modules/angular-mocks/angular-mocks.js',
             {pattern: 'build/**/*.js', included: true},
-            {pattern: 'tst/specs/**/*.js', included: true}
+            {pattern: 'app/specs/**/*.js', included: true}
         ],
 
 
