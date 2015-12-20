@@ -19,9 +19,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var _modelsTstModel2Js = require('./../models/tstModel2.js');
+var _modelsUsersModelJs = require('./../models/UsersModel.js');
 
-var _modelsTstModel2Js2 = _interopRequireDefault(_modelsTstModel2Js);
+var _modelsUsersModelJs2 = _interopRequireDefault(_modelsUsersModelJs);
 
 var _GenericDao = require('../GenericDao');
 
@@ -31,20 +31,20 @@ var _QueryBuilder = require('../QueryBuilder');
 
 var _QueryBuilder2 = _interopRequireDefault(_QueryBuilder);
 
-var DAO = (0, _GenericDao2['default'])(_modelsTstModel2Js2['default']);
+var DAO = (0, _GenericDao2['default'])(_modelsUsersModelJs2['default']);
 
-var ModelManager2 = (function (_DAO) {
-  _inherits(ModelManager2, _DAO);
+var UsersModelManager = (function (_DAO) {
+  _inherits(UsersModelManager, _DAO);
 
-  function ModelManager2() {
-    _classCallCheck(this, ModelManager2);
+  function UsersModelManager() {
+    _classCallCheck(this, UsersModelManager);
 
-    _get(Object.getPrototypeOf(ModelManager2.prototype), 'constructor', this).apply(this, arguments);
+    _get(Object.getPrototypeOf(UsersModelManager.prototype), 'constructor', this).apply(this, arguments);
   }
 
-  return ModelManager2;
+  return UsersModelManager;
 })(DAO);
 
-exports['default'] = ModelManager2;
+exports['default'] = UsersModelManager;
 ;
 module.exports = exports['default'];

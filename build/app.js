@@ -739,19 +739,91 @@ var _DaoHelper = require('./DaoHelper');
 
 var _DaoHelper2 = _interopRequireDefault(_DaoHelper);
 
-var _managersTstManager1 = require('./managers/tstManager1');
+var _managersPostsManager = require('./managers/PostsManager');
 
-var _managersTstManager12 = _interopRequireDefault(_managersTstManager1);
+var _managersPostsManager2 = _interopRequireDefault(_managersPostsManager);
 
-var _managersTstManager2 = require('./managers/tstManager2');
+var _managersTagsManager = require('./managers/TagsManager');
 
-var _managersTstManager22 = _interopRequireDefault(_managersTstManager2);
+var _managersTagsManager2 = _interopRequireDefault(_managersTagsManager);
 
-var _module = angular.module('tstModule', []);
+var _managersUsersManager = require('./managers/UsersManager');
 
-_DaoHelper2['default'].registerService(_module, 'ModelManager', _managersTstManager12['default']);
-_DaoHelper2['default'].registerService(_module, 'ModelManager2', _managersTstManager22['default']);
-},{"./DaoHelper":2,"./managers/tstManager1":7,"./managers/tstManager2":8}],7:[function(require,module,exports){
+var _managersUsersManager2 = _interopRequireDefault(_managersUsersManager);
+
+var _commonDirectivesCommonDirective = require('./common/directives/common.directive');
+
+var _commonDirectivesCommonDirective2 = _interopRequireDefault(_commonDirectivesCommonDirective);
+
+var _routesHomeHomeRoute = require('./routes/home/home.route');
+
+var _routesHomeHomeRoute2 = _interopRequireDefault(_routesHomeHomeRoute);
+
+var _routesHomeControllersHomeController = require('./routes/home/controllers/home.controller');
+
+var _routesHomeControllersHomeController2 = _interopRequireDefault(_routesHomeControllersHomeController);
+
+var _module = angular.module('tstModule', ['ui.router', 'tstModule.common', 'tstModule.home']).config(["$urlRouterProvider", "PostsManagerProvider", "TagsManagerProvider", "UsersManagerProvider", function ($urlRouterProvider, PostsManagerProvider, TagsManagerProvider, UsersManagerProvider) {
+    $urlRouterProvider.otherwise("/home");
+    PostsManagerProvider.setRootUrl('https://gentle-brushlands-6591.herokuapp.com/api/posts');
+    TagsManagerProvider.setRootUrl('https://gentle-brushlands-6591.herokuapp.com/api/tags');
+    UsersManagerProvider.setRootUrl('https://gentle-brushlands-6591.herokuapp.com/api/users');
+}]);
+_DaoHelper2['default'].registerService(_module, 'PostsManager', _managersPostsManager2['default']);
+_DaoHelper2['default'].registerService(_module, 'TagsManager', _managersTagsManager2['default']);
+_DaoHelper2['default'].registerService(_module, 'UsersManager', _managersUsersManager2['default']);
+},{"./DaoHelper":2,"./common/directives/common.directive":7,"./managers/PostsManager":8,"./managers/TagsManager":9,"./managers/UsersManager":10,"./routes/home/controllers/home.controller":14,"./routes/home/home.route":15}],7:[function(require,module,exports){
+/**
+ * Created by Renaud ROHLINGER on 27/11/2015.
+ * Common directive
+ */
+
+'use strict';
+
+(function () {
+    'use strict';
+
+    angular.module('tstModule.common', []).directive('footer', FooterDirective);
+    function FooterDirective() {
+        return {
+            restrict: 'A',
+            bindToController: true,
+            templateUrl: "app/layouts/partials/footer.html",
+            controllerAs: ''
+        };
+    }
+
+    angular.module('tstModule.common').directive('header', HeaderDirective);
+
+    HeaderDirective.$inject = ['$location'];
+    function HeaderDirective($location) {
+        return {
+            restrict: 'A',
+            bindToController: true,
+            templateUrl: "app/layouts/partials/header.html",
+            controllerAs: 'header',
+            link: link
+        };
+        function link($scope, $element, $attrs, $controller) {
+            $scope.ui = {
+                animation: 'animated'
+            };
+            $scope.IsHidden = false;
+
+            $scope.ShowHide = function () {
+                $scope.IsHidden = $scope.IsHidden ? false : true;
+            };
+            $scope.getClass = function (path) {
+                if ($location.path() === '/' + path) {
+                    return 'active';
+                } else {
+                    return '';
+                }
+            };
+        }
+    }
+})();
+},{}],8:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -773,9 +845,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var _modelsTstModel1Js = require('./../models/tstModel1.js');
+var _modelsPostsModelJs = require('./../models/PostsModel.js');
 
-var _modelsTstModel1Js2 = _interopRequireDefault(_modelsTstModel1Js);
+var _modelsPostsModelJs2 = _interopRequireDefault(_modelsPostsModelJs);
 
 var _GenericDao = require('../GenericDao');
 
@@ -785,7 +857,7 @@ var _QueryBuilder = require('../QueryBuilder');
 
 var _QueryBuilder2 = _interopRequireDefault(_QueryBuilder);
 
-var DAO = (0, _GenericDao2['default'])(_modelsTstModel1Js2['default']);
+var DAO = (0, _GenericDao2['default'])(_modelsPostsModelJs2['default']);
 
 var ModelManager = (function (_DAO) {
   _inherits(ModelManager, _DAO);
@@ -802,7 +874,7 @@ var ModelManager = (function (_DAO) {
 exports['default'] = ModelManager;
 ;
 module.exports = exports['default'];
-},{"../GenericDao":3,"../QueryBuilder":4,"./../models/tstModel1.js":9}],8:[function(require,module,exports){
+},{"../GenericDao":3,"../QueryBuilder":4,"./../models/PostsModel.js":11}],9:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -824,9 +896,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var _modelsTstModel2Js = require('./../models/tstModel2.js');
+var _modelsTagsModelJs = require('./../models/TagsModel.js');
 
-var _modelsTstModel2Js2 = _interopRequireDefault(_modelsTstModel2Js);
+var _modelsTagsModelJs2 = _interopRequireDefault(_modelsTagsModelJs);
 
 var _GenericDao = require('../GenericDao');
 
@@ -836,24 +908,75 @@ var _QueryBuilder = require('../QueryBuilder');
 
 var _QueryBuilder2 = _interopRequireDefault(_QueryBuilder);
 
-var DAO = (0, _GenericDao2['default'])(_modelsTstModel2Js2['default']);
+var DAO = (0, _GenericDao2['default'])(_modelsTagsModelJs2['default']);
 
-var ModelManager2 = (function (_DAO) {
-  _inherits(ModelManager2, _DAO);
+var TagsModelManager = (function (_DAO) {
+  _inherits(TagsModelManager, _DAO);
 
-  function ModelManager2() {
-    _classCallCheck(this, ModelManager2);
+  function TagsModelManager() {
+    _classCallCheck(this, TagsModelManager);
 
-    _get(Object.getPrototypeOf(ModelManager2.prototype), 'constructor', this).apply(this, arguments);
+    _get(Object.getPrototypeOf(TagsModelManager.prototype), 'constructor', this).apply(this, arguments);
   }
 
-  return ModelManager2;
+  return TagsModelManager;
 })(DAO);
 
-exports['default'] = ModelManager2;
+exports['default'] = TagsModelManager;
 ;
 module.exports = exports['default'];
-},{"../GenericDao":3,"../QueryBuilder":4,"./../models/tstModel2.js":10}],9:[function(require,module,exports){
+},{"../GenericDao":3,"../QueryBuilder":4,"./../models/TagsModel.js":12}],10:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+// istanbul ignore next
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+// istanbul ignore next
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+// istanbul ignore next
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+// istanbul ignore next
+
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _modelsUsersModelJs = require('./../models/UsersModel.js');
+
+var _modelsUsersModelJs2 = _interopRequireDefault(_modelsUsersModelJs);
+
+var _GenericDao = require('../GenericDao');
+
+var _GenericDao2 = _interopRequireDefault(_GenericDao);
+
+var _QueryBuilder = require('../QueryBuilder');
+
+var _QueryBuilder2 = _interopRequireDefault(_QueryBuilder);
+
+var DAO = (0, _GenericDao2['default'])(_modelsUsersModelJs2['default']);
+
+var UsersModelManager = (function (_DAO) {
+  _inherits(UsersModelManager, _DAO);
+
+  function UsersModelManager() {
+    _classCallCheck(this, UsersModelManager);
+
+    _get(Object.getPrototypeOf(UsersModelManager.prototype), 'constructor', this).apply(this, arguments);
+  }
+
+  return UsersModelManager;
+})(DAO);
+
+exports['default'] = UsersModelManager;
+;
+module.exports = exports['default'];
+},{"../GenericDao":3,"../QueryBuilder":4,"./../models/UsersModel.js":13}],11:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -887,31 +1010,85 @@ var model = {
     },
 
     //private: true
-    label: String,
-
-    model2: {
+    title: String,
+    content: String,
+    user: String,
+    tags: {
         type: String,
-        ref: 'Model2'
+        ref: 'TagsModel'
     }
 };
 
-var AR = (0, _ActiveRecord2['default'])(model, 'Model1');
+var AR = (0, _ActiveRecord2['default'])(model, 'PostsModel');
 
-var Model = (function (_AR) {
-    _inherits(Model, _AR);
+var PostsModel = (function (_AR) {
+    _inherits(PostsModel, _AR);
 
-    function Model() {
-        _classCallCheck(this, Model);
+    function PostsModel() {
+        _classCallCheck(this, PostsModel);
 
-        _get(Object.getPrototypeOf(Model.prototype), 'constructor', this).apply(this, arguments);
+        _get(Object.getPrototypeOf(PostsModel.prototype), 'constructor', this).apply(this, arguments);
     }
 
-    return Model;
+    return PostsModel;
 })(AR);
 
-exports['default'] = Model;
+exports['default'] = PostsModel;
 module.exports = exports['default'];
-},{"../ActiveRecord":1}],10:[function(require,module,exports){
+},{"../ActiveRecord":1}],12:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+    value: true
+});
+// istanbul ignore next
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+// istanbul ignore next
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+// istanbul ignore next
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+// istanbul ignore next
+
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _ActiveRecord = require('../ActiveRecord');
+
+var _ActiveRecord2 = _interopRequireDefault(_ActiveRecord);
+
+var model = {
+
+    _id: {
+        type: String,
+        ref: 'PostsModel'
+    },
+
+    //private: true
+    title: String
+};
+
+var AR = (0, _ActiveRecord2['default'])(model, 'TagsModel');
+
+var TagsModel = (function (_AR) {
+    _inherits(TagsModel, _AR);
+
+    function TagsModel() {
+        _classCallCheck(this, TagsModel);
+
+        _get(Object.getPrototypeOf(TagsModel.prototype), 'constructor', this).apply(this, arguments);
+    }
+
+    return TagsModel;
+})(AR);
+
+exports['default'] = TagsModel;
+module.exports = exports['default'];
+},{"../ActiveRecord":1}],13:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -948,20 +1125,78 @@ var model = {
     Name: String
 };
 
-var AR = (0, _ActiveRecord2['default'])(model, 'Model2');
+var AR = (0, _ActiveRecord2['default'])(model, 'UsersModel');
 
-var Model2 = (function (_AR) {
-    _inherits(Model2, _AR);
+var UsersModel = (function (_AR) {
+    _inherits(UsersModel, _AR);
 
-    function Model2() {
-        _classCallCheck(this, Model2);
+    function UsersModel() {
+        _classCallCheck(this, UsersModel);
 
-        _get(Object.getPrototypeOf(Model2.prototype), 'constructor', this).apply(this, arguments);
+        _get(Object.getPrototypeOf(UsersModel.prototype), 'constructor', this).apply(this, arguments);
     }
 
-    return Model2;
+    return UsersModel;
 })(AR);
 
-exports['default'] = Model2;
+exports['default'] = UsersModel;
 module.exports = exports['default'];
-},{"../ActiveRecord":1}]},{},[6]);
+},{"../ActiveRecord":1}],14:[function(require,module,exports){
+/**
+ * Created by Renaud ROHLINGER on 27/11/2015.
+ * Home controller
+ */
+
+'use strict';
+
+(function () {
+
+    'use strict';
+
+    HomeController.$inject = ["PostsManager", "TagsManager"];
+    angular.module('tstModule.home').controller('HomeController', HomeController);
+    function HomeController(PostsManager, TagsManager) {
+        var self = this;
+        var getAll;
+
+        PostsManager.get().then(function (posts) {
+            console.log(posts.data);
+
+            self.getAll = posts.data;
+        });
+
+        console.log(PostsManager);
+        TagsManager.get().then(function (data) {
+            console.log(data);
+        });
+
+        _.assign(self, {
+            getAll: getAll
+        });
+    }
+})();
+},{}],15:[function(require,module,exports){
+/**
+ * Created by Renaud ROHLINGER on 27/11/2015.
+ * Home router
+ */
+
+'use strict';
+
+(function () {
+            'use strict';
+
+            angular.module('tstModule.home', []).config(["$stateProvider", function ($stateProvider) {
+
+                        var view = 'home';
+
+                        $stateProvider.state(view, {
+                                    url: '/' + view,
+                                    templateUrl: './app/routes/' + view + '/controllers/' + view + '.html',
+                                    bindToController: true,
+                                    controllerAs: view,
+                                    controller: 'HomeController'
+                        });
+            }]);
+})();
+},{}]},{},[6]);

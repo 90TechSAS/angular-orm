@@ -1,7 +1,7 @@
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
-    value: true
+  value: true
 });
 // istanbul ignore next
 
@@ -19,34 +19,32 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var _ActiveRecord = require('../ActiveRecord');
+var _modelsTagsModelJs = require('./../models/TagsModel.js');
 
-var _ActiveRecord2 = _interopRequireDefault(_ActiveRecord);
+var _modelsTagsModelJs2 = _interopRequireDefault(_modelsTagsModelJs);
 
-var model = {
+var _GenericDao = require('../GenericDao');
 
-    _id: {
-        type: String,
-        unique: true
-    },
+var _GenericDao2 = _interopRequireDefault(_GenericDao);
 
-    //private: true
-    Name: String
-};
+var _QueryBuilder = require('../QueryBuilder');
 
-var AR = (0, _ActiveRecord2['default'])(model, 'Model2');
+var _QueryBuilder2 = _interopRequireDefault(_QueryBuilder);
 
-var Model2 = (function (_AR) {
-    _inherits(Model2, _AR);
+var DAO = (0, _GenericDao2['default'])(_modelsTagsModelJs2['default']);
 
-    function Model2() {
-        _classCallCheck(this, Model2);
+var TagsModelManager = (function (_DAO) {
+  _inherits(TagsModelManager, _DAO);
 
-        _get(Object.getPrototypeOf(Model2.prototype), 'constructor', this).apply(this, arguments);
-    }
+  function TagsModelManager() {
+    _classCallCheck(this, TagsModelManager);
 
-    return Model2;
-})(AR);
+    _get(Object.getPrototypeOf(TagsModelManager.prototype), 'constructor', this).apply(this, arguments);
+  }
 
-exports['default'] = Model2;
+  return TagsModelManager;
+})(DAO);
+
+exports['default'] = TagsModelManager;
+;
 module.exports = exports['default'];

@@ -27,31 +27,26 @@ var model = {
 
     _id: {
         type: String,
-        unique: true
+        ref: 'PostsModel'
     },
 
     //private: true
-    label: String,
-
-    model2: {
-        type: String,
-        ref: 'Model2'
-    }
+    title: String
 };
 
-var AR = (0, _ActiveRecord2['default'])(model, 'Model1');
+var AR = (0, _ActiveRecord2['default'])(model, 'TagsModel');
 
-var Model = (function (_AR) {
-    _inherits(Model, _AR);
+var TagsModel = (function (_AR) {
+    _inherits(TagsModel, _AR);
 
-    function Model() {
-        _classCallCheck(this, Model);
+    function TagsModel() {
+        _classCallCheck(this, TagsModel);
 
-        _get(Object.getPrototypeOf(Model.prototype), 'constructor', this).apply(this, arguments);
+        _get(Object.getPrototypeOf(TagsModel.prototype), 'constructor', this).apply(this, arguments);
     }
 
-    return Model;
+    return TagsModel;
 })(AR);
 
-exports['default'] = Model;
+exports['default'] = TagsModel;
 module.exports = exports['default'];

@@ -136,10 +136,10 @@ nav {
   margin-bottom: 4rem;
   text-transform: uppercase;
 
+
 }
 .space {
     width: 100%;
-    background:url(../img/love.jpg);
     opacity: .6;
     height: 100vh;
     position: fixed;
@@ -150,94 +150,12 @@ nav {
   margin-top:160px;
 }
 
-.sublime {
-  list-style: none;
-  font-size: 0.8rem;
-  position:fixed;
-  width:35%;
-  font-family: 'Source Code Pro';
-  background-color:#262728;
-  margin:0px;
-  right: 0px;
-  bottom:0px;
-  font-weight: 600;
-  padding-left:20px;
-  border-top: 25px solid #b4b4b4;
-  .box-shadow(-1px -1px 3px 0 rgba(0,0,0,.6));
-  li {
-    line-height: 20px;    
-  }
-  .blue {
-    color: #66d9ef;
-  }
-
-  .purple {
-    color: #8a7bff;
-  }
-
-  .red {
-    color: #e92772;
-  }
-
-  .green {
-    color: #a6e22d;
-  }
-
-  .orange {
-    color: #fd9720;
-  }
-
-  .yellow {
-    color: #e6db74;
-  }
-
-  .gray {
-    color: #8f908a;
-  }
-
-  .cursor:before {
-    opacity: 0;
-    content: "|";
-    color: #f1f1f1;
-    animation: blink 1.2s infinite;
-  }
-  .buttons {
-    min-height: 0;
-    position: absolute;
-    margin-top: -18px;
-    border-radius: 100%;
-    width: 13px;
-    height: 13px;
-    background-color: #ff5d5b;
-    border: 1px solid #e64344;
-
-    &:before,
-    &:after {
-      position: absolute;
-      content: "";
-      width: 13px;
-      height: 13px;  
-      border-radius: 100%;
-      top: -1px;
-    }
-
-    &:before {
-      left: 20px;
-      border: 1px solid #e3a041;
-      background-color: #ffbc4c;
-    } 
-
-    &:after {
-      left: 40px;
-      border: 1px solid #13ad46;
-      background-color: #00c956;
-    }   
-  }
-}
 .main_div{
-  padding:40px 20px 0px 20px;
+  margin:40px 20px 0px 20px;
+  padding:0px 20px 20px 20px;
+  .box-shadow(inset 0 -1px 0 darken(#fff, 10%));
+  background-color: rgba(254,254,254,0.9);
 }
-
-#sublime_content{
-  min-height:65px;
+.tags h3{
+  text-align: right;
 }

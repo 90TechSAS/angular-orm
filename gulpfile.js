@@ -15,17 +15,13 @@ var gulp       = require('gulp'),
     ngAnnotate = require('gulp-ng-annotate'),
     Server     = require('karma').Server;
 
-var server = {
-    host: 'localhost',
-    port: '8001'
-}
 
 gulp.task('clean-temp', function(){
     return del(['dest']);
 });
 
 gulp.task('es6-commonjs',['clean-temp'], function(){
-    return gulp.src(['./app/**/*.js', './src/**/*.js'])
+    return gulp.src(['./app/**/*.js','./app/**/**/*.js', './src/**/*.js'])
         .pipe(babel({auxiliaryCommentBefore: 'istanbul ignore next'}))
         .pipe(gulp.dest('dest/temp'));
 });
@@ -72,6 +68,7 @@ gulp.task('less', function () {
 gulp.task('watch', function(){
     gulp.watch(['./src/**/*.js'], ['commonjs-bundle']);
     gulp.watch(['./app/**/*.js'], ['commonjs-bundle']);
+    gulp.watch(['./app/**/**/*.js'], ['commonjs-bundle']);
     gulp.watch(['./assets/less/style.less'],['less']);
 });
 

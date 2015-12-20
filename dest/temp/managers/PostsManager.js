@@ -19,9 +19,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var _modelsTstModel1Js = require('./../models/tstModel1.js');
+var _modelsPostsModelJs = require('./../models/PostsModel.js');
 
-var _modelsTstModel1Js2 = _interopRequireDefault(_modelsTstModel1Js);
+var _modelsPostsModelJs2 = _interopRequireDefault(_modelsPostsModelJs);
 
 var _GenericDao = require('../GenericDao');
 
@@ -31,7 +31,7 @@ var _QueryBuilder = require('../QueryBuilder');
 
 var _QueryBuilder2 = _interopRequireDefault(_QueryBuilder);
 
-var DAO = (0, _GenericDao2['default'])(_modelsTstModel1Js2['default']);
+var DAO = (0, _GenericDao2['default'])(_modelsPostsModelJs2['default']);
 
 var ModelManager = (function (_DAO) {
   _inherits(ModelManager, _DAO);

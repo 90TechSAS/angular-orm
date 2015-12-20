@@ -1,10 +1,10 @@
 'use strict';
 
-import Model from './../models/tstModel1.js';
+import PostsModel from './../models/PostsModel.js';
 import GenericDao from '../GenericDao';
 import QueryBuilder from '../QueryBuilder';
 
-var DAO = GenericDao(Model);
+var DAO = GenericDao(PostsModel);
 
 export default class ModelManager extends DAO {
 };

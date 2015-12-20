@@ -12,19 +12,13 @@ var model = {
         //private: true
     },
 
-    label: String,
-
-    model2: {
-        type: String,
-        ref: 'Model2'
-    }
+    Name: String,
 };
 
 
-var AR = ActiveRecord(model, 'Model1');
+var AR = ActiveRecord(model, 'UsersModel');
 
-export default class Model extends AR {
-
+export default class UsersModel extends AR {
 
 }
 

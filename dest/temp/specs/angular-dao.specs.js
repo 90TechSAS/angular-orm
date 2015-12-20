@@ -6,9 +6,10 @@ describe('Angular DAO', function () {
 
     beforeEach(function () {
 
-        module('tstModule', function (ModelManagerProvider, ModelManager2Provider) {
-            ModelManagerProvider.setRootUrl('http://MOCKURL.com/model1');
-            ModelManager2Provider.setRootUrl('http://MOCKURL.com/model2');
+        module('tstModule', function (PostsManagerProviderPostsManagerProvider, TagsManagerProvider, UsersManagerProvider) {
+            PostsManagerProvider.setRootUrl('https://gentle-brushlands-6591.herokuapp.com/api/posts');
+            TagsManagerProvider.setRootUrl('https://gentle-brushlands-6591.herokuapp.com/api/tags');
+            UsersManagerProvider.setRootUrl('https://gentle-brushlands-6591.herokuapp.com/api/users');
         });
 
         inject(function (_ModelManager_, $httpBackend, _$rootScope_) {

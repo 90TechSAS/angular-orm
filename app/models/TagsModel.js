@@ -8,18 +8,16 @@ var model = {
 
     _id: {
         type  : String,
-        unique: true,
+        ref: 'PostsModel',
         //private: true
     },
 
-    Name: String,
+    title: String
 };
 
 
-var AR = ActiveRecord(model, 'Model2');
+var AR = ActiveRecord(model, 'TagsModel');
 
-export default class Model2 extends AR {
-
-
+export default class TagsModel extends AR {
 }
 

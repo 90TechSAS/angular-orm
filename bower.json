@@ -19,6 +19,7 @@
   "dependencies": {
     "angular-mocks": "~1.4.8",
     "angular": "~1.4.8",
-    "lodash": "3.10.1"
+    "lodash": "3.10.1",
+    "angular-ui-router": "~0.2.15"
   }
 }

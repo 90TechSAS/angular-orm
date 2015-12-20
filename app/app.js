@@ -1,12 +1,25 @@
 
 import DaoHelper from './DaoHelper';
 
-import ModelManager from './managers/tstManager1';
-import ModelManager2 from './managers/tstManager2';
+import PostsManager from './managers/PostsManager';
+import TagsManager from './managers/TagsManager';
+import UsersManager from './managers/UsersManager';
+
+import CommonDirective from './common/directives/common.directive';
+
+import HomeRoute from './routes/home/home.route';
+
+import HomeController from './routes/home/controllers/home.controller';
 
 
 var module = angular
-    .module('tstModule', []);
-
-DaoHelper.registerService(module, 'ModelManager', ModelManager);
-DaoHelper.registerService(module, 'ModelManager2', ModelManager2);
+    .module('tstModule', ['ui.router','tstModule.common','tstModule.home'])
+    .config(function($urlRouterProvider,PostsManagerProvider,TagsManagerProvider,UsersManagerProvider) {
+        $urlRouterProvider.otherwise("/home");
+        PostsManagerProvider.setRootUrl('https://gentle-brushlands-6591.herokuapp.com/api/posts');
+        TagsManagerProvider.setRootUrl('https://gentle-brushlands-6591.herokuapp.com/api/tags');
+        UsersManagerProvider.setRootUrl('https://gentle-brushlands-6591.herokuapp.com/api/users');
+    });
+DaoHelper.registerService(module, 'PostsManager', PostsManager);
+DaoHelper.registerService(module, 'TagsManager', TagsManager);
+DaoHelper.registerService(module, 'UsersManager', UsersManager);

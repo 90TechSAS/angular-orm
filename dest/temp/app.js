@@ -8,15 +8,36 @@ var _DaoHelper = require('./DaoHelper');
 
 var _DaoHelper2 = _interopRequireDefault(_DaoHelper);
 
-var _managersTstManager1 = require('./managers/tstManager1');
+var _managersPostsManager = require('./managers/PostsManager');
 
-var _managersTstManager12 = _interopRequireDefault(_managersTstManager1);
+var _managersPostsManager2 = _interopRequireDefault(_managersPostsManager);
 
-var _managersTstManager2 = require('./managers/tstManager2');
+var _managersTagsManager = require('./managers/TagsManager');
 
-var _managersTstManager22 = _interopRequireDefault(_managersTstManager2);
+var _managersTagsManager2 = _interopRequireDefault(_managersTagsManager);
 
-var _module = angular.module('tstModule', []);
+var _managersUsersManager = require('./managers/UsersManager');
 
-_DaoHelper2['default'].registerService(_module, 'ModelManager', _managersTstManager12['default']);
-_DaoHelper2['default'].registerService(_module, 'ModelManager2', _managersTstManager22['default']);
+var _managersUsersManager2 = _interopRequireDefault(_managersUsersManager);
+
+var _commonDirectivesCommonDirective = require('./common/directives/common.directive');
+
+var _commonDirectivesCommonDirective2 = _interopRequireDefault(_commonDirectivesCommonDirective);
+
+var _routesHomeHomeRoute = require('./routes/home/home.route');
+
+var _routesHomeHomeRoute2 = _interopRequireDefault(_routesHomeHomeRoute);
+
+var _routesHomeControllersHomeController = require('./routes/home/controllers/home.controller');
+
+var _routesHomeControllersHomeController2 = _interopRequireDefault(_routesHomeControllersHomeController);
+
+var _module = angular.module('tstModule', ['ui.router', 'tstModule.common', 'tstModule.home']).config(function ($urlRouterProvider, PostsManagerProvider, TagsManagerProvider, UsersManagerProvider) {
+    $urlRouterProvider.otherwise("/home");
+    PostsManagerProvider.setRootUrl('https://gentle-brushlands-6591.herokuapp.com/api/posts');
+    TagsManagerProvider.setRootUrl('https://gentle-brushlands-6591.herokuapp.com/api/tags');
+    UsersManagerProvider.setRootUrl('https://gentle-brushlands-6591.herokuapp.com/api/users');
+});
+_DaoHelper2['default'].registerService(_module, 'PostsManager', _managersPostsManager2['default']);
+_DaoHelper2['default'].registerService(_module, 'TagsManager', _managersTagsManager2['default']);
+_DaoHelper2['default'].registerService(_module, 'UsersManager', _managersUsersManager2['default']);
