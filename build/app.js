@@ -759,11 +759,19 @@ var _routesHomeHomeRoute = require('./routes/home/home.route');
 
 var _routesHomeHomeRoute2 = _interopRequireDefault(_routesHomeHomeRoute);
 
+var _routesArticleArticleRoute = require('./routes/article/article.route');
+
+var _routesArticleArticleRoute2 = _interopRequireDefault(_routesArticleArticleRoute);
+
 var _routesHomeControllersHomeController = require('./routes/home/controllers/home.controller');
 
 var _routesHomeControllersHomeController2 = _interopRequireDefault(_routesHomeControllersHomeController);
 
-var _module = angular.module('tstModule', ['ui.router', 'tstModule.common', 'tstModule.home']).config(["$urlRouterProvider", "PostsManagerProvider", "TagsManagerProvider", "UsersManagerProvider", function ($urlRouterProvider, PostsManagerProvider, TagsManagerProvider, UsersManagerProvider) {
+var _routesArticleControllersArticleController = require('./routes/article/controllers/article.controller');
+
+var _routesArticleControllersArticleController2 = _interopRequireDefault(_routesArticleControllersArticleController);
+
+var _module = angular.module('tstModule', ['ui.router', 'tstModule.common', 'tstModule.home', 'tstModule.article']).config(["$urlRouterProvider", "PostsManagerProvider", "TagsManagerProvider", "UsersManagerProvider", function ($urlRouterProvider, PostsManagerProvider, TagsManagerProvider, UsersManagerProvider) {
     $urlRouterProvider.otherwise("/home");
     PostsManagerProvider.setRootUrl('https://gentle-brushlands-6591.herokuapp.com/api/posts');
     TagsManagerProvider.setRootUrl('https://gentle-brushlands-6591.herokuapp.com/api/tags');
@@ -772,7 +780,7 @@ var _module = angular.module('tstModule', ['ui.router', 'tstModule.common', 'tst
 _DaoHelper2['default'].registerService(_module, 'PostsManager', _managersPostsManager2['default']);
 _DaoHelper2['default'].registerService(_module, 'TagsManager', _managersTagsManager2['default']);
 _DaoHelper2['default'].registerService(_module, 'UsersManager', _managersUsersManager2['default']);
-},{"./DaoHelper":2,"./common/directives/common.directive":7,"./managers/PostsManager":8,"./managers/TagsManager":9,"./managers/UsersManager":10,"./routes/home/controllers/home.controller":14,"./routes/home/home.route":15}],7:[function(require,module,exports){
+},{"./DaoHelper":2,"./common/directives/common.directive":7,"./managers/PostsManager":8,"./managers/TagsManager":9,"./managers/UsersManager":10,"./routes/article/article.route":14,"./routes/article/controllers/article.controller":15,"./routes/home/controllers/home.controller":16,"./routes/home/home.route":17}],7:[function(require,module,exports){
 /**
  * Created by Renaud ROHLINGER on 27/11/2015.
  * Common directive
@@ -1146,6 +1154,58 @@ exports['default'] = UsersModel;
 module.exports = exports['default'];
 },{"../ActiveRecord":1}],14:[function(require,module,exports){
 /**
+ * Created by Renaud ROHLINGER on 21/12/2015.
+ * Article router
+ */
+
+'use strict';
+
+(function () {
+    'use strict';
+
+    angular.module('tstModule.article', []).config(["$stateProvider", function ($stateProvider) {
+
+        $stateProvider.state('article', {
+            url: '/article/:instanceID',
+            templateUrl: './app/routes/article/controllers/article.html',
+            bindToController: true,
+            controllerAs: 'article',
+            controller: 'ArticleController'
+        });
+    }]);
+})();
+},{}],15:[function(require,module,exports){
+/**
+ * Created by Renaud ROHLINGER on 21/12/2015.
+ * Article controller
+ */
+
+'use strict';
+
+(function () {
+
+    'use strict';
+
+    ArticleController.$inject = ["$state", "$stateParams", "PostsManager", "TagsManager"];
+    angular.module('tstModule.article').controller('ArticleController', ArticleController);
+    function ArticleController($state, $stateParams, PostsManager, TagsManager) {
+        var self = this;
+        var getArticle;
+        // get id from stateParam
+        var id = $stateParams.instanceID;
+
+        // get post by id
+        PostsManager.getById(id, PostsManager.query().populate(['tags', 'user'])).then(function (data) {
+            self.getArticle = data;
+        });
+
+        _.assign(self, {
+            getArticle: getArticle
+        });
+    }
+})();
+},{}],16:[function(require,module,exports){
+/**
  * Created by Renaud ROHLINGER on 27/11/2015.
  * Home controller
  */
@@ -1163,6 +1223,7 @@ module.exports = exports['default'];
         var getAll;
 
         PostsManager.get(PostsManager.query().populate(['tags', 'user'])).then(function (posts) {
+            console.log(posts.data);
             self.getAll = posts.data;
         });
 
@@ -1171,7 +1232,7 @@ module.exports = exports['default'];
         });
     }
 })();
-},{}],15:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 /**
  * Created by Renaud ROHLINGER on 27/11/2015.
  * Home router

@@ -15,6 +15,7 @@
     	var getAll;    	
 
     	PostsManager.get(PostsManager.query().populate(['tags','user'])).then(function(posts){
+            console.log(posts.data);
             self.getAll = posts.data;
         });
 

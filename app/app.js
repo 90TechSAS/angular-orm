@@ -8,12 +8,14 @@ import UsersManager from './managers/UsersManager';
 import CommonDirective from './common/directives/common.directive';
 
 import HomeRoute from './routes/home/home.route';
+import ArticleRoute from './routes/article/article.route';
 
 import HomeController from './routes/home/controllers/home.controller';
+import ArticleController from './routes/article/controllers/article.controller';
 
 
 var module = angular
-    .module('tstModule', ['ui.router','tstModule.common','tstModule.home'])
+    .module('tstModule', ['ui.router','tstModule.common','tstModule.home','tstModule.article'])
     .config(function($urlRouterProvider,PostsManagerProvider,TagsManagerProvider,UsersManagerProvider) {
         $urlRouterProvider.otherwise("/home");
         PostsManagerProvider.setRootUrl('https://gentle-brushlands-6591.herokuapp.com/api/posts');
