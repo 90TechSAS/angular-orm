@@ -160,9 +160,13 @@ function ActiveRecord(model, name) {
                     if (obj[key] && (field.ref || _.isArray(field) && field[0].ref)) {
 
                         if (_.isArray(obj[key])) {
-                            obj[key] = obj[key].map(function (val) {
-                                return val._id || val;
-                            });
+                            obj[key] = _.compact(obj[key].map(function (val) {
+                                if (typeof val === 'object') {
+                                    return val._id;
+                                } else if (typeof val === 'string') {
+                                    return val;
+                                }
+                            }));
                         } else {
                             obj[key] = obj[key]._id || obj[key];
                         }
