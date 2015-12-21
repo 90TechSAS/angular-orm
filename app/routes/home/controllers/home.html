@@ -3,11 +3,10 @@
     	<div class="col span_2_of_4 main_div" ng-repeat="post in home.getAll">
 	  		<h1>{{post.title}}</h1>
 	        <p>{{post.content}}</p>
-	        <h3>Rédigé par {{post.user}}</h3>
-	        <div class="tags"><h3>Tags : {{post.tags}}</h3></div>
+	        <h3>Rédigé par {{post.user.lastName}} {{post.user.firstName}}</h3>
+	        <div class="tags"><h3>Tags : <span ng-repeat="tag in post.tags">#{{tag.title}} </span></h3></div>
 	    </div>
     </div>
 	<div ui-view  class="animated"></div>
-
  <div footer></div>
 

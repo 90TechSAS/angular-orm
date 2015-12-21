@@ -8,11 +8,11 @@ var model = {
 
     _id: {
         type  : String,
-        unique: true,
+        ref: 'PostsModel'
         //private: true
     },
-
-    Name: String,
+    firstName: String,
+    lastName: String
 };
 
 

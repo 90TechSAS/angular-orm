@@ -14,11 +14,14 @@ var model = {
 
     title: String,
     content: String,
-    user: String,
-    tags: {
+    user: {
+        type: String,
+        ref: 'UsersModel'
+    },
+    tags: [{
         type: String,
         ref: 'TagsModel'
-    }
+    }]
 };
 
 

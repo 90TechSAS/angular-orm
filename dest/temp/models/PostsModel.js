@@ -33,11 +33,14 @@ var model = {
     //private: true
     title: String,
     content: String,
-    user: String,
-    tags: {
+    user: {
+        type: String,
+        ref: 'UsersModel'
+    },
+    tags: [{
         type: String,
         ref: 'TagsModel'
-    }
+    }]
 };
 
 var AR = (0, _ActiveRecord2['default'])(model, 'PostsModel');

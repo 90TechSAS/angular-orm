@@ -27,11 +27,11 @@ var model = {
 
     _id: {
         type: String,
-        unique: true
+        ref: 'PostsModel'
+        //private: true
     },
-
-    //private: true
-    Name: String
+    firstName: String,
+    lastName: String
 };
 
 var AR = (0, _ActiveRecord2['default'])(model, 'UsersModel');
