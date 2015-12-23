@@ -37,7 +37,7 @@ export default class QueryBuilder {
 
     archived(isArchived){
         this.opts = this.opts || {};
-        if (isArchived){
+        if (_.isBoolean(isArchived)){
             this.opts.archived = isArchived;
         }
         return this;
