@@ -10,12 +10,12 @@
     'use strict';
 
     angular.module('tstModule.home').controller('HomeController', HomeController);
-    function HomeController(PostsManager, TagsManager) {
+    function HomeController(PostsManager) {
         var self = this;
         var getAll;
+        var get;
 
         PostsManager.get(PostsManager.query().populate(['tags', 'user'])).then(function (posts) {
-            console.log(posts.data);
             self.getAll = posts.data;
         });
 

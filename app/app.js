@@ -6,12 +6,14 @@ import TagsManager from './managers/TagsManager';
 import UsersManager from './managers/UsersManager';
 
 import CommonDirective from './common/directives/common.directive';
+import CommonController from './common/controllers/common.controller';
 
 import HomeRoute from './routes/home/home.route';
 import ArticleRoute from './routes/article/article.route';
 
 import HomeController from './routes/home/controllers/home.controller';
 import ArticleController from './routes/article/controllers/article.controller';
+import ArticleCreationController from './routes/article/controllers/article-creation.controller';
 
 
 var module = angular

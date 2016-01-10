@@ -10,12 +10,12 @@
     angular
     	.module('tstModule.home')
         .controller('HomeController' , HomeController);
-    function HomeController(PostsManager,TagsManager) {
+    function HomeController(PostsManager) {
         var self = this;
-    	var getAll;    	
-
-    	PostsManager.get(PostsManager.query().populate(['tags','user'])).then(function(posts){
-            console.log(posts.data);
+        var getAll;         
+    	var get;     	
+        
+        PostsManager.get(PostsManager.query().populate(['tags','user'])).then(function(posts){
             self.getAll = posts.data;
         });
 

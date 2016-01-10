@@ -1,0 +1,43 @@
+<div header></div>
+<div class="group animated">
+	<div class="col span_2_of_4 main_div">
+		<form name="createArticleForm" ng-submit="article.createArticle(createArticleForm.$valid)">
+		<a class="btn" ui-sref="home">&#10094;</a>
+		<h1>Write an article</h1>
+        <div class="group">      
+		    <input type="text" ng-required="true"  ng-model="article.title" required autofocus>
+		    <span class="highlight"></span>
+		    <span class="bar"></span>
+		    <label>Title</label>
+		</div>
+        <div class="group">      
+		    <input type="textarea" ng-required="true" class="description-input" ng-model="article.description" required>
+		    <span class="highlight"></span>
+		    <span class="bar"></span>
+		    <label>Description</label>
+		</div>
+        <div class="custom_selectfield">
+        <select ng-model="article.user"  ng-required="true" ng-options="user as article.GetUserFullName(user) for user in article.users">
+        	<option value="">Select a user</option>
+        </select>
+        </div>
+        <div class="custom_selectfield">
+        <select ng-model="article.newTag" ng-change="article.AddTag()"ng-options="tag as tag.title for tag in article.tagslist">
+        	<option value="">Select a tag</option>
+        </select>
+        </div>
+        <div class="tags">
+        <h3>Tags : 
+        <span ng-repeat="tag in article.tags">
+	        #{{tag.title}}
+	        <a ng-click="article.RemoveTag(tag)">x</a></span>
+        </h3>
+        </div>
+		
+        <button class="btn" type="submit" ng-click="article.createArticle()">Save Article</button>
+        </form>
+    </div>
+</div>
+<div ui-view  class="animated"></div>
+<div footer></div>
+

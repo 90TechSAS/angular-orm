@@ -1,14 +1,14 @@
- <div header></div>
-    <div class="group animated">
-    	<div class="col span_2_of_4 main_div" ng-repeat="post in home.getAll">
-	  		<h1>{{post.title}}</h1>
-	        <p>{{ post.content | limitTo: 240 }}{{post.content.length > 240 ? '...' : ''}}</p>
-	        <h3>Rédigé par {{post.user.lastName}} {{post.user.firstName}}</h3>
-	        <div class="tags"><h3>Tags : <span ng-repeat="tag in post.tags">#{{tag.title}} </span></h3></div>
-	        <div><a class="btn" ui-sref="article({ instanceID:post._id })">Read more...</a></div>
+<div header></div>
+<div class="group animated">
+	<div class="col span_2_of_4 main_div" ng-repeat="post in home.getAll">
+  		<h1>{{post.title}}</h1>
+        <p>{{ post.content | limitTo: 240 }}{{post.content.length > 240 ? '...' : ''}}</p>
+        <h3>Written by {{post.user.lastName}} {{post.user.firstName}}</h3>
+        <div class="tags"><h3>Tags : <span ng-repeat="tag in post.tags">#{{tag.title}} </span></h3></div>
+        <div><a class="btn" ui-sref="article({ instanceID:post._id })">Read more...</a></div>
 
-	    </div>
     </div>
-	<div ui-view  class="animated"></div>
- <div footer></div>
+</div>
+<div ui-view  class="animated"></div>
+<div footer></div>
 

@@ -24,6 +24,10 @@ var _commonDirectivesCommonDirective = require('./common/directives/common.direc
 
 var _commonDirectivesCommonDirective2 = _interopRequireDefault(_commonDirectivesCommonDirective);
 
+var _commonControllersCommonController = require('./common/controllers/common.controller');
+
+var _commonControllersCommonController2 = _interopRequireDefault(_commonControllersCommonController);
+
 var _routesHomeHomeRoute = require('./routes/home/home.route');
 
 var _routesHomeHomeRoute2 = _interopRequireDefault(_routesHomeHomeRoute);
@@ -39,6 +43,10 @@ var _routesHomeControllersHomeController2 = _interopRequireDefault(_routesHomeCo
 var _routesArticleControllersArticleController = require('./routes/article/controllers/article.controller');
 
 var _routesArticleControllersArticleController2 = _interopRequireDefault(_routesArticleControllersArticleController);
+
+var _routesArticleControllersArticleCreationController = require('./routes/article/controllers/article-creation.controller');
+
+var _routesArticleControllersArticleCreationController2 = _interopRequireDefault(_routesArticleControllersArticleCreationController);
 
 var _module = angular.module('tstModule', ['ui.router', 'tstModule.common', 'tstModule.home', 'tstModule.article']).config(function ($urlRouterProvider, PostsManagerProvider, TagsManagerProvider, UsersManagerProvider) {
     $urlRouterProvider.otherwise("/home");

@@ -1,14 +1,14 @@
- <div header></div>
-    <div class="group animated">
-    	<div class="col span_2_of_4 main_div">
-	  		<h1>{{article.getArticle.title}}</h1>
-	        <p>{{article.getArticle.content}}</p>
-	        <h3>Rédigé par {{article.getArticle.user.lastName}} {{article.getArticle.user.firstName}}</h3>
-	        <div class="tags"><h3>Tags : <span ng-repeat="article in article.getArticle.tags">#{{article.title}} </span></h3></div>
-	        <div><a class="btn" ui-sref="home">Back to home</a></div>
-
-	    </div>
+<div header></div>
+<div class="group animated">
+	<div class="col span_2_of_4 main_div">
+	<a class="btn" ng-click="article.removeArticle()">&#215;</a>
+  		<h1>{{article.getArticle.title}}</h1>
+        <p>{{article.getArticle.content}}</p>
+        <h3>Written by {{article.getArticle.user.lastName}} {{article.getArticle.user.firstName}}</h3>
+        <div class="tags"><h3>Tags : <span ng-repeat="article in article.getArticle.tags">#{{article.title}} </span></h3></div>
+        <div><a class="btn" ui-sref="home">Back to home</a></div>
     </div>
-	<div ui-view  class="animated"></div>
- <div footer></div>
+</div>
+<div ui-view  class="animated"></div>
+<div footer></div>
 

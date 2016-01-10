@@ -27,6 +27,7 @@
                 return {
                     restrict: 'A',
                     bindToController: true, 
+                    controller: 'CommonController',
                     templateUrl: "app/layouts/partials/header.html",
                     controllerAs: 'header',
                     link: link

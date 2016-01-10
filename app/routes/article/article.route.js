@@ -11,8 +11,6 @@
     angular
         .module('tstModule.article',[])
         .config(function($stateProvider) {
-
-
             $stateProvider
                 .state('article', {
                             url:'/article/:instanceID',
@@ -20,6 +18,13 @@
                             bindToController: true, 
                             controllerAs: 'article',
                             controller: 'ArticleController'
+                })                
+                .state('write', {
+                            url:'/write',
+                            templateUrl:'./app/routes/article/controllers/article-creation.html',
+                            bindToController: true, 
+                            controllerAs: 'article',
+                            controller: 'ArticleCreationController'
                 })
         });
        

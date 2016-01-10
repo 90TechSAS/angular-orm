@@ -755,6 +755,10 @@ var _commonDirectivesCommonDirective = require('./common/directives/common.direc
 
 var _commonDirectivesCommonDirective2 = _interopRequireDefault(_commonDirectivesCommonDirective);
 
+var _commonControllersCommonController = require('./common/controllers/common.controller');
+
+var _commonControllersCommonController2 = _interopRequireDefault(_commonControllersCommonController);
+
 var _routesHomeHomeRoute = require('./routes/home/home.route');
 
 var _routesHomeHomeRoute2 = _interopRequireDefault(_routesHomeHomeRoute);
@@ -771,6 +775,10 @@ var _routesArticleControllersArticleController = require('./routes/article/contr
 
 var _routesArticleControllersArticleController2 = _interopRequireDefault(_routesArticleControllersArticleController);
 
+var _routesArticleControllersArticleCreationController = require('./routes/article/controllers/article-creation.controller');
+
+var _routesArticleControllersArticleCreationController2 = _interopRequireDefault(_routesArticleControllersArticleCreationController);
+
 var _module = angular.module('tstModule', ['ui.router', 'tstModule.common', 'tstModule.home', 'tstModule.article']).config(["$urlRouterProvider", "PostsManagerProvider", "TagsManagerProvider", "UsersManagerProvider", function ($urlRouterProvider, PostsManagerProvider, TagsManagerProvider, UsersManagerProvider) {
     $urlRouterProvider.otherwise("/home");
     PostsManagerProvider.setRootUrl('https://gentle-brushlands-6591.herokuapp.com/api/posts');
@@ -780,7 +788,30 @@ var _module = angular.module('tstModule', ['ui.router', 'tstModule.common', 'tst
 _DaoHelper2['default'].registerService(_module, 'PostsManager', _managersPostsManager2['default']);
 _DaoHelper2['default'].registerService(_module, 'TagsManager', _managersTagsManager2['default']);
 _DaoHelper2['default'].registerService(_module, 'UsersManager', _managersUsersManager2['default']);
-},{"./DaoHelper":2,"./common/directives/common.directive":7,"./managers/PostsManager":8,"./managers/TagsManager":9,"./managers/UsersManager":10,"./routes/article/article.route":14,"./routes/article/controllers/article.controller":15,"./routes/home/controllers/home.controller":16,"./routes/home/home.route":17}],7:[function(require,module,exports){
+},{"./DaoHelper":2,"./common/controllers/common.controller":7,"./common/directives/common.directive":8,"./managers/PostsManager":9,"./managers/TagsManager":10,"./managers/UsersManager":11,"./routes/article/article.route":15,"./routes/article/controllers/article-creation.controller":16,"./routes/article/controllers/article.controller":17,"./routes/home/controllers/home.controller":18,"./routes/home/home.route":19}],7:[function(require,module,exports){
+/**
+ * Created by Renaud ROHLINGER on 27/11/2015.
+ * Home controller
+ */
+
+'use strict';
+
+(function () {
+
+    'use strict';
+
+    angular.module('tstModule.common').controller('CommonController', CommonController);
+    function CommonController() {
+        var self = this;
+        var notifications = {};
+        // refresh data
+
+        _.assign(self, {
+            notification: notifications
+        });
+    }
+})();
+},{}],8:[function(require,module,exports){
 /**
  * Created by Renaud ROHLINGER on 27/11/2015.
  * Common directive
@@ -808,6 +839,7 @@ _DaoHelper2['default'].registerService(_module, 'UsersManager', _managersUsersMa
         return {
             restrict: 'A',
             bindToController: true,
+            controller: 'CommonController',
             templateUrl: "app/layouts/partials/header.html",
             controllerAs: 'header',
             link: link
@@ -831,7 +863,7 @@ _DaoHelper2['default'].registerService(_module, 'UsersManager', _managersUsersMa
         }
     }
 })();
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -882,7 +914,7 @@ var ModelManager = (function (_DAO) {
 exports['default'] = ModelManager;
 ;
 module.exports = exports['default'];
-},{"../GenericDao":3,"../QueryBuilder":4,"./../models/PostsModel.js":11}],9:[function(require,module,exports){
+},{"../GenericDao":3,"../QueryBuilder":4,"./../models/PostsModel.js":12}],10:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -933,7 +965,7 @@ var TagsModelManager = (function (_DAO) {
 exports['default'] = TagsModelManager;
 ;
 module.exports = exports['default'];
-},{"../GenericDao":3,"../QueryBuilder":4,"./../models/TagsModel.js":12}],10:[function(require,module,exports){
+},{"../GenericDao":3,"../QueryBuilder":4,"./../models/TagsModel.js":13}],11:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -984,7 +1016,7 @@ var UsersModelManager = (function (_DAO) {
 exports['default'] = UsersModelManager;
 ;
 module.exports = exports['default'];
-},{"../GenericDao":3,"../QueryBuilder":4,"./../models/UsersModel.js":13}],11:[function(require,module,exports){
+},{"../GenericDao":3,"../QueryBuilder":4,"./../models/UsersModel.js":14}],12:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1046,7 +1078,7 @@ var PostsModel = (function (_AR) {
 
 exports['default'] = PostsModel;
 module.exports = exports['default'];
-},{"../ActiveRecord":1}],12:[function(require,module,exports){
+},{"../ActiveRecord":1}],13:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1099,7 +1131,7 @@ var TagsModel = (function (_AR) {
 
 exports['default'] = TagsModel;
 module.exports = exports['default'];
-},{"../ActiveRecord":1}],13:[function(require,module,exports){
+},{"../ActiveRecord":1}],14:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1152,7 +1184,7 @@ var UsersModel = (function (_AR) {
 
 exports['default'] = UsersModel;
 module.exports = exports['default'];
-},{"../ActiveRecord":1}],14:[function(require,module,exports){
+},{"../ActiveRecord":1}],15:[function(require,module,exports){
 /**
  * Created by Renaud ROHLINGER on 21/12/2015.
  * Article router
@@ -1164,17 +1196,107 @@ module.exports = exports['default'];
     'use strict';
 
     angular.module('tstModule.article', []).config(["$stateProvider", function ($stateProvider) {
-
         $stateProvider.state('article', {
             url: '/article/:instanceID',
             templateUrl: './app/routes/article/controllers/article.html',
             bindToController: true,
             controllerAs: 'article',
             controller: 'ArticleController'
+        }).state('write', {
+            url: '/write',
+            templateUrl: './app/routes/article/controllers/article-creation.html',
+            bindToController: true,
+            controllerAs: 'article',
+            controller: 'ArticleCreationController'
         });
     }]);
 })();
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
+/**
+ * Created by Renaud ROHLINGER on 06/01/2015.
+ * Article controller
+ */
+
+'use strict';
+
+(function () {
+
+    'use strict';
+
+    ArticleCreationController.$inject = ["$state", "$stateParams", "PostsManager", "TagsManager", "UsersManager"];
+    angular.module('tstModule.article').controller('ArticleCreationController', ArticleCreationController);
+    function ArticleCreationController($state, $stateParams, PostsManager, TagsManager, UsersManager) {
+        var self = this;
+        //var getArticle;
+        // get id from stateParam
+        //var id = $stateParams.instanceID;  	
+        var newTag = {};
+        var name = "";
+        var firstname = "";
+        var description = "";
+        var title = "";
+        var tags = [];
+        var tagslist = [];
+        var users = [];
+        var user = {};
+
+        function AddTag() {
+            if (self.newTag != {} && tags.indexOf(self.newTag) == -1) {
+                tags.push(self.newTag);
+                self.newTag = {};
+            }
+        }
+        function RemoveTag(tag) {
+            var i = tags.indexOf(tag);
+            if (i != -1) {
+                tags.splice(i, 1);
+            }
+        }
+        function GetUserFullName(user) {
+            return user.firstName + ' ' + user.lastName;
+        };
+
+        UsersManager.get().then(function (users) {
+            self.users = users.data;
+        });
+        TagsManager.get().then(function (tags) {
+            self.tagslist = tags.data;
+        });
+
+        function createArticle(isValid) {
+            if (isValid) {
+                PostsManager.create({ title: self.title, content: self.description, user: self.user, tags: self.tags }).save();
+                alert("Ajout de l'article accomplie");
+            }
+        }
+
+        /*PostsManager.getById(id,PostsManager.query().populate(['tags','user'])).then(function(data){
+               self.getArticle = data;
+           });*/
+        /*    PostsManager.post('/items/submit/new-item', function(req, res){
+              new PostsModel(req.body.formContents).save(function (e) {
+                res.send('item saved');
+              });
+            });*/
+
+        _.assign(self, {
+            AddTag: AddTag,
+            RemoveTag: RemoveTag,
+            GetUserFullName: GetUserFullName,
+            createArticle: createArticle,
+            tags: tags,
+            newTag: newTag,
+            name: name,
+            firstname: firstname,
+            description: description,
+            title: title,
+            user: user,
+            users: users,
+            tagslist: tagslist
+        });
+    }
+})();
+},{}],17:[function(require,module,exports){
 /**
  * Created by Renaud ROHLINGER on 21/12/2015.
  * Article controller
@@ -1186,9 +1308,9 @@ module.exports = exports['default'];
 
     'use strict';
 
-    ArticleController.$inject = ["$state", "$stateParams", "PostsManager", "TagsManager"];
+    ArticleController.$inject = ["$state", "$stateParams", "$location", "PostsManager"];
     angular.module('tstModule.article').controller('ArticleController', ArticleController);
-    function ArticleController($state, $stateParams, PostsManager, TagsManager) {
+    function ArticleController($state, $stateParams, $location, PostsManager) {
         var self = this;
         var getArticle;
         // get id from stateParam
@@ -1199,12 +1321,17 @@ module.exports = exports['default'];
             self.getArticle = data;
         });
 
+        function removeArticle() {
+            self.getArticle.remove();
+            alert("Supression de l'article accomplie");
+        }
         _.assign(self, {
-            getArticle: getArticle
+            getArticle: getArticle,
+            removeArticle: removeArticle
         });
     }
 })();
-},{}],16:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 /**
  * Created by Renaud ROHLINGER on 27/11/2015.
  * Home controller
@@ -1216,14 +1343,14 @@ module.exports = exports['default'];
 
     'use strict';
 
-    HomeController.$inject = ["PostsManager", "TagsManager"];
+    HomeController.$inject = ["PostsManager"];
     angular.module('tstModule.home').controller('HomeController', HomeController);
-    function HomeController(PostsManager, TagsManager) {
+    function HomeController(PostsManager) {
         var self = this;
         var getAll;
+        var get;
 
         PostsManager.get(PostsManager.query().populate(['tags', 'user'])).then(function (posts) {
-            console.log(posts.data);
             self.getAll = posts.data;
         });
 
@@ -1232,7 +1359,7 @@ module.exports = exports['default'];
         });
     }
 })();
-},{}],17:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 /**
  * Created by Renaud ROHLINGER on 27/11/2015.
  * Home router

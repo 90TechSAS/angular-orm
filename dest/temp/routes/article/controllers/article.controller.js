@@ -10,7 +10,7 @@
     'use strict';
 
     angular.module('tstModule.article').controller('ArticleController', ArticleController);
-    function ArticleController($state, $stateParams, PostsManager, TagsManager) {
+    function ArticleController($state, $stateParams, $location, PostsManager) {
         var self = this;
         var getArticle;
         // get id from stateParam
@@ -21,8 +21,13 @@
             self.getArticle = data;
         });
 
+        function removeArticle() {
+            self.getArticle.remove();
+            alert("Supression de l'article accomplie");
+        }
         _.assign(self, {
-            getArticle: getArticle
+            getArticle: getArticle,
+            removeArticle: removeArticle
         });
     }
 })();
