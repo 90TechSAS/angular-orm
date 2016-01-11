@@ -25,14 +25,14 @@ export default function ActiveRecord(model, name){
             _.each(model, (field, key)=>{
                 if (options && options[key]){
                     var name = _.isArray(field) ? field[0].ref : field.ref;
-                    var dao = sl.getDao(name);
+                    var dao  = sl.getDao(name);
                     if (dao){
-                        if (!this[key] || typeof(this[key])==='string' || (typeof(options[key]) === 'object')){
+                        if (!this[key] || typeof(this[key]) === 'string' || (typeof(options[key]) === 'object')){
                             // If new object contains unpopulated fields, but previous object had the info, don't delete it.
                             // Happens a lot during savings, since you can't specify populates on save.
                             this[key] = dao.build(_.clone(options[key]));
                         }
-                    } else {
+                    } else{
                         this[key] = this.buildField(field, options[key])
                     }
                 } else if (_.isArray(field)){
@@ -44,7 +44,7 @@ export default function ActiveRecord(model, name){
         }
 
         clone(){
-            var m = sl.getModel(name);
+            var m  = sl.getModel(name);
             var ob = new m(this.$injector, this.rootUrl, this);
             delete ob._id;
             return ob;
@@ -144,7 +144,7 @@ export default function ActiveRecord(model, name){
                         obj[key] = _.compact(obj[key].map((val) =>{
                             if (typeof(val) === 'object'){
                                 return field.nested ? val : val._id;
-                            } else if (typeof(val)=== 'string'){
+                            } else if (typeof(val) === 'string'){
                                 return val;
                             }
                         }));
@@ -159,18 +159,25 @@ export default function ActiveRecord(model, name){
 
         }
 
-        save(){
+        save(populate){
             var toSave = this.beforeSave();
-            if (this._id){
-                return this.$http.put(this.rootUrl + '/' + this._id, toSave).then((data)=>{
-                    this.build(data.data);
-                    return data;
-                })
+            var callback;
+            if (populate){
+                var dao = sl.getDao(name);
+                callback = ()=>{
+                    return dao.getById(this._id, dao.query().populate(populate));
+                }
             } else{
-                return this.$http.post(this.rootUrl, toSave).then((data)=>{
+                callback = (data) =>{
                     this.build(data.data);
                     return data;
-                });
+                }
+            }
+
+            if (this._id){
+                return this.$http.put(this.rootUrl + '/' + this._id, toSave).then(callback)
+            } else{
+                return this.$http.post(this.rootUrl, toSave).then(callback);
             }
         }
 
@@ -214,7 +221,7 @@ export default function ActiveRecord(model, name){
             var toPopulate = populateArray ? _.pick(pop, function(p, k){
                 return _.contains(populateArray, k);
             }) : _.pick(pop, function(v){
-                return v.populateDefault || (v[0] && v[0].populateDefault);
+                return v.populateDefault || (v[0] && v[0].populateDefault);
             });
             return ActiveRecord.makePopObject(toPopulate);
 
@@ -225,6 +232,6 @@ export default function ActiveRecord(model, name){
         }
 
     };
- //   sl.registerModel(name, ActiveRecord);
+    //   sl.registerModel(name, ActiveRecord);
     return ActiveRecord;
 }

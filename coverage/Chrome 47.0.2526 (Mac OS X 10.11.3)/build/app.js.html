@@ -20,14 +20,14 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">90.47% </span>
+        <span class="strong">90.37% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>560/619</span>
+        <span class='fraction'>563/623</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">76.36% </span>
+        <span class="strong">76.08% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>281/368</span>
+        <span class='fraction'>283/372</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">90.85% </span>
@@ -35,9 +35,9 @@
         <span class='fraction'>129/142</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">87.43% </span>
+        <span class="strong">87.31% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>334/382</span>
+        <span class='fraction'>337/386</span>
       </div>
       <div class='fl pad1y'>
         <span class="strong">71 statements, 71 branches</span>
@@ -1018,7 +1018,14 @@
 969
 970
 971
-972</td><td class="line-coverage quiet"><span class="cline-any cline-yes">16×</span>
+972
+973
+974
+975
+976
+977
+978
+979</td><td class="line-coverage quiet"><span class="cline-any cline-yes">16×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1206,14 +1213,21 @@
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -2169,22 +2183,29 @@ function ActiveRecord(model, name) {
             }
         }, {
             key: 'save',
-            value: function save() {
+            value: function save(populate) {
                 // istanbul ignore next
 &nbsp;
                 var _this3 = this;
 &nbsp;
                 var toSave = this.beforeSave();
-                <span class="missing-if-branch" title="else path not taken" >E</span>if (this._id) {
-                    return this.$http.put(this.rootUrl + '/' + this._id, toSave).then(function (data) {
+                var callback;
+                <span class="missing-if-branch" title="if path not taken" >I</span>if (populate) {
+<span class="cstat-no" title="statement not covered" >                    var dao = sl.getDao(name);</span>
+<span class="cstat-no" title="statement not covered" >                    callback = <span class="fstat-no" title="function not covered" >function () {</span></span>
+<span class="cstat-no" title="statement not covered" >                        return dao.get(_this3._id, dao.query().populate(populate));</span>
+                    };
+                } else {
+                    callback = function (data) {
                         _this3.build(data.data);
                         return data;
-                    });
+                    };
+                }
+&nbsp;
+                <span class="missing-if-branch" title="else path not taken" >E</span>if (this._id) {
+                    return this.$http.put(this.rootUrl + '/' + this._id, toSave).then(callback);
                 } else {
-<span class="cstat-no" title="statement not covered" >                    return this.$http.post(this.rootUrl, toSave).then(<span class="fstat-no" title="function not covered" >function (data) {</span></span>
-<span class="cstat-no" title="statement not covered" >                        _this3.build(data.data);</span>
-<span class="cstat-no" title="statement not covered" >                        return data;</span>
-                    });
+<span class="cstat-no" title="statement not covered" >                    return this.$http.post(this.rootUrl, toSave).then(callback);</span>
                 }
             }
         }, {
@@ -2594,7 +2615,7 @@ var QueryBuilder = (function () {
         key: 'archived',
         value: function archived(isArchived) {
             this.opts = this.opts || <span class="branch-1 cbranch-no" title="branch not covered" >{};</span>
-            <span class="missing-if-branch" title="else path not taken" >E</span>if (_.isBoolean(isArchived)) {
+            <span class="missing-if-branch" title="else path not taken" >E</span>if (isArchived || <span class="branch-1 cbranch-no" title="branch not covered" >_.isBoolean(isArchived))</span> {
                 this.opts.archived = isArchived;
             }
             return this;
@@ -2966,7 +2987,7 @@ module.exports = exports['default'];
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Wed Dec 23 2015 10:46:58 GMT+0100 (CET)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Mon Jan 11 2016 16:47:52 GMT+0100 (CET)
 </div>
 </div>
 <script src="../prettify.js"></script>

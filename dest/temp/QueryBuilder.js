@@ -58,7 +58,7 @@ var QueryBuilder = (function () {
         key: 'archived',
         value: function archived(isArchived) {
             this.opts = this.opts || {};
-            if (_.isBoolean(isArchived)) {
+            if (isArchived || _.isBoolean(isArchived)) {
                 this.opts.archived = isArchived;
             }
             return this;

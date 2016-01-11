@@ -177,22 +177,29 @@ function ActiveRecord(model, name) {
             }
         }, {
             key: 'save',
-            value: function save() {
+            value: function save(populate) {
                 // istanbul ignore next
 
                 var _this3 = this;
 
                 var toSave = this.beforeSave();
-                if (this._id) {
-                    return this.$http.put(this.rootUrl + '/' + this._id, toSave).then(function (data) {
-                        _this3.build(data.data);
-                        return data;
-                    });
+                var callback;
+                if (populate) {
+                    var dao = sl.getDao(name);
+                    callback = function () {
+                        return dao.get(_this3._id, dao.query().populate(populate));
+                    };
                 } else {
-                    return this.$http.post(this.rootUrl, toSave).then(function (data) {
+                    callback = function (data) {
                         _this3.build(data.data);
                         return data;
-                    });
+                    };
+                }
+
+                if (this._id) {
+                    return this.$http.put(this.rootUrl + '/' + this._id, toSave).then(callback);
+                } else {
+                    return this.$http.post(this.rootUrl, toSave).then(callback);
                 }
             }
         }, {
