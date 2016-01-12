@@ -8,14 +8,14 @@
     'use strict';
 
     angular
-    	.module('tstModule.home')
+    	.module('angularOrm.home')
         .controller('HomeController' , HomeController);
     function HomeController(PostsManager) {
         var self = this;
         var getAll;         
     	var get;     	
         
-        PostsManager.get(PostsManager.query().populate(['tags','user'])).then(function(posts){
+        PostsManager.get(PostsManager.query().populate(['tags','user']).sort('-_id')).then(function(posts){
             self.getAll = posts.data;
         });
 

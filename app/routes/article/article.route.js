@@ -9,7 +9,7 @@
 
 
     angular
-        .module('tstModule.article',[])
+        .module('angularOrm.article',[])
         .config(function($stateProvider) {
             $stateProvider
                 .state('article', {

@@ -28,6 +28,10 @@ var _commonControllersCommonController = require('./common/controllers/common.co
 
 var _commonControllersCommonController2 = _interopRequireDefault(_commonControllersCommonController);
 
+var _commonServicesNotificationService = require('./common/services/notification.service');
+
+var _commonServicesNotificationService2 = _interopRequireDefault(_commonServicesNotificationService);
+
 var _routesHomeHomeRoute = require('./routes/home/home.route');
 
 var _routesHomeHomeRoute2 = _interopRequireDefault(_routesHomeHomeRoute);
@@ -48,7 +52,7 @@ var _routesArticleControllersArticleCreationController = require('./routes/artic
 
 var _routesArticleControllersArticleCreationController2 = _interopRequireDefault(_routesArticleControllersArticleCreationController);
 
-var _module = angular.module('tstModule', ['ui.router', 'tstModule.common', 'tstModule.home', 'tstModule.article']).config(function ($urlRouterProvider, PostsManagerProvider, TagsManagerProvider, UsersManagerProvider) {
+var _module = angular.module('angularOrm', ['ui.router', 'angularOrm.service', 'angularOrm.common', 'angularOrm.home', 'angularOrm.article']).config(function ($urlRouterProvider, PostsManagerProvider, TagsManagerProvider, UsersManagerProvider) {
     $urlRouterProvider.otherwise("/home");
     PostsManagerProvider.setRootUrl('https://gentle-brushlands-6591.herokuapp.com/api/posts');
     TagsManagerProvider.setRootUrl('https://gentle-brushlands-6591.herokuapp.com/api/tags');

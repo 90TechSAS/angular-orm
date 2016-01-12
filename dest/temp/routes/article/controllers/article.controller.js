@@ -9,8 +9,8 @@
 
     'use strict';
 
-    angular.module('tstModule.article').controller('ArticleController', ArticleController);
-    function ArticleController($state, $stateParams, $location, PostsManager) {
+    angular.module('angularOrm.article').controller('ArticleController', ArticleController);
+    function ArticleController($state, $stateParams, $timeout, NotificationService, PostsManager) {
         var self = this;
         var getArticle;
         // get id from stateParam
@@ -22,8 +22,9 @@
         });
 
         function removeArticle() {
-            self.getArticle.remove();
-            alert("Supression de l'article accomplie");
+            self.getArticle.remove().then(function (data) {
+                NotificationService.notify('notify', "success", "L'élément à été supprimé avec succès");
+            });
         }
         _.assign(self, {
             getArticle: getArticle,

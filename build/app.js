@@ -759,6 +759,10 @@ var _commonControllersCommonController = require('./common/controllers/common.co
 
 var _commonControllersCommonController2 = _interopRequireDefault(_commonControllersCommonController);
 
+var _commonServicesNotificationService = require('./common/services/notification.service');
+
+var _commonServicesNotificationService2 = _interopRequireDefault(_commonServicesNotificationService);
+
 var _routesHomeHomeRoute = require('./routes/home/home.route');
 
 var _routesHomeHomeRoute2 = _interopRequireDefault(_routesHomeHomeRoute);
@@ -779,7 +783,7 @@ var _routesArticleControllersArticleCreationController = require('./routes/artic
 
 var _routesArticleControllersArticleCreationController2 = _interopRequireDefault(_routesArticleControllersArticleCreationController);
 
-var _module = angular.module('tstModule', ['ui.router', 'tstModule.common', 'tstModule.home', 'tstModule.article']).config(["$urlRouterProvider", "PostsManagerProvider", "TagsManagerProvider", "UsersManagerProvider", function ($urlRouterProvider, PostsManagerProvider, TagsManagerProvider, UsersManagerProvider) {
+var _module = angular.module('angularOrm', ['ui.router', 'angularOrm.service', 'angularOrm.common', 'angularOrm.home', 'angularOrm.article']).config(["$urlRouterProvider", "PostsManagerProvider", "TagsManagerProvider", "UsersManagerProvider", function ($urlRouterProvider, PostsManagerProvider, TagsManagerProvider, UsersManagerProvider) {
     $urlRouterProvider.otherwise("/home");
     PostsManagerProvider.setRootUrl('https://gentle-brushlands-6591.herokuapp.com/api/posts');
     TagsManagerProvider.setRootUrl('https://gentle-brushlands-6591.herokuapp.com/api/tags');
@@ -788,7 +792,7 @@ var _module = angular.module('tstModule', ['ui.router', 'tstModule.common', 'tst
 _DaoHelper2['default'].registerService(_module, 'PostsManager', _managersPostsManager2['default']);
 _DaoHelper2['default'].registerService(_module, 'TagsManager', _managersTagsManager2['default']);
 _DaoHelper2['default'].registerService(_module, 'UsersManager', _managersUsersManager2['default']);
-},{"./DaoHelper":2,"./common/controllers/common.controller":7,"./common/directives/common.directive":8,"./managers/PostsManager":9,"./managers/TagsManager":10,"./managers/UsersManager":11,"./routes/article/article.route":15,"./routes/article/controllers/article-creation.controller":16,"./routes/article/controllers/article.controller":17,"./routes/home/controllers/home.controller":18,"./routes/home/home.route":19}],7:[function(require,module,exports){
+},{"./DaoHelper":2,"./common/controllers/common.controller":7,"./common/directives/common.directive":8,"./common/services/notification.service":9,"./managers/PostsManager":10,"./managers/TagsManager":11,"./managers/UsersManager":12,"./routes/article/article.route":16,"./routes/article/controllers/article-creation.controller":17,"./routes/article/controllers/article.controller":18,"./routes/home/controllers/home.controller":19,"./routes/home/home.route":20}],7:[function(require,module,exports){
 /**
  * Created by Renaud ROHLINGER on 27/11/2015.
  * Home controller
@@ -800,14 +804,34 @@ _DaoHelper2['default'].registerService(_module, 'UsersManager', _managersUsersMa
 
     'use strict';
 
-    angular.module('tstModule.common').controller('CommonController', CommonController);
-    function CommonController() {
+    CommonController.$inject = ["NotificationService", "$timeout", "$state"];
+    angular.module('angularOrm.common').controller('CommonController', CommonController);
+    function CommonController(NotificationService, $timeout, $state) {
         var self = this;
-        var notifications = {};
-        // refresh data
+        var notification = {};
+        // attribute id to the notify event
+        var id = 'vm1';
+
+        // start the notification observer
+        NotificationService.linkEvent(showNotification, 'notify', id);
+
+        function showNotification(typenotif, message) {
+            //NotificationService.unlinkEvent('let_me_know');*
+            self.notification.typenotif = typenotif;
+            self.notification.message = message;
+
+            $timeout(function () {
+                // after 3 secondes hide the notification
+                self.notification.typenotif = "hidden";
+            }, 2000).then(function () {
+                return $timeout(function () {
+                    $state.go("home", {}, { reload: false });
+                }, 500);
+            });
+        }
 
         _.assign(self, {
-            notification: notifications
+            notification: notification
         });
     }
 })();
@@ -822,7 +846,7 @@ _DaoHelper2['default'].registerService(_module, 'UsersManager', _managersUsersMa
 (function () {
     'use strict';
 
-    angular.module('tstModule.common', []).directive('footer', FooterDirective);
+    angular.module('angularOrm.common', []).directive('footer', FooterDirective);
     function FooterDirective() {
         return {
             restrict: 'A',
@@ -832,7 +856,7 @@ _DaoHelper2['default'].registerService(_module, 'UsersManager', _managersUsersMa
         };
     }
 
-    angular.module('tstModule.common').directive('header', HeaderDirective);
+    angular.module('angularOrm.common').directive('header', HeaderDirective);
 
     HeaderDirective.$inject = ['$location'];
     function HeaderDirective($location) {
@@ -864,6 +888,90 @@ _DaoHelper2['default'].registerService(_module, 'UsersManager', _managersUsersMa
     }
 })();
 },{}],9:[function(require,module,exports){
+/**
+ * Created by Renaud ROHLINGER on 12/01/2015.
+ * Notification service
+ */
+
+'use strict';
+
+(function () {
+  'use strict';
+
+  /**
+   * @ngdoc service
+   * @name angularOrm.service:NotificationService
+   * @description
+   * # NotificationService
+   * Manages all notifications inside the application
+   *
+  */
+  angular.module('angularOrm.service', []).factory('NotificationService', NotificationService);
+  function NotificationService() {
+    var observerNotificationService = {};
+
+    /*
+    * @ngdoc property
+    * @name observerNotificationService#observers
+    * @propertyOf angularOrm.service:NotificationService
+    * @description object to store all observers
+    */
+    observerNotificationService.observers = {};
+
+    /**
+    * @ngdoc method
+    * @name observerNotificationService#linkEvent
+    * @methodOf angularOrm.service:NotificationService
+    * @param {function} callback the callback function to fire
+    * @param {string} event name of the event
+    * @param {string} id unique id for the object that is listening i.e. namespace
+    * @description adds events listeners
+    */
+    observerNotificationService.linkEvent = function (callback, event, id) {
+      if (id) {
+        if (!observerNotificationService.observers[event]) {
+          observerNotificationService.observers[event] = {};
+        }
+
+        if (!observerNotificationService.observers[event][id]) observerNotificationService.observers[event][id] = [];
+
+        observerNotificationService.observers[event][id].push(callback);
+      }
+    };
+    /**
+    * @ngdoc method
+    * @name observerNotificationService#unlinkEvent
+    * @methodOf angularOrm.service:NotificationService
+    * @param {string} event name of the event
+    * @description removes removes all the event from the observer object
+    */
+    observerNotificationService.unlinkEvent = function (event) {
+      if (event in observerNotificationService.observers) {
+        delete observerNotificationService.observers[event];
+      }
+    };
+
+    /**
+    * @ngdoc method
+    * @name observerNotificationService#notify
+    * @methodOf angularOrm.service:NotificationService
+    * @param {string} event name of the event
+    * @param {string|object|array|number} type of the notification ex:error/success
+    * @param {string|object|array|number} message of the notification
+    * @description notifies all observers of a specific event
+    */
+    observerNotificationService.notify = function (event, typenotif, message) {
+      for (var id in observerNotificationService.observers[event]) {
+        angular.forEach(observerNotificationService.observers[event][id], function (callback) {
+          callback(typenotif, message);
+        });
+      }
+    };
+
+    return observerNotificationService;
+  }
+})();
+},{}],10:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -914,7 +1022,7 @@ var ModelManager = (function (_DAO) {
 exports['default'] = ModelManager;
 ;
 module.exports = exports['default'];
-},{"../GenericDao":3,"../QueryBuilder":4,"./../models/PostsModel.js":12}],10:[function(require,module,exports){
+},{"../GenericDao":3,"../QueryBuilder":4,"./../models/PostsModel.js":13}],11:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -965,7 +1073,7 @@ var TagsModelManager = (function (_DAO) {
 exports['default'] = TagsModelManager;
 ;
 module.exports = exports['default'];
-},{"../GenericDao":3,"../QueryBuilder":4,"./../models/TagsModel.js":13}],11:[function(require,module,exports){
+},{"../GenericDao":3,"../QueryBuilder":4,"./../models/TagsModel.js":14}],12:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1016,7 +1124,7 @@ var UsersModelManager = (function (_DAO) {
 exports['default'] = UsersModelManager;
 ;
 module.exports = exports['default'];
-},{"../GenericDao":3,"../QueryBuilder":4,"./../models/UsersModel.js":14}],12:[function(require,module,exports){
+},{"../GenericDao":3,"../QueryBuilder":4,"./../models/UsersModel.js":15}],13:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1078,7 +1186,7 @@ var PostsModel = (function (_AR) {
 
 exports['default'] = PostsModel;
 module.exports = exports['default'];
-},{"../ActiveRecord":1}],13:[function(require,module,exports){
+},{"../ActiveRecord":1}],14:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1131,7 +1239,7 @@ var TagsModel = (function (_AR) {
 
 exports['default'] = TagsModel;
 module.exports = exports['default'];
-},{"../ActiveRecord":1}],14:[function(require,module,exports){
+},{"../ActiveRecord":1}],15:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1184,7 +1292,7 @@ var UsersModel = (function (_AR) {
 
 exports['default'] = UsersModel;
 module.exports = exports['default'];
-},{"../ActiveRecord":1}],15:[function(require,module,exports){
+},{"../ActiveRecord":1}],16:[function(require,module,exports){
 /**
  * Created by Renaud ROHLINGER on 21/12/2015.
  * Article router
@@ -1195,7 +1303,7 @@ module.exports = exports['default'];
 (function () {
     'use strict';
 
-    angular.module('tstModule.article', []).config(["$stateProvider", function ($stateProvider) {
+    angular.module('angularOrm.article', []).config(["$stateProvider", function ($stateProvider) {
         $stateProvider.state('article', {
             url: '/article/:instanceID',
             templateUrl: './app/routes/article/controllers/article.html',
@@ -1211,7 +1319,7 @@ module.exports = exports['default'];
         });
     }]);
 })();
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 /**
  * Created by Renaud ROHLINGER on 06/01/2015.
  * Article controller
@@ -1223,9 +1331,9 @@ module.exports = exports['default'];
 
     'use strict';
 
-    ArticleCreationController.$inject = ["$state", "$stateParams", "PostsManager", "TagsManager", "UsersManager"];
-    angular.module('tstModule.article').controller('ArticleCreationController', ArticleCreationController);
-    function ArticleCreationController($state, $stateParams, PostsManager, TagsManager, UsersManager) {
+    ArticleCreationController.$inject = ["$state", "$stateParams", "$timeout", "NotificationService", "PostsManager", "TagsManager", "UsersManager"];
+    angular.module('angularOrm.article').controller('ArticleCreationController', ArticleCreationController);
+    function ArticleCreationController($state, $stateParams, $timeout, NotificationService, PostsManager, TagsManager, UsersManager) {
         var self = this;
         //var getArticle;
         // get id from stateParam
@@ -1246,6 +1354,7 @@ module.exports = exports['default'];
                 self.newTag = {};
             }
         }
+
         function RemoveTag(tag) {
             var i = tags.indexOf(tag);
             if (i != -1) {
@@ -1265,8 +1374,10 @@ module.exports = exports['default'];
 
         function createArticle(isValid) {
             if (isValid) {
-                PostsManager.create({ title: self.title, content: self.description, user: self.user, tags: self.tags }).save();
-                alert("Ajout de l'article accomplie");
+                PostsManager.create({ title: self.title, content: self.description, user: self.user, tags: self.tags }).save().then(function (data) {
+                    NotificationService.notify('notify', "success", "L'élément à été ajouté avec succès");
+                });
+                // event,type,message
             }
         }
 
@@ -1296,7 +1407,7 @@ module.exports = exports['default'];
         });
     }
 })();
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 /**
  * Created by Renaud ROHLINGER on 21/12/2015.
  * Article controller
@@ -1308,9 +1419,9 @@ module.exports = exports['default'];
 
     'use strict';
 
-    ArticleController.$inject = ["$state", "$stateParams", "$location", "PostsManager"];
-    angular.module('tstModule.article').controller('ArticleController', ArticleController);
-    function ArticleController($state, $stateParams, $location, PostsManager) {
+    ArticleController.$inject = ["$state", "$stateParams", "$timeout", "NotificationService", "PostsManager"];
+    angular.module('angularOrm.article').controller('ArticleController', ArticleController);
+    function ArticleController($state, $stateParams, $timeout, NotificationService, PostsManager) {
         var self = this;
         var getArticle;
         // get id from stateParam
@@ -1322,8 +1433,9 @@ module.exports = exports['default'];
         });
 
         function removeArticle() {
-            self.getArticle.remove();
-            alert("Supression de l'article accomplie");
+            self.getArticle.remove().then(function (data) {
+                NotificationService.notify('notify', "success", "L'élément à été supprimé avec succès");
+            });
         }
         _.assign(self, {
             getArticle: getArticle,
@@ -1331,7 +1443,7 @@ module.exports = exports['default'];
         });
     }
 })();
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 /**
  * Created by Renaud ROHLINGER on 27/11/2015.
  * Home controller
@@ -1344,13 +1456,13 @@ module.exports = exports['default'];
     'use strict';
 
     HomeController.$inject = ["PostsManager"];
-    angular.module('tstModule.home').controller('HomeController', HomeController);
+    angular.module('angularOrm.home').controller('HomeController', HomeController);
     function HomeController(PostsManager) {
         var self = this;
         var getAll;
         var get;
 
-        PostsManager.get(PostsManager.query().populate(['tags', 'user'])).then(function (posts) {
+        PostsManager.get(PostsManager.query().populate(['tags', 'user']).sort('-_id')).then(function (posts) {
             self.getAll = posts.data;
         });
 
@@ -1359,7 +1471,7 @@ module.exports = exports['default'];
         });
     }
 })();
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 /**
  * Created by Renaud ROHLINGER on 27/11/2015.
  * Home router
@@ -1370,7 +1482,7 @@ module.exports = exports['default'];
 (function () {
             'use strict';
 
-            angular.module('tstModule.home', []).config(["$stateProvider", function ($stateProvider) {
+            angular.module('angularOrm.home', []).config(["$stateProvider", function ($stateProvider) {
 
                         var view = 'home';
 

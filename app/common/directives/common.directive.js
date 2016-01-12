@@ -7,7 +7,7 @@
     'use strict';
 
     angular
-        .module('tstModule.common', [])
+        .module('angularOrm.common', [])
         .directive('footer', FooterDirective);
             function FooterDirective() {
                 return {
@@ -19,7 +19,7 @@
             }
 
     angular
-        .module('tstModule.common')
+        .module('angularOrm.common')
         .directive('header', HeaderDirective);
 
             HeaderDirective.$inject = ['$location'];

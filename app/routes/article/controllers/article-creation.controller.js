@@ -8,9 +8,9 @@
     'use strict';
 
     angular
-    	.module('tstModule.article')
+    	.module('angularOrm.article')
         .controller('ArticleCreationController' , ArticleCreationController);
-    function ArticleCreationController($state, $stateParams,PostsManager,TagsManager,UsersManager) {
+    function ArticleCreationController($state,$stateParams,$timeout,NotificationService,PostsManager,TagsManager,UsersManager) {
         var self = this;
     	//var getArticle; 
         // get id from stateParam
@@ -25,12 +25,15 @@
         var users=[];
         var user={};
 
+
         function AddTag(){
             if(self.newTag!={}&&tags.indexOf(self.newTag)==-1){
                 tags.push(self.newTag);
                 self.newTag = {};  
             }
         }
+
+
         function RemoveTag(tag){
             var i = tags.indexOf(tag);
             if(i != -1) {
@@ -51,8 +54,10 @@
 
         function createArticle(isValid){
             if(isValid) {
-            PostsManager.create({title:self.title, content:self.description,user:self.user,tags:self.tags}).save();
-            alert("Ajout de l'article accomplie");
+            PostsManager.create({title:self.title, content:self.description,user:self.user,tags:self.tags}).save().then(function(data){
+                NotificationService.notify('notify',"success","L'élément à été ajouté avec succès");
+            });
+            // event,type,message
             }
         }
 

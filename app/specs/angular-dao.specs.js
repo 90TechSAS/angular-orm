@@ -4,7 +4,7 @@ describe('Angular DAO', function(){
 
     beforeEach(function(){
 
-        module('tstModule', function(PostsManagerProviderPostsManagerProvider,TagsManagerProvider,UsersManagerProvider) {
+        module('angularOrm', function(PostsManagerProviderPostsManagerProvider,TagsManagerProvider,UsersManagerProvider) {
             PostsManagerProvider.setRootUrl('http://MOCKURL.com/model1');
             TagsManagerProvider.setRootUrl('http://MOCKURL.com/model2');
             UsersManagerProvider.setRootUrl('http://MOCKURL.com/model3');

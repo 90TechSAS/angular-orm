@@ -8,7 +8,7 @@
 (function () {
             'use strict';
 
-            angular.module('tstModule.home', []).config(function ($stateProvider) {
+            angular.module('angularOrm.home', []).config(function ($stateProvider) {
 
                         var view = 'home';
 

@@ -9,7 +9,7 @@
 
 
     angular
-        .module('tstModule.home',[])
+        .module('angularOrm.home',[])
         .config(function($stateProvider) {
 
             var view = 'home';

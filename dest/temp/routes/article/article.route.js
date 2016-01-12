@@ -8,7 +8,7 @@
 (function () {
     'use strict';
 
-    angular.module('tstModule.article', []).config(function ($stateProvider) {
+    angular.module('angularOrm.article', []).config(function ($stateProvider) {
         $stateProvider.state('article', {
             url: '/article/:instanceID',
             templateUrl: './app/routes/article/controllers/article.html',
