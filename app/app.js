@@ -8,11 +8,13 @@ import UsersManager from './managers/UsersManager';
 import CommonDirective from './common/directives/common.directive';
 import CommonController from './common/controllers/common.controller';
 import NotificationService from './common/services/notification.service';
+import LoadingService from './common/services/loading.service';
 
 import HomeRoute from './routes/home/home.route';
+import HomeController from './routes/home/controllers/home.controller';
+
 import ArticleRoute from './routes/article/article.route';
 
-import HomeController from './routes/home/controllers/home.controller';
 import ArticleController from './routes/article/controllers/article.controller';
 import ArticleCreationController from './routes/article/controllers/article-creation.controller';
 

@@ -7,11 +7,8 @@ import ActiveRecord from '../ActiveRecord'
 var model = {
 
     _id: {
-        type  : String,
-        ref: 'PostsModel',
-        //private: true
+        type  : String
     },
-
     title: String
 };
 

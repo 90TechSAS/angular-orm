@@ -1,6 +1,6 @@
 <div header></div>
 <div class="group animated">
-	<div class="col span_2_of_4 main_div" ng-repeat="post in home.getAll">
+	<div class="col span_2_of_4 main_div" ng-repeat="post in home.allPosts">
   		<h1>{{post.title}}</h1>
         <p>{{ post.content | limitTo: 240 }}{{post.content.length > 240 ? '...' : ''}}</p>
         <h3>Written by {{post.user.lastName}} {{post.user.firstName}}</h3>

@@ -8,6 +8,7 @@ var gulp       = require('gulp'),
     bowerFiles = require('main-bower-files'),
     browserify = require('browserify'),
     del        = require('del'),
+    gulpDocs = require('gulp-ngdocs'),
     source     = require('vinyl-source-stream'),
     buffer     = require('vinyl-buffer'),
     rename     = require('gulp-rename'),
@@ -28,6 +29,12 @@ gulp.task('es6-commonjs',['clean-temp'], function(){
 
 gulp.task('bundle-commonjs-clean', function(){
     return del(['build']);
+});
+
+gulp.task('ngdocs', [], function () {
+    return gulp.src(['./app/**/*.js','./app/**/**/*.js', './src/**/*.js'])
+    .pipe(gulpDocs.process())
+    .pipe(gulp.dest('./docs'));
 });
 
 gulp.task('commonjs-bundle',['bundle-commonjs-clean','es6-commonjs'], function(){

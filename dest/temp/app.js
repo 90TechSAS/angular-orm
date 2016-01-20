@@ -32,17 +32,21 @@ var _commonServicesNotificationService = require('./common/services/notification
 
 var _commonServicesNotificationService2 = _interopRequireDefault(_commonServicesNotificationService);
 
+var _commonServicesLoadingService = require('./common/services/loading.service');
+
+var _commonServicesLoadingService2 = _interopRequireDefault(_commonServicesLoadingService);
+
 var _routesHomeHomeRoute = require('./routes/home/home.route');
 
 var _routesHomeHomeRoute2 = _interopRequireDefault(_routesHomeHomeRoute);
 
-var _routesArticleArticleRoute = require('./routes/article/article.route');
-
-var _routesArticleArticleRoute2 = _interopRequireDefault(_routesArticleArticleRoute);
-
 var _routesHomeControllersHomeController = require('./routes/home/controllers/home.controller');
 
 var _routesHomeControllersHomeController2 = _interopRequireDefault(_routesHomeControllersHomeController);
+
+var _routesArticleArticleRoute = require('./routes/article/article.route');
+
+var _routesArticleArticleRoute2 = _interopRequireDefault(_routesArticleArticleRoute);
 
 var _routesArticleControllersArticleController = require('./routes/article/controllers/article.controller');
 

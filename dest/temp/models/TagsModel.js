@@ -26,11 +26,8 @@ var _ActiveRecord2 = _interopRequireDefault(_ActiveRecord);
 var model = {
 
     _id: {
-        type: String,
-        ref: 'PostsModel'
+        type: String
     },
-
-    //private: true
     title: String
 };
 

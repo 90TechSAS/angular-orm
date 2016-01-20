@@ -8,17 +8,7 @@
 (function () {
     'use strict';
 
-    angular.module('angularOrm.common', []).directive('footer', FooterDirective);
-    function FooterDirective() {
-        return {
-            restrict: 'A',
-            bindToController: true,
-            templateUrl: "app/layouts/partials/footer.html",
-            controllerAs: ''
-        };
-    }
-
-    angular.module('angularOrm.common').directive('header', HeaderDirective);
+    angular.module('angularOrm.common', []).directive('header', HeaderDirective);
 
     HeaderDirective.$inject = ['$location'];
     function HeaderDirective($location) {
@@ -47,5 +37,15 @@
                 }
             };
         }
+    }
+
+    angular.module('angularOrm.common').directive('footer', FooterDirective);
+    function FooterDirective() {
+        return {
+            restrict: 'A',
+            bindToController: true,
+            templateUrl: "app/layouts/partials/footer.html",
+            controllerAs: ''
+        };
     }
 })();

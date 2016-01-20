@@ -10,17 +10,18 @@
     'use strict';
 
     angular.module('angularOrm.common').controller('CommonController', CommonController);
-    function CommonController(NotificationService, $timeout, $state) {
+    function CommonController(NotificationService, LoadingService, $timeout, $state) {
         var self = this;
         var notification = {};
+
         // attribute id to the notify event
         var id = 'vm1';
 
         // start the notification observer
         NotificationService.linkEvent(showNotification, 'notify', id);
+        LoadingService.linkEvent(showLoader);
 
         function showNotification(typenotif, message) {
-            //NotificationService.unlinkEvent('let_me_know');*
             self.notification.typenotif = typenotif;
             self.notification.message = message;
 
@@ -34,8 +35,13 @@
             });
         }
 
+        function showLoader() {
+            return LoadingService.get();
+        }
+
         _.assign(self, {
-            notification: notification
+            notification: notification,
+            showLoader: showLoader
         });
     }
 })();

@@ -30,7 +30,6 @@ var model = {
         unique: true
     },
 
-    //private: true
     title: String,
     content: String,
     user: {

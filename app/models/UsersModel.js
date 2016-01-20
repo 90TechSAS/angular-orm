@@ -9,7 +9,6 @@ var model = {
     _id: {
         type  : String,
         ref: 'PostsModel'
-        //private: true
     },
     firstName: String,
     lastName: String

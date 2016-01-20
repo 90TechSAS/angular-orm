@@ -9,12 +9,9 @@
 
     angular
     	.module('angularOrm.article')
-        .controller('ArticleCreationController' , ArticleCreationController);
-    function ArticleCreationController($state,$stateParams,$timeout,NotificationService,PostsManager,TagsManager,UsersManager) {
-        var self = this;
-    	//var getArticle; 
-        // get id from stateParam
-        //var id = $stateParams.instanceID;  	
+        .controller('ArticleCreationController', ArticleCreationController);
+    function ArticleCreationController($state,$stateParams,$timeout,NotificationService,LoadingService,PostsManager,TagsManager,UsersManager) {
+        var vm = this;
         var newTag={};
         var name="";
         var firstname="";
@@ -27,9 +24,9 @@
 
 
         function AddTag(){
-            if(self.newTag!={}&&tags.indexOf(self.newTag)==-1){
-                tags.push(self.newTag);
-                self.newTag = {};  
+            if(vm.newTag!={}&&tags.indexOf(vm.newTag)==-1){
+                tags.push(vm.newTag);
+                vm.newTag = {};  
             }
         }
 
@@ -45,32 +42,42 @@
         };
 
 
-        UsersManager.get().then(function(users){
-            self.users = users.data;
-        });
-        TagsManager.get().then(function(tags){
-            self.tagslist = tags.data;
-        });
+        activate();
+        
+        LoadingService.set(true);
+
+        function activate() {
+           
+            getTags().then(function() {
+                getUsers().then(function() {
+                    LoadingService.set(false);
+                }); 
+            });
+        }
+
+        function getUsers() {
+            return UsersManager.get().then(function(users){
+                vm.users = users.data;
+                return vm.users;
+            });
+        }
+
+        function getTags() {
+            return TagsManager.get().then(function(tags){
+                vm.tagslist = tags.data;
+                return vm.tagslist;
+            });
+        }
 
         function createArticle(isValid){
             if(isValid) {
-            PostsManager.create({title:self.title, content:self.description,user:self.user,tags:self.tags}).save().then(function(data){
-                NotificationService.notify('notify',"success","L'élément à été ajouté avec succès");
-            });
-            // event,type,message
+                PostsManager.create({title:vm.title, content:vm.description,user:vm.user,tags:vm.tags}).save().then(function(data){
+                    NotificationService.notify('notify',"success","L'élément à été ajouté avec succès");
+                });
             }
         }
 
-    	/*PostsManager.getById(id,PostsManager.query().populate(['tags','user'])).then(function(data){
-            self.getArticle = data;
-        });*/
-    /*    PostsManager.post('/items/submit/new-item', function(req, res){
-          new PostsModel(req.body.formContents).save(function (e) {
-            res.send('item saved');
-          });
-        });*/
-
-        _.assign(self, {
+        _.assign(vm, {
             AddTag:AddTag,
             RemoveTag:RemoveTag,
         	GetUserFullName:GetUserFullName,

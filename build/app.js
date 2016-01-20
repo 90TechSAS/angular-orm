@@ -763,17 +763,21 @@ var _commonServicesNotificationService = require('./common/services/notification
 
 var _commonServicesNotificationService2 = _interopRequireDefault(_commonServicesNotificationService);
 
+var _commonServicesLoadingService = require('./common/services/loading.service');
+
+var _commonServicesLoadingService2 = _interopRequireDefault(_commonServicesLoadingService);
+
 var _routesHomeHomeRoute = require('./routes/home/home.route');
 
 var _routesHomeHomeRoute2 = _interopRequireDefault(_routesHomeHomeRoute);
 
-var _routesArticleArticleRoute = require('./routes/article/article.route');
-
-var _routesArticleArticleRoute2 = _interopRequireDefault(_routesArticleArticleRoute);
-
 var _routesHomeControllersHomeController = require('./routes/home/controllers/home.controller');
 
 var _routesHomeControllersHomeController2 = _interopRequireDefault(_routesHomeControllersHomeController);
+
+var _routesArticleArticleRoute = require('./routes/article/article.route');
+
+var _routesArticleArticleRoute2 = _interopRequireDefault(_routesArticleArticleRoute);
 
 var _routesArticleControllersArticleController = require('./routes/article/controllers/article.controller');
 
@@ -792,7 +796,7 @@ var _module = angular.module('angularOrm', ['ui.router', 'angularOrm.service', '
 _DaoHelper2['default'].registerService(_module, 'PostsManager', _managersPostsManager2['default']);
 _DaoHelper2['default'].registerService(_module, 'TagsManager', _managersTagsManager2['default']);
 _DaoHelper2['default'].registerService(_module, 'UsersManager', _managersUsersManager2['default']);
-},{"./DaoHelper":2,"./common/controllers/common.controller":7,"./common/directives/common.directive":8,"./common/services/notification.service":9,"./managers/PostsManager":10,"./managers/TagsManager":11,"./managers/UsersManager":12,"./routes/article/article.route":16,"./routes/article/controllers/article-creation.controller":17,"./routes/article/controllers/article.controller":18,"./routes/home/controllers/home.controller":19,"./routes/home/home.route":20}],7:[function(require,module,exports){
+},{"./DaoHelper":2,"./common/controllers/common.controller":7,"./common/directives/common.directive":8,"./common/services/loading.service":9,"./common/services/notification.service":10,"./managers/PostsManager":11,"./managers/TagsManager":12,"./managers/UsersManager":13,"./routes/article/article.route":17,"./routes/article/controllers/article-creation.controller":18,"./routes/article/controllers/article.controller":19,"./routes/home/controllers/home.controller":20,"./routes/home/home.route":21}],7:[function(require,module,exports){
 /**
  * Created by Renaud ROHLINGER on 27/11/2015.
  * Home controller
@@ -804,19 +808,20 @@ _DaoHelper2['default'].registerService(_module, 'UsersManager', _managersUsersMa
 
     'use strict';
 
-    CommonController.$inject = ["NotificationService", "$timeout", "$state"];
+    CommonController.$inject = ["NotificationService", "LoadingService", "$timeout", "$state"];
     angular.module('angularOrm.common').controller('CommonController', CommonController);
-    function CommonController(NotificationService, $timeout, $state) {
+    function CommonController(NotificationService, LoadingService, $timeout, $state) {
         var self = this;
         var notification = {};
+
         // attribute id to the notify event
         var id = 'vm1';
 
         // start the notification observer
         NotificationService.linkEvent(showNotification, 'notify', id);
+        LoadingService.linkEvent(showLoader);
 
         function showNotification(typenotif, message) {
-            //NotificationService.unlinkEvent('let_me_know');*
             self.notification.typenotif = typenotif;
             self.notification.message = message;
 
@@ -830,8 +835,13 @@ _DaoHelper2['default'].registerService(_module, 'UsersManager', _managersUsersMa
             });
         }
 
+        function showLoader() {
+            return LoadingService.get();
+        }
+
         _.assign(self, {
-            notification: notification
+            notification: notification,
+            showLoader: showLoader
         });
     }
 })();
@@ -846,17 +856,7 @@ _DaoHelper2['default'].registerService(_module, 'UsersManager', _managersUsersMa
 (function () {
     'use strict';
 
-    angular.module('angularOrm.common', []).directive('footer', FooterDirective);
-    function FooterDirective() {
-        return {
-            restrict: 'A',
-            bindToController: true,
-            templateUrl: "app/layouts/partials/footer.html",
-            controllerAs: ''
-        };
-    }
-
-    angular.module('angularOrm.common').directive('header', HeaderDirective);
+    angular.module('angularOrm.common', []).directive('header', HeaderDirective);
 
     HeaderDirective.$inject = ['$location'];
     function HeaderDirective($location) {
@@ -886,8 +886,76 @@ _DaoHelper2['default'].registerService(_module, 'UsersManager', _managersUsersMa
             };
         }
     }
+
+    angular.module('angularOrm.common').directive('footer', FooterDirective);
+    function FooterDirective() {
+        return {
+            restrict: 'A',
+            bindToController: true,
+            templateUrl: "app/layouts/partials/footer.html",
+            controllerAs: ''
+        };
+    }
 })();
 },{}],9:[function(require,module,exports){
+/**
+ * Created by Renaud ROHLINGER on 19/01/2015.
+ * Notification service
+ */
+
+'use strict';
+
+(function () {
+    'use strict';
+
+    /**
+     * @ngdoc service
+     * @name angularOrm.service:LoadingService
+     * @description
+     * # LoadingService
+     * Manages the loader inside the app
+     *
+    */
+    angular.module('angularOrm.service').factory('LoadingService', LoadingService);
+    function LoadingService() {
+
+        var observerLoadingService = {};
+        observerLoadingService.loading = true;
+        // initialise function
+        observerLoadingService.observers = function (x) {
+            return x * x;
+        };
+
+        observerLoadingService.linkEvent = function (callback) {
+            observerLoadingService.observers = callback;
+        };
+        /**
+        * @ngdoc method
+        * @name observerLoadingService#set
+        * @methodOf angularOrm.service:LoadingService
+        * @param {function} callback the callback function to fire
+        * @param {string} boolean to check if the app is loading
+        * @description setter of the loader
+        */
+        observerLoadingService.set = function (isloading) {
+            observerLoadingService.loading = isloading;
+            observerLoadingService.observers();
+        };
+
+        /**
+        * @ngdoc method
+        * @name observerLoadingService#get
+        * @methodOf angularOrm.service:LoadingService
+        * @description getter of the loader
+        */
+        observerLoadingService.get = function () {
+            return observerLoadingService.loading;
+        };
+
+        return observerLoadingService;
+    }
+})();
+},{}],10:[function(require,module,exports){
 /**
  * Created by Renaud ROHLINGER on 12/01/2015.
  * Notification service
@@ -971,7 +1039,7 @@ _DaoHelper2['default'].registerService(_module, 'UsersManager', _managersUsersMa
     return observerNotificationService;
   }
 })();
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1022,7 +1090,7 @@ var ModelManager = (function (_DAO) {
 exports['default'] = ModelManager;
 ;
 module.exports = exports['default'];
-},{"../GenericDao":3,"../QueryBuilder":4,"./../models/PostsModel.js":13}],11:[function(require,module,exports){
+},{"../GenericDao":3,"../QueryBuilder":4,"./../models/PostsModel.js":14}],12:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1073,7 +1141,7 @@ var TagsModelManager = (function (_DAO) {
 exports['default'] = TagsModelManager;
 ;
 module.exports = exports['default'];
-},{"../GenericDao":3,"../QueryBuilder":4,"./../models/TagsModel.js":14}],12:[function(require,module,exports){
+},{"../GenericDao":3,"../QueryBuilder":4,"./../models/TagsModel.js":15}],13:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1124,7 +1192,7 @@ var UsersModelManager = (function (_DAO) {
 exports['default'] = UsersModelManager;
 ;
 module.exports = exports['default'];
-},{"../GenericDao":3,"../QueryBuilder":4,"./../models/UsersModel.js":15}],13:[function(require,module,exports){
+},{"../GenericDao":3,"../QueryBuilder":4,"./../models/UsersModel.js":16}],14:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1157,7 +1225,6 @@ var model = {
         unique: true
     },
 
-    //private: true
     title: String,
     content: String,
     user: {
@@ -1185,59 +1252,6 @@ var PostsModel = (function (_AR) {
 })(AR);
 
 exports['default'] = PostsModel;
-module.exports = exports['default'];
-},{"../ActiveRecord":1}],14:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, '__esModule', {
-    value: true
-});
-// istanbul ignore next
-
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
-
-// istanbul ignore next
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-// istanbul ignore next
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-// istanbul ignore next
-
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var _ActiveRecord = require('../ActiveRecord');
-
-var _ActiveRecord2 = _interopRequireDefault(_ActiveRecord);
-
-var model = {
-
-    _id: {
-        type: String,
-        ref: 'PostsModel'
-    },
-
-    //private: true
-    title: String
-};
-
-var AR = (0, _ActiveRecord2['default'])(model, 'TagsModel');
-
-var TagsModel = (function (_AR) {
-    _inherits(TagsModel, _AR);
-
-    function TagsModel() {
-        _classCallCheck(this, TagsModel);
-
-        _get(Object.getPrototypeOf(TagsModel.prototype), 'constructor', this).apply(this, arguments);
-    }
-
-    return TagsModel;
-})(AR);
-
-exports['default'] = TagsModel;
 module.exports = exports['default'];
 },{"../ActiveRecord":1}],15:[function(require,module,exports){
 'use strict';
@@ -1268,9 +1282,58 @@ var _ActiveRecord2 = _interopRequireDefault(_ActiveRecord);
 var model = {
 
     _id: {
+        type: String
+    },
+    title: String
+};
+
+var AR = (0, _ActiveRecord2['default'])(model, 'TagsModel');
+
+var TagsModel = (function (_AR) {
+    _inherits(TagsModel, _AR);
+
+    function TagsModel() {
+        _classCallCheck(this, TagsModel);
+
+        _get(Object.getPrototypeOf(TagsModel.prototype), 'constructor', this).apply(this, arguments);
+    }
+
+    return TagsModel;
+})(AR);
+
+exports['default'] = TagsModel;
+module.exports = exports['default'];
+},{"../ActiveRecord":1}],16:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+    value: true
+});
+// istanbul ignore next
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+// istanbul ignore next
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+// istanbul ignore next
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+// istanbul ignore next
+
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _ActiveRecord = require('../ActiveRecord');
+
+var _ActiveRecord2 = _interopRequireDefault(_ActiveRecord);
+
+var model = {
+
+    _id: {
         type: String,
         ref: 'PostsModel'
-        //private: true
     },
     firstName: String,
     lastName: String
@@ -1292,7 +1355,7 @@ var UsersModel = (function (_AR) {
 
 exports['default'] = UsersModel;
 module.exports = exports['default'];
-},{"../ActiveRecord":1}],16:[function(require,module,exports){
+},{"../ActiveRecord":1}],17:[function(require,module,exports){
 /**
  * Created by Renaud ROHLINGER on 21/12/2015.
  * Article router
@@ -1319,7 +1382,7 @@ module.exports = exports['default'];
         });
     }]);
 })();
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 /**
  * Created by Renaud ROHLINGER on 06/01/2015.
  * Article controller
@@ -1331,13 +1394,10 @@ module.exports = exports['default'];
 
     'use strict';
 
-    ArticleCreationController.$inject = ["$state", "$stateParams", "$timeout", "NotificationService", "PostsManager", "TagsManager", "UsersManager"];
+    ArticleCreationController.$inject = ["$state", "$stateParams", "$timeout", "NotificationService", "LoadingService", "PostsManager", "TagsManager", "UsersManager"];
     angular.module('angularOrm.article').controller('ArticleCreationController', ArticleCreationController);
-    function ArticleCreationController($state, $stateParams, $timeout, NotificationService, PostsManager, TagsManager, UsersManager) {
-        var self = this;
-        //var getArticle;
-        // get id from stateParam
-        //var id = $stateParams.instanceID;  	
+    function ArticleCreationController($state, $stateParams, $timeout, NotificationService, LoadingService, PostsManager, TagsManager, UsersManager) {
+        var vm = this;
         var newTag = {};
         var name = "";
         var firstname = "";
@@ -1349,9 +1409,9 @@ module.exports = exports['default'];
         var user = {};
 
         function AddTag() {
-            if (self.newTag != {} && tags.indexOf(self.newTag) == -1) {
-                tags.push(self.newTag);
-                self.newTag = {};
+            if (vm.newTag != {} && tags.indexOf(vm.newTag) == -1) {
+                tags.push(vm.newTag);
+                vm.newTag = {};
             }
         }
 
@@ -1365,32 +1425,42 @@ module.exports = exports['default'];
             return user.firstName + ' ' + user.lastName;
         };
 
-        UsersManager.get().then(function (users) {
-            self.users = users.data;
-        });
-        TagsManager.get().then(function (tags) {
-            self.tagslist = tags.data;
-        });
+        activate();
+
+        LoadingService.set(true);
+
+        function activate() {
+
+            getTags().then(function () {
+                getUsers().then(function () {
+                    LoadingService.set(false);
+                });
+            });
+        }
+
+        function getUsers() {
+            return UsersManager.get().then(function (users) {
+                vm.users = users.data;
+                return vm.users;
+            });
+        }
+
+        function getTags() {
+            return TagsManager.get().then(function (tags) {
+                vm.tagslist = tags.data;
+                return vm.tagslist;
+            });
+        }
 
         function createArticle(isValid) {
             if (isValid) {
-                PostsManager.create({ title: self.title, content: self.description, user: self.user, tags: self.tags }).save().then(function (data) {
+                PostsManager.create({ title: vm.title, content: vm.description, user: vm.user, tags: vm.tags }).save().then(function (data) {
                     NotificationService.notify('notify', "success", "L'élément à été ajouté avec succès");
                 });
-                // event,type,message
             }
         }
 
-        /*PostsManager.getById(id,PostsManager.query().populate(['tags','user'])).then(function(data){
-               self.getArticle = data;
-           });*/
-        /*    PostsManager.post('/items/submit/new-item', function(req, res){
-              new PostsModel(req.body.formContents).save(function (e) {
-                res.send('item saved');
-              });
-            });*/
-
-        _.assign(self, {
+        _.assign(vm, {
             AddTag: AddTag,
             RemoveTag: RemoveTag,
             GetUserFullName: GetUserFullName,
@@ -1407,7 +1477,7 @@ module.exports = exports['default'];
         });
     }
 })();
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 /**
  * Created by Renaud ROHLINGER on 21/12/2015.
  * Article controller
@@ -1419,31 +1489,64 @@ module.exports = exports['default'];
 
     'use strict';
 
-    ArticleController.$inject = ["$state", "$stateParams", "$timeout", "NotificationService", "PostsManager"];
+    ArticleController.$inject = ["$state", "$stateParams", "$timeout", "NotificationService", "LoadingService", "PostsManager"];
     angular.module('angularOrm.article').controller('ArticleController', ArticleController);
-    function ArticleController($state, $stateParams, $timeout, NotificationService, PostsManager) {
-        var self = this;
+    function ArticleController($state, $stateParams, $timeout, NotificationService, LoadingService, PostsManager) {
+        var vm = this;
         var getArticle;
         // get id from stateParam
         var id = $stateParams.instanceID;
 
-        // get post by id
-        PostsManager.getById(id, PostsManager.query().populate(['tags', 'user'])).then(function (data) {
-            self.getArticle = data;
-        });
+        activate();
 
-        function removeArticle() {
-            self.getArticle.remove().then(function (data) {
-                NotificationService.notify('notify', "success", "L'élément à été supprimé avec succès");
+        LoadingService.set(true);
+
+        function activate() {
+            /**
+            * Etape 1
+            * Appelle la fonction getAllPosts pour récupérer
+            * les données «allPosts» et attend la promise.
+            */
+            return getPost().then(function () {
+                /**
+                 * Etape 4
+                 * Exécute une action à la résolution de la promise finale.
+                 */
+                LoadingService.set(false);
             });
         }
-        _.assign(self, {
+
+        function getPost() {
+            /**
+            * Etape 2
+            * Appel du service de données pour récupérer les données
+            * et attend la promesse.
+            */
+            return PostsManager.getById(id, PostsManager.query().populate(['tags', 'user'])).then(function (data) {
+                /**
+                * Etape 3
+                * Définit les données et résout la promesse.
+                */
+                vm.getArticle = data;
+                return vm.getArticle;
+            });
+        }
+
+        function removeArticle() {
+
+            LoadingService.set(true);
+            vm.getArticle.remove().then(function (data) {
+                NotificationService.notify('notify', "success", "L'élément à été supprimé avec succès");
+                LoadingService.set(false);
+            });
+        }
+        _.assign(vm, {
             getArticle: getArticle,
             removeArticle: removeArticle
         });
     }
 })();
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 /**
  * Created by Renaud ROHLINGER on 27/11/2015.
  * Home controller
@@ -1455,23 +1558,52 @@ module.exports = exports['default'];
 
     'use strict';
 
-    HomeController.$inject = ["PostsManager"];
+    HomeController.$inject = ["PostsManager", "LoadingService"];
     angular.module('angularOrm.home').controller('HomeController', HomeController);
-    function HomeController(PostsManager) {
-        var self = this;
-        var getAll;
+    function HomeController(PostsManager, LoadingService) {
+        var vm = this;
+        var allPosts;
         var get;
 
-        PostsManager.get(PostsManager.query().populate(['tags', 'user']).sort('-_id')).then(function (posts) {
-            self.getAll = posts.data;
-        });
+        activate();
 
-        _.assign(self, {
-            getAll: getAll
+        function activate() {
+            /**
+            * Etape 1
+            * Appelle la fonction getAllPosts pour récupérer
+            * les données «allPosts» et attend la promise.
+            */
+            return getAllPosts().then(function () {
+                /**
+                 * Etape 4
+                 * Exécute une action à la résolution de la promise finale.
+                 */
+                LoadingService.set(false);
+            });
+        }
+
+        function getAllPosts() {
+            /**
+            * Etape 2
+            * Appel du service de données pour récupérer les données
+            * et attend la promesse.
+            */
+            return PostsManager.get(PostsManager.query().populate(['tags', 'user']).sort('-_id')).then(function (posts) {
+                /**
+                * Etape 3
+                * Définit les données et résout la promesse.
+                */
+                vm.allPosts = posts.data;
+                return vm.allPosts;
+            });
+        }
+
+        _.assign(vm, {
+            allPosts: allPosts
         });
     }
 })();
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 /**
  * Created by Renaud ROHLINGER on 27/11/2015.
  * Home router

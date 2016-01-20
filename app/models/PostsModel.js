@@ -9,7 +9,6 @@ var model = {
     _id: {
         type  : String,
         unique: true,
-        //private: true
     },
 
     title: String,
