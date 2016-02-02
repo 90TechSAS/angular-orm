@@ -8,7 +8,7 @@ export default class QueryBuilder {
     setQuery(query){
         this.opts            = this.opts || {};
         this.opts.conditions = this.opts.conditions || {};
-        _.merge(this.opts.conditions, query);
+        _.merge(this.opts.conditions, _.cloneDeep(query));
     }
 
     select(ids, key){
@@ -79,9 +79,9 @@ export default class QueryBuilder {
         return this;
     }
 
-    search(term){
+    search(term, field='name'){
         if (term){
-            this.setQuery({name: {$regex: '.*' + term + '.*', $options: 'i'}})
+            this.setQuery({[field]: {$regex: '.*' + term + '.*', $options: 'i'}})
         }
         return this;
     }
