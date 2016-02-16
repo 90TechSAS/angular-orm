@@ -17,7 +17,7 @@ Easily communicate with mongoose/baucis api
     You can chose to use stock QueryBuilder or extend it to add custom querying behaviour. 
     It is necessary to obtain a QueryBuilder instance from the DAO's query method before passing it back in the QB's get() method
 
-  - ServieLocator (Singleton)
+  - ServiceLocator (Singleton)
     
     Internally used by the other classes to retrieve corresponding DAO from ActiveRecord, or the ActiveRecord from the DAO. 
     Objects will be automatically registered in the SL when creating the DAO.
