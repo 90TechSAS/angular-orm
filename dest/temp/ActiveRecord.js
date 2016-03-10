@@ -187,7 +187,7 @@ function ActiveRecord(model, name) {
                 if (populate) {
                     var dao = sl.getDao(name);
                     callback = function () {
-                        return dao.get(_this3._id, dao.query().populate(populate));
+                        return dao.getById(_this3._id, dao.query().populate(populate));
                     };
                 } else {
                     callback = function (data) {
