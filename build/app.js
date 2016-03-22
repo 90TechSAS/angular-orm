@@ -472,7 +472,11 @@ function GenericDao(model, qb) {
                 }
                 _.set(options, ['conditions', '$where'], condition);
                 return this.$http.post(this.url + '/filters', options).then(function (response) {
-                    return { meta: { total: response.headers('X-Total-Count') }, data: response.data.map(_this2.build, _this2) };
+                    if (typeof response.data == 'number') {
+                        return { meta: { total: response.headers('X-Total-Count') }, data: response.data };
+                    } else {
+                        return { meta: { total: response.headers('X-Total-Count') }, data: response.data.map(_this2.build, _this2) };
+                    }
                 });
             }
         }, {
