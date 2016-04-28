@@ -90,22 +90,36 @@ export default function ActiveRecord(model, name){
             var deferred = $q.defer();
             var self     = this;
             if (Array.isArray(model[field]) && Array.isArray(this[field]) && this[field].length){
-                var ids  = this[field].map((i)=>{
-                    return (typeof i === 'string') ? i : i._id;
-                })
-                var name = model[field][0].ref;
-                if (!name)
-                    deferred.reject('Cannot Populate: unknown model');
-                else{
+              /**
+               * The field is an array. It may contain mixed populated and unpopulated data.
+               * first, sort it out (typeof unpopulated is string)
+               */
+              var grouped = _.groupBy(this[field], (i) => typeof i)
+                /** No string = everything is populated (or array is empty), we're all set */
+                if (!grouped.string){
+                    deferred.resolve(this[field]);
+                } else {
+                  /** Resolve the model name and the corresponding DAO */
+                  var name = model[field][0].ref;
+                  if (!name)
+                      deferred.reject('Cannot Populate: unknown model');
+                  else{
                     var dao = sl.getDao(name);
-                    if (!dao){
-                        deferred.reject('Cannot Populate: unknown DAO');
-                    } else{
-                        return dao.get(dao.query().select(ids)).then((d)=>{
-                            this[field] = d.data;
-                            return this;
-                        })
-                    }
+                      if (!dao){
+                          deferred.reject('Cannot Populate: unknown DAO');
+                      } else{
+                          return dao.get(dao.query().select(grouped.string)).then((d)=>{
+                            /** To preserve order, we map the existing field, replacing only the populated values */
+                              self[field] = self[field].map((f) => {
+                                 if (typeof f === 'string'){
+                                    return _.find(d.data, (foo) => { return (foo._id === f)})
+                                 }
+                                return f
+                              })
+                              return self;
+                          })
+                      }
+                }
                 }
             }
 

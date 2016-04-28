@@ -107,27 +107,41 @@ function ActiveRecord(model, name) {
         }, {
             key: 'populate',
             value: function populate(field) {
-                // istanbul ignore next
-
-                var _this2 = this;
-
                 var $q = this.$injector.get('$q');
                 var deferred = $q.defer();
                 var self = this;
                 if (Array.isArray(model[field]) && Array.isArray(this[field]) && this[field].length) {
-                    var ids = this[field].map(function (i) {
-                        return typeof i === 'string' ? i : i._id;
+                    /**
+                     * The field is an array. It may contain mixed populated and unpopulated data.
+                     * first, sort it out (typeof unpopulated is string)
+                     */
+                    var grouped = _.groupBy(this[field], function (i) {
+                        return typeof i;
                     });
-                    var name = model[field][0].ref;
-                    if (!name) deferred.reject('Cannot Populate: unknown model');else {
-                        var dao = sl.getDao(name);
-                        if (!dao) {
-                            deferred.reject('Cannot Populate: unknown DAO');
-                        } else {
-                            return dao.get(dao.query().select(ids)).then(function (d) {
-                                _this2[field] = d.data;
-                                return _this2;
-                            });
+                    /** No string = everything is populated (or array is empty), we're all set */
+                    if (!grouped.string) {
+                        deferred.resolve(this[field]);
+                    } else {
+                        /** Resolve the model name and the corresponding DAO */
+                        var name = model[field][0].ref;
+                        if (!name) deferred.reject('Cannot Populate: unknown model');else {
+                            var dao = sl.getDao(name);
+                            if (!dao) {
+                                deferred.reject('Cannot Populate: unknown DAO');
+                            } else {
+                                return dao.get(dao.query().select(grouped.string)).then(function (d) {
+                                    /** To preserve order, we map the existing field, replacing only the populated values */
+                                    self[field] = self[field].map(function (f) {
+                                        if (typeof f === 'string') {
+                                            return _.find(d.data, function (foo) {
+                                                return foo._id === f;
+                                            });
+                                        }
+                                        return f;
+                                    });
+                                    return self;
+                                });
+                            }
                         }
                     }
                 }
@@ -181,18 +195,18 @@ function ActiveRecord(model, name) {
             value: function save(populate) {
                 // istanbul ignore next
 
-                var _this3 = this;
+                var _this2 = this;
 
                 var toSave = this.beforeSave();
                 var callback;
                 if (populate) {
                     var dao = sl.getDao(name);
                     callback = function () {
-                        return dao.getById(_this3._id, dao.query().populate(populate));
+                        return dao.getById(_this2._id, dao.query().populate(populate));
                     };
                 } else {
                     callback = function (data) {
-                        _this3.build(data.data);
+                        _this2.build(data.data);
                         return data;
                     };
                 }
@@ -920,6 +934,11 @@ var model = {
 
     //private: true
     label: String,
+
+    models2: [{
+        type: String,
+        ref: 'Model2'
+    }],
 
     model2: {
         type: String,

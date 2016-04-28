@@ -14,6 +14,13 @@ var model = {
 
     label: String,
 
+    models2: [
+        {
+            type: String,
+            ref: 'Model2'
+        }
+    ],
+
     model2: {
         type: String,
         ref: 'Model2'

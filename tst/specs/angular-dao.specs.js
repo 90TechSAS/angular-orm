@@ -1,6 +1,6 @@
 describe('Angular DAO', function () {
 
-  var ModelManager, httpBackend, $rootScope;
+  var ModelManager, httpBackend, $rootScope, $timeout;
 
   beforeEach(function () {
 
@@ -9,10 +9,11 @@ describe('Angular DAO', function () {
       ModelManager2Provider.setRootUrl('http://MOCKURL.com/model2');
     });
 
-    inject(function (_ModelManager_, $httpBackend, _$rootScope_) {
+    inject(function (_ModelManager_, $httpBackend, _$rootScope_, _$timeout_) {
       ModelManager = _ModelManager_;
       httpBackend = $httpBackend;
       $rootScope = _$rootScope_;
+      $timeout = _$timeout_;
 
     })
 
@@ -105,24 +106,24 @@ describe('Angular DAO', function () {
 
   it('Should merge queries on the same field, two arrays queries', function () {
     httpBackend.expectGET(encodeURI('http://MOCKURL.com/model1?conditions={"label":{"$in":["2","3","4","5"]}}')).respond([]);
-    ModelManager.get(ModelManager.query().select([ '2','3' ], 'label').select(['4', '5'], 'label'));
+    ModelManager.get(ModelManager.query().select([ '2', '3' ], 'label').select([ '4', '5' ], 'label'));
     httpBackend.flush();
   });
 
   it('Should merge queries on the same field, single then array', function () {
     httpBackend.expectGET(encodeURI('http://MOCKURL.com/model1?conditions={"label":{"$in":["2","3","4"]}}')).respond([]);
-    ModelManager.get(ModelManager.query().select('2', 'label').select(['3', '4'], 'label'));
+    ModelManager.get(ModelManager.query().select('2', 'label').select([ '3', '4' ], 'label'));
     httpBackend.flush();
   });
 
   it('Should merge queries on the same field, array then single', function () {
     httpBackend.expectGET(encodeURI('http://MOCKURL.com/model1?conditions={"label":{"$in":["2","3","4"]}}')).respond([]);
-    ModelManager.get(ModelManager.query().select(['2', '3'], 'label').select('4', 'label'));
+    ModelManager.get(ModelManager.query().select([ '2', '3' ], 'label').select('4', 'label'));
     httpBackend.flush();
   });
   it('Should merge queries on the same field, array then single-array', function () {
     httpBackend.expectGET(encodeURI('http://MOCKURL.com/model1?conditions={"label":{"$in":["2","3","4"]}}')).respond([]);
-    ModelManager.get(ModelManager.query().select(['2', '3'], 'label').select(['4'], 'label'));
+    ModelManager.get(ModelManager.query().select([ '2', '3' ], 'label').select([ '4' ], 'label'));
     httpBackend.flush();
   });
 
@@ -170,6 +171,21 @@ describe('Angular DAO', function () {
     model.populate('model2');
     httpBackend.flush();
     // $rootScope.$digest();
+
+  });
+
+  it('Should make subPopulate queries on arrays', function () {
+    var model = ModelManager.create({
+      _id: '1234656',
+      models2: [ '77777', '4444', { _id: '888', toto: 'tutu' } ]
+    });
+    httpBackend.expectGET(encodeURI('http://MOCKURL.com/model2?conditions={"_id":{"$in":["77777","4444"]}}')).respond([ { _id: '77777' }, { _id: '4444' } ]);
+    model.populate('models2').then(function () {
+      expect(model.models2[ 0 ]._id).toEqual('77777')
+      expect(model.models2[ 1 ]._id).toEqual('4444')
+      expect(model.models2[ 2 ]._id).toEqual('888')
+    });
+    httpBackend.flush()
 
   });
 
