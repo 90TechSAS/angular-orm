@@ -73,7 +73,11 @@ export default function GenericDao(model, qb){
             }
             _.set(options, ['conditions', '$where'], condition);
             return this.$http.post(this.url + '/filters', options).then((response)=>{
-                return {meta: {total: response.headers('X-Total-Count')}, data: response.data.map(this.build, this)};
+                if (typeof response.data == 'number') {
+                    return {meta: {total: response.headers('X-Total-Count')}, data: response.data};
+                } else {
+                    return {meta: {total: response.headers('X-Total-Count')}, data: response.data.map(this.build, this)};
+                }
             })
         }
 
