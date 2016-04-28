@@ -179,7 +179,7 @@ describe('Angular DAO', function () {
     httpBackend.expectGET(encodeURI('http://MOCKURL.com/model2?conditions={"_id":{"$in":["77777","4444"]}}')).respond([{ _id: '77777' }, { _id: '4444' }]);
     model.populate('models2').then(function () {
       expect(model.models2[0]._id).toEqual('77777');
-      console.log(expect(model.models2[1]._id).toEqual('4444'));
+      expect(model.models2[1]._id).toEqual('4444');
       expect(model.models2[2]._id).toEqual('888');
     });
     httpBackend.flush();
