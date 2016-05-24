@@ -697,7 +697,19 @@ var QueryBuilder = (function () {
       var field = arguments.length <= 1 || arguments[1] === undefined ? 'name' : arguments[1];
 
       if (term) {
-        this.setQuery(_defineProperty({}, field, { $regex: '.*' + term + '.*', $options: 'i' }));
+        if (Array.isArray(field)) {
+          var q = {
+            $or: field.map(function (element) {
+              return _defineProperty({}, element, {
+                $regex: '.*' + term + '.*',
+                $options: 'i'
+              });
+            })
+          };
+          this.setQuery(q);
+        } else {
+          this.setQuery(_defineProperty({}, field, { $regex: '.*' + term + '.*', $options: 'i' }));
+        }
       }
       return this;
     }

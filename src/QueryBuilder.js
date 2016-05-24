@@ -93,7 +93,23 @@ export default class QueryBuilder {
 
   search (term, field = 'name') {
     if (term) {
-      this.setQuery({ [field]: { $regex: '.*' + term + '.*', $options: 'i' } })
+      if (Array.isArray(field)) {
+        var q = {
+          $or: field.map(
+            (element) => {
+              return {
+                [ element ]: {
+                  $regex: `.*${term}.*`,
+                  $options: 'i'
+                }
+              }
+            }
+          )
+        }
+        this.setQuery(q)
+      } else {
+        this.setQuery({ [field]: { $regex: '.*' + term + '.*', $options: 'i' } })
+      }
     }
     return this;
   }

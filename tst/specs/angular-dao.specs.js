@@ -162,6 +162,18 @@ describe('Angular DAO', function () {
     httpBackend.flush();
   });
 
+  it('Should search on another field', function () {
+    httpBackend.expectGET(encodeURI('http://MOCKURL.com/model1?conditions={"label":{"$regex":".*toto.*","$options":"i"}}')).respond([]);
+    ModelManager.get(ModelManager.query().search('toto', 'label'));
+    httpBackend.flush();
+  });
+
+  it('Should search on multiple fields', function () {
+    httpBackend.expectGET(encodeURI('http://MOCKURL.com/model1?conditions={"$or":[{"name":{"$regex":".*toto.*","$options":"i"}},{"label":{"$regex":".*toto.*","$options":"i"}}]}')).respond([]);
+    ModelManager.get(ModelManager.query().search('toto', ['name', 'label']));
+    httpBackend.flush();
+  });
+
   it('Should make subPopulate queries', function () {
     var model = ModelManager.create({
       _id: '1234656',
