@@ -52,7 +52,7 @@ function ActiveRecord(model, name) {
                 var _this = this;
 
                 _.each(model, function (field, key) {
-                    if (options && options[key]) {
+                    if (options && (options[key] || options[key] === 0)) {
                         var name = _.isArray(field) ? field[0].ref : field.ref;
                         var dao = sl.getDao(name);
                         if (dao) {

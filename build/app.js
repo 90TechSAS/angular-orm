@@ -53,7 +53,7 @@ function ActiveRecord(model, name) {
                 var _this = this;
 
                 _.each(model, function (field, key) {
-                    if (options && options[key]) {
+                    if (options && (options[key] || options[key] === 0)) {
                         var name = _.isArray(field) ? field[0].ref : field.ref;
                         var dao = sl.getDao(name);
                         if (dao) {
@@ -554,6 +554,7 @@ function GenericDao(model, qb) {
                     qb.setQuery(obj);
                 }
                 return this.$http.get(this.url, { params: qb.opts }).then(function (data) {
+
                     return {
                         data: data.data.map(_this4.build, _this4), meta: { total: data.headers('X-Total-Count') }
                     };
@@ -950,6 +951,8 @@ var model = {
 
     //private: true
     label: String,
+
+    num: Number,
 
     models2: [{
         type: String,

@@ -37,6 +37,14 @@ describe('Angular DAO', function () {
     ModelManager.getById('ididid');
   });
 
+  it('should deserialize numbers', function () {
+    httpBackend.expectGET('http://MOCKURL.com/model1/ididid').respond({ num: 0, label: 'toto' });
+    ModelManager.getById('ididid').then(function (data) {
+      expect(data.num).toBeDefined()
+    })
+    httpBackend.flush();
+  });
+
   it('should make a post query', function () {
     httpBackend.expectPOST('http://MOCKURL.com/model1/filters').respond();
     ModelManager.post();
@@ -170,7 +178,7 @@ describe('Angular DAO', function () {
 
   it('Should search on multiple fields', function () {
     httpBackend.expectGET(encodeURI('http://MOCKURL.com/model1?conditions={"$or":[{"name":{"$regex":".*toto.*","$options":"i"}},{"label":{"$regex":".*toto.*","$options":"i"}}]}')).respond([]);
-    ModelManager.get(ModelManager.query().search('toto', ['name', 'label']));
+    ModelManager.get(ModelManager.query().search('toto', [ 'name', 'label' ]));
     httpBackend.flush();
   });
 

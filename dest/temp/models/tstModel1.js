@@ -33,6 +33,8 @@ var model = {
     //private: true
     label: String,
 
+    num: Number,
+
     models2: [{
         type: String,
         ref: 'Model2'

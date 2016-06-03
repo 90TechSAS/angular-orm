@@ -14,6 +14,8 @@ var model = {
 
     label: String,
 
+    num: Number,
+
     models2: [
         {
             type: String,

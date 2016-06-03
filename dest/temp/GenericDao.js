@@ -184,6 +184,7 @@ function GenericDao(model, qb) {
                     qb.setQuery(obj);
                 }
                 return this.$http.get(this.url, { params: qb.opts }).then(function (data) {
+
                     return {
                         data: data.data.map(_this4.build, _this4), meta: { total: data.headers('X-Total-Count') }
                     };

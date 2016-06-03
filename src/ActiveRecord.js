@@ -23,7 +23,7 @@ export default function ActiveRecord(model, name){
 
         build(options){
             _.each(model, (field, key)=>{
-                if (options && options[key]){
+                if (options && (options[key] || options[key] === 0)){
                     var name = _.isArray(field) ? field[0].ref : field.ref;
                     var dao  = sl.getDao(name);
                     if (dao){
