@@ -56,6 +56,14 @@ export default class QueryBuilder {
     return this;
   }
 
+  deleted (isDeleted) {
+    this.opts = this.opts || {};
+    if (isDeleted || _.isBoolean(isDeleted)) {
+      this.opts.deleted = isDeleted;
+    }
+    return this;
+  }
+
   paginate (pagination) {
     this.opts = this.opts || {};
     if (pagination) {

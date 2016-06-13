@@ -654,6 +654,15 @@ var QueryBuilder = (function () {
       return this;
     }
   }, {
+    key: 'deleted',
+    value: function deleted(isDeleted) {
+      this.opts = this.opts || {};
+      if (isDeleted || _.isBoolean(isDeleted)) {
+        this.opts.deleted = isDeleted;
+      }
+      return this;
+    }
+  }, {
     key: 'paginate',
     value: function paginate(pagination) {
       this.opts = this.opts || {};

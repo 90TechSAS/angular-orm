@@ -141,6 +141,14 @@ describe('Angular DAO', function () {
     httpBackend.flush();
 
   });
+
+  it('Should query for deleted', function () {
+    httpBackend.expectGET(encodeURI('http://MOCKURL.com/model1?deleted=true')).respond([]);
+    ModelManager.get(ModelManager.query().deleted(true));
+    httpBackend.flush();
+
+  });
+
   it('Should paginate', function () {
     httpBackend.expectGET(encodeURI('http://MOCKURL.com/model1?limit=10&skip=5')).respond([]);
     ModelManager.get(ModelManager.query().paginate({ skip: 5, limit: 10 }));
