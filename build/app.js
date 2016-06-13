@@ -106,7 +106,7 @@ function ActiveRecord(model, name) {
             }
         }, {
             key: 'populate',
-            value: function populate(field) {
+            value: function populate(field, query) {
                 var $q = this.$injector.get('$q');
                 var deferred = $q.defer();
                 var self = this;
@@ -129,7 +129,7 @@ function ActiveRecord(model, name) {
                             if (!dao) {
                                 deferred.reject('Cannot Populate: unknown DAO');
                             } else {
-                                return dao.get(dao.query().select(grouped.string)).then(function (d) {
+                                return dao.get(dao.query(query).select(grouped.string)).then(function (d) {
                                     /** To preserve order, we map the existing field, replacing only the populated values */
                                     self[field] = self[field].map(function (f) {
                                         if (typeof f === 'string') {
