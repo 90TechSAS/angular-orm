@@ -43,7 +43,7 @@ export default function ActiveRecord(model, name){
                          * In any of those cases, it is safe to override existing. Otherwise, do nothing
                          */
                         if (Array.isArray(options[key])){
-                            if (!this.key ||
+                            if (!this[key] ||
                               !this[key][0] ||
                               typeof(this[key][0]) === 'string' ||
                               typeof(options[key][0]) === 'object')

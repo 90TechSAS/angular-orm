@@ -73,7 +73,7 @@ function ActiveRecord(model, name) {
                              * In any of those cases, it is safe to override existing. Otherwise, do nothing
                              */
                             if (Array.isArray(options[key])) {
-                                if (!_this.key || !_this[key][0] || typeof _this[key][0] === 'string' || typeof options[key][0] === 'object') {
+                                if (!_this[key] || !_this[key][0] || typeof _this[key][0] === 'string' || typeof options[key][0] === 'object') {
                                     _this[key] = dao.build(_.clone(options[key]));
                                 }
                             } else if (!_this[key] || typeof _this[key] === 'string' || typeof options[key] === 'object') {

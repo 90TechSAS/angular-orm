@@ -224,7 +224,6 @@ describe('Angular DAO', function () {
     model.save().then(function () {
       expect(model.models2[0]._id).toEqual('888');
     });
-    //  httpBackend.flush()
   });
 
   it('Should save objects', function () {
