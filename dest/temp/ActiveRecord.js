@@ -56,9 +56,26 @@ function ActiveRecord(model, name) {
                         var name = _.isArray(field) ? field[0].ref : field.ref;
                         var dao = sl.getDao(name);
                         if (dao) {
-                            if (!_this[key] || typeof _this[key] === 'string' || typeof options[key] === 'object') {
-                                // If new object contains unpopulated fields, but previous object had the info, don't delete it.
-                                // Happens a lot during savings, since you can't specify populates on save.
+                            /**
+                             * Deal with populated fields when building a pre-existing object
+                             *
+                             * Some fields might be populated in existing object, but not in the incoming one
+                             * To prevent things from disappearing, determine when new data should overwrite exiting
+                             *
+                             * (In the case of an array, determine if we need to override values or not, based
+                             * on the first element, which should be good enough for most cases.
+                             * Ideally, we should do the same as in populate)
+                             *
+                             * Either the element doesn't exit
+                             * or this element is a string (not populated)
+                             * or the incoming element is populated (an object) regardless of the state of existing object
+                             * In any of those cases, it is safe to override existing. Otherwise, do nothing
+                             */
+                            if (Array.isArray(options[key])) {
+                                if (!_this.key || !_this[key][0] || typeof _this[key][0] === 'string' || typeof options[key][0] === 'object') {
+                                    _this[key] = dao.build(_.clone(options[key]));
+                                }
+                            } else if (!_this[key] || typeof _this[key] === 'string' || typeof options[key] === 'object') {
                                 _this[key] = dao.build(_.clone(options[key]));
                             }
                         } else {

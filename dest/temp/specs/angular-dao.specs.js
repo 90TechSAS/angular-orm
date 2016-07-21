@@ -212,6 +212,21 @@ describe('Angular DAO', function () {
     httpBackend.flush();
   });
 
+  it('Should not override populated arrays on save', function () {
+    var model = ModelManager.create({
+      _id: '1234656',
+      models2: [{ _id: '888', toto: 'tutu' }]
+    });
+    httpBackend.expectPUT(encodeURI('http://MOCKURL.com/model1/1234656')).respond({
+      _id: '1234656',
+      models2: ['888']
+    });
+    model.save().then(function () {
+      expect(model.models2[0]._id).toEqual('888');
+    });
+    //  httpBackend.flush()
+  });
+
   it('Should save objects', function () {
     var model = ModelManager.createModel({
       _id: '1234656',
