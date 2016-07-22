@@ -108,6 +108,11 @@ export default function ActiveRecord(model, name){
 
         populate(field, query){
             var $q       = this.$injector.get('$q');
+
+            if (Array.isArray(field)){
+             return $q.all(field.map(f => this.populate(f, query))).then(() => this)
+            }
+
             var deferred = $q.defer();
             var self     = this;
             if (Array.isArray(model[field]) && Array.isArray(this[field]) && this[field].length){

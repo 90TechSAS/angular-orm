@@ -123,7 +123,20 @@ function ActiveRecord(model, name) {
         }, {
             key: 'populate',
             value: function populate(field, query) {
+                // istanbul ignore next
+
+                var _this2 = this;
+
                 var $q = this.$injector.get('$q');
+
+                if (Array.isArray(field)) {
+                    return $q.all(field.map(function (f) {
+                        return _this2.populate(f, query);
+                    })).then(function () {
+                        return _this2;
+                    });
+                }
+
                 var deferred = $q.defer();
                 var self = this;
                 if (Array.isArray(model[field]) && Array.isArray(this[field]) && this[field].length) {
@@ -211,18 +224,18 @@ function ActiveRecord(model, name) {
             value: function save(populate) {
                 // istanbul ignore next
 
-                var _this2 = this;
+                var _this3 = this;
 
                 var toSave = this.beforeSave();
                 var callback;
                 if (populate) {
                     var dao = sl.getDao(name);
                     callback = function () {
-                        return dao.getById(_this2._id, dao.query().populate(populate));
+                        return dao.getById(_this3._id, dao.query().populate(populate));
                     };
                 } else {
                     callback = function (data) {
-                        _this2.build(data.data);
+                        _this3.build(data.data);
                         return data;
                     };
                 }
