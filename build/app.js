@@ -63,20 +63,22 @@ function ActiveRecord(model, name) {
                              * Some fields might be populated in existing object, but not in the incoming one
                              * To prevent things from disappearing, determine when new data should overwrite exiting
                              *
-                             * (In the case of an array, determine if we need to override values or not, based
-                             * on the first element, which should be good enough for most cases.
-                             * Ideally, we should do the same as in populate)
-                             *
-                             * Either the element doesn't exit
-                             * or this element is a string (not populated)
-                             * or the incoming element is populated (an object) regardless of the state of existing object
-                             * In any of those cases, it is safe to override existing. Otherwise, do nothing
+                             * In the case of an array, look at each incoming value.
+                             * If it is populated, keep it
+                             * If it isn't, try to find the populated value in the existing array, and use it instead.
                              */
                             if (Array.isArray(options[key])) {
-                                if (!_this[key] || !_this[key][0] || typeof _this[key][0] === 'string' || typeof options[key][0] === 'object') {
-                                    _this[key] = dao.build(_.clone(options[key]));
-                                }
-                            } else if (!_this[key] || typeof _this[key] === 'string' || typeof options[key] === 'object') {
+                                var populated = options[key].map(function (value) {
+                                    if (typeof value === 'string' && _this[key] && Array.isArray(_this[key])) {
+                                        var found = _this[key].find(function (element) {
+                                            return element._id === value;
+                                        });
+                                        if (found) return found;
+                                    }
+                                    return value;
+                                });
+                                _this[key] = dao.build(_.clone(populated));
+                            } else if (!_this[key] || typeof _this[key] === 'string' || typeof options[key] === 'object' || _this[key]._id !== options[key]) {
                                 _this[key] = dao.build(_.clone(options[key]));
                             }
                         } else {
@@ -1054,7 +1056,7 @@ var model = {
     },
 
     //private: true
-    Name: String
+    name: String
 };
 
 var AR = (0, _ActiveRecord2['default'])(model, 'Model2');

@@ -80,7 +80,6 @@ describe('Angular DAO', function () {
       expect(data.save).toBeDefined();
     });
     httpBackend.flush();
-
   });
 
   it('Should query by Id if not key specified', function () {
@@ -190,6 +189,12 @@ describe('Angular DAO', function () {
     httpBackend.flush();
   });
 
+  it('Should count', function () {
+    httpBackend.expectGET(encodeURI('http://MOCKURL.com/model1?count=true')).respond([]);
+    ModelManager.count()
+    httpBackend.flush()
+  })
+
   it('Should make subPopulate queries', function () {
     var model = ModelManager.create({
       _id: '1234656',
@@ -198,8 +203,15 @@ describe('Angular DAO', function () {
     httpBackend.expectGET('http://MOCKURL.com/model2/77777').respond();
     model.populate('model2');
     httpBackend.flush();
-    // $rootScope.$digest();
+  });
 
+  it('Should have a clone function', function () {
+    var model = ModelManager.create({
+      _id: '1234656',
+      model2: '77777'
+    });
+    var clone = model.clone()
+    expect(clone._id).not.toBeDefined()
   });
 
   it('Should make subPopulate queries on arrays', function () {
@@ -214,38 +226,136 @@ describe('Angular DAO', function () {
       expect(model.models2[ 2 ]._id).toEqual('888')
     });
     httpBackend.flush()
+  });
 
+  it('Should not make useless subPopulate queries on arrays', function () {
+    var model = ModelManager.create({
+      _id: '1234656',
+      models2: [ { _id: '77777', name: 'toto' }, { _id: '888', toto: 'tutu' } ]
+    });
+    model.populate('models2').then(function () {
+      expect(model.models2[ 0 ]._id).toEqual('77777')
+      expect(model.models2[ 1 ]._id).toEqual('888')
+    });
   });
 
   it('Should make subPopulate queries on several fields', function () {
     var model = ModelManager.create({
       _id: '1234656',
       model2: '888',
-      models2: [ '77777', '4444']
+      models2: [ '77777', '4444' ]
     });
     httpBackend.expectGET(encodeURI('http://MOCKURL.com/model2?conditions={"_id":{"$in":["77777","4444"]}}')).respond([ { _id: '77777' }, { _id: '4444' } ]);
     httpBackend.expectGET(encodeURI('http://MOCKURL.com/model2/888')).respond({ _id: '888' });
-    model.populate(['models2', 'model2']).then(function () {
+    model.populate([ 'models2', 'model2' ]).then(function () {
       expect(model.models2[ 0 ]._id).toEqual('77777');
       expect(model.models2[ 1 ]._id).toEqual('4444');
       expect(model.model2._id).toEqual('888');
     });
     httpBackend.flush()
-
   });
 
-  it ('Should not override populated arrays on save', function(){
+  it('should populate again after save', function () {
     var model = ModelManager.create({
       _id: '1234656',
-      models2: [ { _id: '888', toto: 'tutu' } ]
+      model2: { _id: '888', name: 'tutu' },
+      models2: [ '999' ]
     });
     httpBackend.expectPUT(encodeURI('http://MOCKURL.com/model1/1234656')).respond({
       _id: '1234656',
-      models2: [ '888']
-    });
-    model.save().then(function(){
-      expect(model.models2[0 ]._id).toEqual('888')
+      model2: '888',
+      models2: [ '999' ]
     })
+    httpBackend.expectGET(encodeURI('http://MOCKURL.com/model1/1234656?populate=[{"path":"models2"},{"path":"model2"}]')).respond({
+      _id: '1234656',
+      model2: { _id: '888', name: 'tutu' },
+      models2: [ { _id: '999' } ]
+    })
+    model.save([ 'model2', 'models2' ]).then(function (pop) {
+      expect(pop.models2[ 0 ]._id).toEqual('999')
+    })
+    httpBackend.flush()
+  })
+
+  it('should not override populated values on save', function () {
+    var model = ModelManager.create({
+      _id: '1234656',
+      model2: { _id: '888', name: 'tutu' }
+    });
+    httpBackend.expectPUT(encodeURI('http://MOCKURL.com/model1/1234656')).respond({
+      _id: '1234656',
+      model2: '888'
+    })
+    model.save().then(function () {
+      expect(model.model2._id).toEqual('888')
+    })
+    httpBackend.flush()
+  })
+
+  it('should override if populated value isnt the same', function () {
+    var model = ModelManager.create({
+      _id: '1234656',
+      model2: { _id: '888', name: 'tutu' }
+    });
+    httpBackend.expectPUT(encodeURI('http://MOCKURL.com/model1/1234656')).respond({
+      _id: '1234656',
+      model2: '777'
+    })
+    model.save().then(function () {
+      expect(model.model2).toEqual('777')
+    })
+    httpBackend.flush()
+  })
+
+  it('Should not override populated arrays on save', function () {
+    var model = ModelManager.create({
+      _id: '1234656',
+      models2: [ { _id: '888', name: 'tutu' } ]
+    });
+    httpBackend.expectPUT(encodeURI('http://MOCKURL.com/model1/1234656')).respond({
+      _id: '1234656',
+      models2: [ '888' ]
+    });
+    model.save().then(function () {
+      expect(model.models2[ 0 ]._id).toEqual('888')
+    })
+    httpBackend.flush()
+  })
+
+  it('Should not override populated arrays values, but be able to add newly added values', function () {
+    var model = ModelManager.create({
+      _id: '1234656',
+      models2: [ { _id: '888', name: 'tutu' } ]
+    });
+    httpBackend.expectPUT(encodeURI('http://MOCKURL.com/model1/1234656')).respond({
+      _id: '1234656',
+      models2: [ '888', '999' ]
+    });
+    model.save().then(function () {
+      expect(model.models2.length).toEqual(2)
+      expect(model.models2[ 0 ]._id).toEqual('888')
+      expect(model.models2[ 0 ].name).toEqual('tutu')
+      expect(model.models2[ 1 ]).toEqual('999')
+    })
+    httpBackend.flush()
+  })
+
+  it('Should not override populated arrays values, but detect deleted values', function () {
+    var model = ModelManager.create({
+      _id: '1234656',
+      models2: [ { _id: '888', name: 'tutu' }, { _id: '111', name: 'toto' } ]
+    });
+    httpBackend.expectPUT(encodeURI('http://MOCKURL.com/model1/1234656')).respond({
+      _id: '1234656',
+      models2: [ '999', '111' ]
+    });
+    model.save().then(function () {
+      expect(model.models2.length).toEqual(2)
+      expect(model.models2[ 0 ]).toEqual('999')
+      expect(model.models2[ 1 ]._id).toEqual('111')
+      expect(model.models2[ 1 ].name).toEqual('toto')
+    })
+    httpBackend.flush()
   })
 
   it('Should save objects', function () {

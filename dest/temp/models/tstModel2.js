@@ -31,7 +31,7 @@ var model = {
     },
 
     //private: true
-    Name: String
+    name: String
 };
 
 var AR = (0, _ActiveRecord2['default'])(model, 'Model2');

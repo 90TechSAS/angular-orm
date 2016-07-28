@@ -12,7 +12,7 @@ var model = {
         //private: true
     },
 
-    Name: String,
+    name: String,
 };
 
 
