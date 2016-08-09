@@ -70,7 +70,7 @@ function ActiveRecord(model, name) {
                                 var populated = options[key].map(function (value) {
                                     if (typeof value === 'string' && _this[key] && Array.isArray(_this[key])) {
                                         var found = _this[key].find(function (element) {
-                                            return element._id === value;
+                                            return element && element._id === value;
                                         });
                                         if (found) return found;
                                     }

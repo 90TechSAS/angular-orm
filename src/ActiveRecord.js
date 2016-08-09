@@ -42,7 +42,7 @@ export default function ActiveRecord(model, name){
                               (value)=>{
                                 if (typeof value === 'string' && this[key] && Array.isArray(this[key])){
                                   let found = this[key].find((element) => {
-                                    return element._id === value
+                                    return element && element._id === value
                                   });
                                   if (found) return found
                                 }
