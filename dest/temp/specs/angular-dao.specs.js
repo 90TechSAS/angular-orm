@@ -389,6 +389,18 @@ describe('Angular DAO', function () {
     httpBackend.flush();
   });
 
+  it('Should deep nested objects', function () {
+    var model = ModelManager.createModel({
+      label: 'toto',
+      model2: { name: 'toto' }
+    });
+    httpBackend.expectPOST('http://MOCKURL.com/model2').respond({ name: 'toto', _id: '1111' });
+    httpBackend.expectPOST('http://MOCKURL.com/model1').respond({ label: 'toto' });
+    model.saveDeep();
+    httpBackend.flush();
+    expect(model.model2._id).toEqual('1111');
+  });
+
   it('Should make a query with populate', function () {
     httpBackend.expectGET(encodeURI('http://MOCKURL.com/model1?populate=[{"path":"model2"}]')).respond([]);
     ModelManager.get(ModelManager.query().populate('model2'));
