@@ -97,6 +97,10 @@ function ActiveRecord(model, name) {
                 delete ob._id;
                 return ob;
             }
+
+            /**
+             * Be careful when using this method. It will ignore non-populated fields, keeping the _id entry !
+             */
         }, {
             key: 'cloneDeep',
             value: function cloneDeep() {
@@ -107,12 +111,12 @@ function ActiveRecord(model, name) {
                         if (v[0].ref) {
                             /** Array of nested Objects. Need to clone each */
                             clone[k] = clone[k].map(function (e) {
-                                return e.cloneDeep();
+                                return e.cloneDeep ? e.cloneDeep() : e;
                             });
                         }
                     } else if (v.ref) {
                         /** Single nested object, replace it */
-                        clone[k] = clone[k].cloneDeep();
+                        clone[k] = clone[k].cloneDeep ? clone[k].cloneDeep() : clone[k];
                     }
                 });
                 return clone;

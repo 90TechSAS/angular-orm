@@ -229,7 +229,8 @@ describe('Angular DAO', function () {
         {
           _id: '3333',
           name: 'titi'
-        }
+        },
+        '444'
       ]
     })
     var clone = model.cloneDeep()
@@ -237,6 +238,7 @@ describe('Angular DAO', function () {
     expect(clone.model2._id).not.toBeDefined()
     expect(clone.models2[ 0 ]._id).not.toBeDefined()
     expect(clone.models2[ 1 ]._id).not.toBeDefined()
+    expect(clone.models2[ 2 ]).toEqual('444')
   })
 
   it('Should make subPopulate queries on arrays', function () {
