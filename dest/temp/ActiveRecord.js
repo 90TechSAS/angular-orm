@@ -107,16 +107,18 @@ function ActiveRecord(model, name) {
                 var clone = this.clone();
                 /** Find ref properties that need their _id to be removed */
                 _.each(model, function (v, k) {
-                    if (_.isArray(v)) {
-                        if (v[0].ref) {
-                            /** Array of nested Objects. Need to clone each */
-                            clone[k] = clone[k].map(function (e) {
-                                return e.cloneDeep ? e.cloneDeep() : e;
-                            });
+                    if (clone[k]) {
+                        if (_.isArray(v)) {
+                            if (v[0].ref) {
+                                /** Array of nested Objects. Need to clone each */
+                                clone[k] = clone[k].map(function (e) {
+                                    return e.cloneDeep ? e.cloneDeep() : e;
+                                });
+                            }
+                        } else if (v.ref) {
+                            /** Single nested object, replace it */
+                            clone[k] = clone[k].cloneDeep ? clone[k].cloneDeep() : clone[k];
                         }
-                    } else if (v.ref) {
-                        /** Single nested object, replace it */
-                        clone[k] = clone[k].cloneDeep ? clone[k].cloneDeep() : clone[k];
                     }
                 });
                 return clone;

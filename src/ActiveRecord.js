@@ -81,6 +81,7 @@ export default function ActiveRecord(model, name){
             var clone = this.clone()
             /** Find ref properties that need their _id to be removed */
             _.each(model, (v, k) => {
+              if (clone[k]){
                 if (_.isArray(v)){
                     if (v[ 0 ].ref){
                         /** Array of nested Objects. Need to clone each */
@@ -90,6 +91,7 @@ export default function ActiveRecord(model, name){
                     /** Single nested object, replace it */
                     clone[ k ] = clone[ k ].cloneDeep ? clone[ k ].cloneDeep() : clone[k]
                 }
+              }
             })
             return clone
         }
