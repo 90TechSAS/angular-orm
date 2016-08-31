@@ -214,6 +214,31 @@ describe('Angular DAO', function () {
     expect(clone._id).not.toBeDefined()
   });
 
+  it('Should Clone Deep', function(){
+    var model = ModelManager.create({
+      _id: '123456',
+      model2: {
+        _id: '1111',
+        name: 'toto'
+      },
+      models2: [
+        {
+          _id: '2222',
+          name: 'tutu'
+        },
+        {
+          _id: '3333',
+          name: 'titi'
+        }
+      ]
+    })
+    var clone = model.cloneDeep()
+    expect(clone._id).not.toBeDefined()
+    expect(clone.model2._id).not.toBeDefined()
+    expect(clone.models2[ 0 ]._id).not.toBeDefined()
+    expect(clone.models2[ 1 ]._id).not.toBeDefined()
+  })
+
   it('Should make subPopulate queries on arrays', function () {
     var model = ModelManager.create({
       _id: '1234656',

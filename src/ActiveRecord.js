@@ -7,8 +7,8 @@ import ServiceLocator from './ServiceLocator'
  * Generates populate parameters.
  * Provides several helper methods
  *
- * @param Object Mongoose Style Model
- * @param String Name of the Model (must be the same as described in 'ref' of others models relations.
+ * @param model Object Mongoose Style Model
+ * @param name String Name of the Model (must be the same as described in 'ref' of others models relations.
  * @returns {$ES6_CLASS$}
  */
 export default function ActiveRecord(model, name){
@@ -72,6 +72,23 @@ export default function ActiveRecord(model, name){
             var ob = new m(this.$injector, this.rootUrl, this);
             delete ob._id;
             return ob;
+        }
+
+        cloneDeep(){
+            var clone = this.clone()
+            /** Find ref properties that need their _id to be removed */
+            _.each(model, (v, k) => {
+                if (_.isArray(v)){
+                    if (v[ 0 ].ref){
+                        /** Array of nested Objects. Need to clone each */
+                        clone[ k ] = clone[ k ].map(e => e.cloneDeep())
+                    }
+                } else if (v.ref){
+                    /** Single nested object, replace it */
+                    clone[ k ] = clone[ k ].cloneDeep()
+                }
+            })
+            return clone
         }
 
         get $injector(){
