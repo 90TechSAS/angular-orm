@@ -118,6 +118,21 @@ Easily communicate with mongoose/baucis api
     Then chain methods like `paginate populate sort`...
     And pass it back to the `get()` method of the Manager
   
+  - Complex Queries
+    ````
+      var qb = AddressManager.query()
+      qb
+        .search('query', 'some field')
+        .sort('anotherfield')
+        .populate('field')
+      AddressManager
+        .get(qb)
+        .then(
+          function(data){ 
+            // Do Something with data
+          })
+      ```
+    
     
     
     
