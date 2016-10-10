@@ -214,7 +214,7 @@ describe('Angular DAO', function () {
     expect(clone._id).not.toBeDefined()
   });
 
-  it('Should Clone Deep', function(){
+  it('Should Clone Deep', function () {
     var model = ModelManager.create({
       _id: '123456',
       model2: {
@@ -298,7 +298,7 @@ describe('Angular DAO', function () {
       model2: { _id: '888', name: 'tutu' },
       models2: [ { _id: '999' } ]
     })
-    model.save([ 'model2', 'models2' ]).then(function (pop) {
+    model.save({force: true, populate: [ 'model2', 'models2' ]}).then(function (pop) {
       expect(pop.models2[ 0 ]._id).toEqual('999')
     })
     httpBackend.flush()
@@ -313,7 +313,7 @@ describe('Angular DAO', function () {
       _id: '1234656',
       model2: '888'
     })
-    model.save().then(function () {
+    model.save({force:true}).then(function () {
       expect(model.model2._id).toEqual('888')
     })
     httpBackend.flush()
@@ -328,7 +328,7 @@ describe('Angular DAO', function () {
       _id: '1234656',
       model2: '777'
     })
-    model.save().then(function () {
+    model.save({force: true}).then(function () {
       expect(model.model2).toEqual('777')
     })
     httpBackend.flush()
@@ -343,7 +343,7 @@ describe('Angular DAO', function () {
       _id: '1234656',
       models2: [ '888' ]
     });
-    model.save().then(function () {
+    model.save({force: true}).then(function () {
       expect(model.models2[ 0 ]._id).toEqual('888')
     })
     httpBackend.flush()
@@ -358,7 +358,7 @@ describe('Angular DAO', function () {
       _id: '1234656',
       models2: [ '888', '999' ]
     });
-    model.save().then(function () {
+    model.save({force:true}).then(function () {
       expect(model.models2.length).toEqual(2)
       expect(model.models2[ 0 ]._id).toEqual('888')
       expect(model.models2[ 0 ].name).toEqual('tutu')
@@ -376,7 +376,7 @@ describe('Angular DAO', function () {
       _id: '1234656',
       models2: [ '999', '111' ]
     });
-    model.save().then(function () {
+    model.save({force: true}).then(function () {
       expect(model.models2.length).toEqual(2)
       expect(model.models2[ 0 ]).toEqual('999')
       expect(model.models2[ 1 ]._id).toEqual('111')
@@ -385,23 +385,54 @@ describe('Angular DAO', function () {
     httpBackend.flush()
   })
 
-  it('Should save objects', function () {
+  it('should save only modified values', function () {
     var model = ModelManager.createModel({
-      _id: '1234656',
+      _id: '123456',
+      model2: '7777',
+      label: 'toto'
+    })
+    model.label = 'tutu'
+    httpBackend.expectPUT('http://MOCKURL.com/model1/123456', { label: 'tutu' }).respond()
+    model.save()
+    httpBackend.flush()
+  })
+
+  it('should save only modified values in arrays', function () {
+    var model = ModelManager.createModel({
+      _id: '123456',
+      models2: ['7777'],
+      label: 'toto'
+    })
+    model.models2.push('8888')
+    httpBackend.expectPUT('http://MOCKURL.com/model1/123456', { models2: ['7777', '8888'] }).respond()
+    model.save()
+    httpBackend.flush()
+  })
+
+  it('Should save new objects', function () {
+    var model = ModelManager.createModel({
       model2: '77777'
     });
-    httpBackend.expectPUT('http://MOCKURL.com/model1/1234656').respond();
+    httpBackend.expectPOST('http://MOCKURL.com/model1', {model2: '77777'}).respond();
     model.save();
     httpBackend.flush();
+  });
+
+  it('Should not save unedited objects', function () {
+    var model = ModelManager.createModel({
+      _id: '123456',
+      model2: '77777'
+    });
+    model.save();
   });
 
   it('Should deep nested objects', function () {
     var model = ModelManager.createModel({
       label: 'toto',
-      model2: { name: 'toto'}
+      model2: { name: 'toto' }
     });
-    httpBackend.expectPOST('http://MOCKURL.com/model2').respond({name: 'toto', _id: '1111'});
-    httpBackend.expectPOST('http://MOCKURL.com/model1').respond({label: 'toto'});
+    httpBackend.expectPOST('http://MOCKURL.com/model2').respond({ name: 'toto', _id: '1111' });
+    httpBackend.expectPOST('http://MOCKURL.com/model1').respond({ label: 'toto' });
     model.saveDeep();
     httpBackend.flush();
     expect(model.model2._id).toEqual('1111')

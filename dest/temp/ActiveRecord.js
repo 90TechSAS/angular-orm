@@ -21,6 +21,8 @@ var _ServiceLocator = require('./ServiceLocator');
 
 var _ServiceLocator2 = _interopRequireDefault(_ServiceLocator);
 
+var deep = require('deep-diff').diff;
+
 /**
  *
  * Can be inherited or used as is. Holds the model definition,
@@ -51,6 +53,7 @@ function ActiveRecord(model, name) {
 
         var _this = this;
 
+        this.__old = {};
         _.each(model, function (field, key) {
           if (options && (options[key] || options[key] === 0)) {
             var name = _.isArray(field) ? field[0].ref : field.ref;
@@ -83,8 +86,12 @@ function ActiveRecord(model, name) {
             } else {
               _this[key] = _this.buildField(field, options[key]);
             }
-          } else if (_.isArray(field)) {
-            _this[key] = [];
+          }
+          /*else if (_.isArray(field)) {
+           this[ key ] = [];
+           } */
+          if (options && options._id) {
+            _this.__old[key] = _.cloneDeep(_this[key]);
           }
         });
         return this;
@@ -226,8 +233,18 @@ function ActiveRecord(model, name) {
     }, {
       key: 'beforeSave',
       value: function beforeSave(obj) {
+        // istanbul ignore next
+
+        var _this3 = this;
+
+        var opts = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+
         obj = obj || _.cloneDeep(this);
         _.each(model, function (field, key) {
+          if (!opts.force && !deep(obj[key], _this3.__old[key])) {
+            delete obj[key];
+            return;
+          }
           if (obj[key] && (field.ref || _.isArray(field) && field[0].ref)) {
 
             if (_.isArray(obj[key])) {
@@ -245,25 +262,36 @@ function ActiveRecord(model, name) {
             obj[key] = new Date(moment(obj[key])).toISOString();
           }
         });
+        delete obj.rootUrl;
+        delete obj.$injector;
+        delete obj._injector;
+        delete obj.__old;
         return obj;
       }
     }, {
       key: 'save',
-      value: function save(populate) {
+      value: function save() {
         // istanbul ignore next
 
-        var _this3 = this;
+        var _this4 = this;
 
-        var toSave = this.beforeSave();
+        var opts = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+        var toSave = this.beforeSave(null, opts);
+        if (_.isEmpty(toSave)) {
+          return this.$injector.get('$q')(function (resolve) {
+            return resolve({ data: _this4 });
+          });
+        }
         var callback;
-        if (populate) {
+        if (opts.populate) {
           var dao = sl.getDao(name);
           callback = function () {
-            return dao.getById(_this3._id, dao.query().populate(populate));
+            return dao.getById(_this4._id, dao.query().populate(opts.populate));
           };
         } else {
           callback = function (data) {
-            _this3.build(data.data);
+            _this4.build(data.data);
             return data;
           };
         }
@@ -279,28 +307,28 @@ function ActiveRecord(model, name) {
       value: function saveDeep(populate) {
         // istanbul ignore next
 
-        var _this4 = this;
+        var _this5 = this;
 
         var promises = [];
         /** Find ref properties that might need to be saved */
         _.each(model, function (v, k) {
-          if (_this4[k]) {
+          if (_this5[k]) {
             if (_.isArray(v)) {
               if (v[0].ref) {
                 /** Array of nested Objects. Check if need to save each */
-                _this4[k].forEach(function (e) {
+                _this5[k].forEach(function (e) {
                   if (!e._id && e.saveDeep) promises.push(e.saveDeep());
                 });
               }
             } else if (v.ref) {
               /** Single nested object, save it if needed */
-              if (!_this4[k]._id && _this4[k].saveDeep) promises.push(_this4[k].saveDeep());
+              if (!_this5[k]._id && _this5[k].saveDeep) promises.push(_this5[k].saveDeep());
             }
           }
         });
         var $q = this._injector.get('$q');
         return $q.all(promises).then(function () {
-          return _this4.save(populate);
+          return _this5.save(populate);
         });
       }
     }, {

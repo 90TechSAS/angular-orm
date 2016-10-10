@@ -1,5 +1,6 @@
 //_ = require('lodash');
 import ServiceLocator from './ServiceLocator'
+var deep = require('deep-diff').diff
 
 /**
  *
@@ -22,6 +23,7 @@ export default function ActiveRecord (model, name) {
     }
 
     build (options) {
+      this.__old = {}
       _.each(model, (field, key)=> {
         if (options && (options[ key ] || options[ key ] === 0)) {
           var name = _.isArray(field) ? field[ 0 ].ref : field.ref;
@@ -59,8 +61,12 @@ export default function ActiveRecord (model, name) {
           } else {
             this[ key ] = this.buildField(field, options[ key ])
           }
-        } else if (_.isArray(field)) {
-          this[ key ] = [];
+        }
+        /*else if (_.isArray(field)) {
+         this[ key ] = [];
+         } */
+        if (options && options._id) {
+          this.__old[ key ] = _.cloneDeep(this[ key ])
         }
       });
       return this;
@@ -197,9 +203,13 @@ export default function ActiveRecord (model, name) {
 
     }
 
-    beforeSave (obj) {
+    beforeSave (obj, opts={}) {
       obj = obj || _.cloneDeep(this);
       _.each(model, (field, key)=> {
+        if (!opts.force && !deep(obj[ key ], this.__old[ key ])) {
+          delete obj[ key ]
+          return
+        }
         if (obj[ key ] && (field.ref || (_.isArray(field) && field[ 0 ].ref))) {
 
           if (_.isArray(obj[ key ])) {
@@ -219,17 +229,22 @@ export default function ActiveRecord (model, name) {
       });
       delete obj.rootUrl;
       delete obj.$injector;
+      delete obj._injector;
+      delete obj.__old;
       return obj;
 
     }
 
-    save (populate) {
-      var toSave = this.beforeSave();
+    save (opts={}) {
+      var toSave = this.beforeSave(null, opts);
+      if (_.isEmpty(toSave)) {
+        return this.$injector.get('$q')(resolve => resolve({data: this}))
+      }
       var callback;
-      if (populate) {
+      if (opts.populate) {
         var dao = sl.getDao(name);
         callback = ()=> {
-          return dao.getById(this._id, dao.query().populate(populate));
+          return dao.getById(this._id, dao.query().populate(opts.populate));
         }
       } else {
         callback = (data) => {
