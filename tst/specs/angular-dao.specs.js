@@ -298,7 +298,7 @@ describe('Angular DAO', function () {
       model2: { _id: '888', name: 'tutu' },
       models2: [ { _id: '999' } ]
     })
-    model.save({force: true, populate: [ 'model2', 'models2' ]}).then(function (pop) {
+    model.save({ force: true, populate: [ 'model2', 'models2' ] }).then(function (pop) {
       expect(pop.models2[ 0 ]._id).toEqual('999')
     })
     httpBackend.flush()
@@ -313,7 +313,7 @@ describe('Angular DAO', function () {
       _id: '1234656',
       model2: '888'
     })
-    model.save({force:true}).then(function () {
+    model.save({ force: true }).then(function () {
       expect(model.model2._id).toEqual('888')
     })
     httpBackend.flush()
@@ -328,7 +328,7 @@ describe('Angular DAO', function () {
       _id: '1234656',
       model2: '777'
     })
-    model.save({force: true}).then(function () {
+    model.save({ force: true }).then(function () {
       expect(model.model2).toEqual('777')
     })
     httpBackend.flush()
@@ -343,7 +343,7 @@ describe('Angular DAO', function () {
       _id: '1234656',
       models2: [ '888' ]
     });
-    model.save({force: true}).then(function () {
+    model.save({ force: true }).then(function () {
       expect(model.models2[ 0 ]._id).toEqual('888')
     })
     httpBackend.flush()
@@ -358,7 +358,7 @@ describe('Angular DAO', function () {
       _id: '1234656',
       models2: [ '888', '999' ]
     });
-    model.save({force:true}).then(function () {
+    model.save({ force: true }).then(function () {
       expect(model.models2.length).toEqual(2)
       expect(model.models2[ 0 ]._id).toEqual('888')
       expect(model.models2[ 0 ].name).toEqual('tutu')
@@ -376,7 +376,7 @@ describe('Angular DAO', function () {
       _id: '1234656',
       models2: [ '999', '111' ]
     });
-    model.save({force: true}).then(function () {
+    model.save({ force: true }).then(function () {
       expect(model.models2.length).toEqual(2)
       expect(model.models2[ 0 ]).toEqual('999')
       expect(model.models2[ 1 ]._id).toEqual('111')
@@ -400,11 +400,11 @@ describe('Angular DAO', function () {
   it('should save only modified values in arrays', function () {
     var model = ModelManager.createModel({
       _id: '123456',
-      models2: ['7777'],
+      models2: [ '7777' ],
       label: 'toto'
     })
     model.models2.push('8888')
-    httpBackend.expectPUT('http://MOCKURL.com/model1/123456', { models2: ['7777', '8888'] }).respond()
+    httpBackend.expectPUT('http://MOCKURL.com/model1/123456', { models2: [ '7777', '8888' ] }).respond()
     model.save()
     httpBackend.flush()
   })
@@ -413,7 +413,7 @@ describe('Angular DAO', function () {
     var model = ModelManager.createModel({
       model2: '77777'
     });
-    httpBackend.expectPOST('http://MOCKURL.com/model1', {model2: '77777'}).respond();
+    httpBackend.expectPOST('http://MOCKURL.com/model1', { model2: '77777' }).respond();
     model.save();
     httpBackend.flush();
   });
@@ -444,5 +444,76 @@ describe('Angular DAO', function () {
     httpBackend.flush();
 
   })
+
+  it('Should not make a diff with dates', function () {
+    var model = ModelManager.create({
+      _id: '007',
+      when: new Date()
+    })
+    model.save()
+  })
+
+  it('Should make a diff with dates if needed', function () {
+    var model = ModelManager.create({
+      _id: '007',
+      when: new Date()
+    })
+    model.when = new Date(203939)
+    httpBackend.expectPUT('http://MOCKURL.com/model1/007', {
+      when: new Date(203939)
+    }).respond();
+    model.save()
+  })
+
+  it('Should not make a diff between populated and unpopulated nested field', function () {
+    var model = ModelManager.create({
+      _id: '1234656',
+      model2: '888',
+      models2: [ '77777', '4444' ]
+    });
+    httpBackend.expectGET(encodeURI('http://MOCKURL.com/model2?conditions={"_id":{"$in":["77777","4444"]}}')).respond([ { _id: '77777' }, { _id: '4444' } ]);
+    httpBackend.expectGET(encodeURI('http://MOCKURL.com/model2/888')).respond({ _id: '888' });
+    model.populate([ 'models2', 'model2' ]).then(function () {
+      expect(model.models2[ 0 ]._id).toEqual('77777');
+      expect(model.models2[ 1 ]._id).toEqual('4444');
+      expect(model.model2._id).toEqual('888');
+    });
+    httpBackend.flush()
+    model.save()
+  });
+
+  it('Should make a diff between populated and unpopulated nested field', function () {
+    var model = ModelManager.create({
+      _id: '1234656',
+      model2: '888'
+    });
+    httpBackend.expectGET(encodeURI('http://MOCKURL.com/model2/888')).respond({ _id: '888' });
+    model.populate([ 'models2', 'model2' ]).then(function () {
+      expect(model.model2._id).toEqual('888');
+    });
+    httpBackend.flush()
+    model.model2 = { _id: '999' }
+    httpBackend.expectPUT('http://MOCKURL.com/model1/1234656', {
+      model2: '999'
+    }).respond();
+    model.save()
+  });
+
+  it('Should make a diff between populated and unpopulated nested fields array', function () {
+    var model = ModelManager.create({
+      _id: '1234656',
+      models2: ['888']
+    });
+    httpBackend.expectGET(encodeURI('http://MOCKURL.com/model2?conditions={"_id":"888"}')).respond([{ _id: '888' }]);
+    model.populate([ 'models2', 'model2' ]).then(function () {
+      expect(model.models2[0]._id).toEqual('888');
+    });
+    httpBackend.flush()
+    model.models2.push({ _id: '999' })
+    httpBackend.expectPUT('http://MOCKURL.com/model1/1234656', {
+      models2: ['888', '999']
+    }).respond();
+    model.save()
+  });
 
 });

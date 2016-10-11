@@ -94,8 +94,22 @@ function ActiveRecord(model, name) {
                 _this[key] = _this.buildField(field, options[key]);
               }
             }
-            if (options && options._id) {
-              sess[key] = _.cloneDeep(_this[key]);
+            /** Save state of the object for diff purpose */
+            if (options && options._id && _this[key]) {
+              var toSave = undefined;
+              /** If the field is a ref, only save id or the ids array */
+              if (_.isArray(field) && field[0].ref || field.ref) {
+                if (_.isArray(field)) {
+                  toSave = _this[key].map(function (entry) {
+                    return typeof entry === 'string' ? entry : entry._id;
+                  });
+                } else {
+                  toSave = typeof _this[key] === 'string' ? _this[key] : _this[key]._id;
+                }
+              } else {
+                toSave = _this[key];
+              }
+              sess[key] = _.cloneDeep(toSave);
             }
           });
           session.save(sess);
@@ -243,10 +257,6 @@ function ActiveRecord(model, name) {
           obj = obj || _.cloneDeep(this);
           var old = session.retrieve(this._id) || {};
           _.each(model, function (field, key) {
-            if (!opts.force && !deep(obj[key], old[key])) {
-              delete obj[key];
-              return;
-            }
             if (obj[key] && (field.ref || _.isArray(field) && field[0].ref)) {
 
               if (_.isArray(obj[key])) {
@@ -262,6 +272,9 @@ function ActiveRecord(model, name) {
               }
             } else if (obj[key] && (field.type === Date || _.isArray(field) && field[0].type === Date)) {
               obj[key] = new Date(moment(obj[key])).toISOString();
+            }
+            if (!opts.force && !deep(obj[key], old[key])) {
+              delete obj[key];
             }
           });
           delete obj.rootUrl;

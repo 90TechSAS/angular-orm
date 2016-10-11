@@ -12,6 +12,8 @@ var model = {
         //private: true
     },
 
+    when: Date,
+
     label: String,
 
     num: Number,

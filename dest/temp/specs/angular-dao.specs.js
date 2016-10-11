@@ -437,4 +437,75 @@ describe('Angular DAO', function () {
     ModelManager.get(ModelManager.query().populate('model2'));
     httpBackend.flush();
   });
+
+  it('Should not make a diff with dates', function () {
+    var model = ModelManager.create({
+      _id: '007',
+      when: new Date()
+    });
+    model.save();
+  });
+
+  it('Should make a diff with dates if needed', function () {
+    var model = ModelManager.create({
+      _id: '007',
+      when: new Date()
+    });
+    model.when = new Date(203939);
+    httpBackend.expectPUT('http://MOCKURL.com/model1/007', {
+      when: new Date(203939)
+    }).respond();
+    model.save();
+  });
+
+  it('Should not make a diff between populated and unpopulated nested field', function () {
+    var model = ModelManager.create({
+      _id: '1234656',
+      model2: '888',
+      models2: ['77777', '4444']
+    });
+    httpBackend.expectGET(encodeURI('http://MOCKURL.com/model2?conditions={"_id":{"$in":["77777","4444"]}}')).respond([{ _id: '77777' }, { _id: '4444' }]);
+    httpBackend.expectGET(encodeURI('http://MOCKURL.com/model2/888')).respond({ _id: '888' });
+    model.populate(['models2', 'model2']).then(function () {
+      expect(model.models2[0]._id).toEqual('77777');
+      expect(model.models2[1]._id).toEqual('4444');
+      expect(model.model2._id).toEqual('888');
+    });
+    httpBackend.flush();
+    model.save();
+  });
+
+  it('Should make a diff between populated and unpopulated nested field', function () {
+    var model = ModelManager.create({
+      _id: '1234656',
+      model2: '888'
+    });
+    httpBackend.expectGET(encodeURI('http://MOCKURL.com/model2/888')).respond({ _id: '888' });
+    model.populate(['models2', 'model2']).then(function () {
+      expect(model.model2._id).toEqual('888');
+    });
+    httpBackend.flush();
+    model.model2 = { _id: '999' };
+    httpBackend.expectPUT('http://MOCKURL.com/model1/1234656', {
+      model2: '999'
+    }).respond();
+    model.save();
+  });
+
+  it('Should make a diff between populated and unpopulated nested fields array', function () {
+    var model = ModelManager.create({
+      _id: '1234656',
+      models2: ['888']
+    });
+    httpBackend.expectGET(encodeURI('http://MOCKURL.com/model2?conditions={"_id":"888"}')).respond([{ _id: '888' }]);
+    model.populate(['models2', 'model2']).then(function () {
+      expect(model.models2[0]._id).toEqual('888');
+    });
+    httpBackend.flush();
+    model.models2.push({ _id: '999' });
+    httpBackend.expectPUT('http://MOCKURL.com/model1/1234656', {
+      models2: ['888', '999']
+    }).respond();
+    model.save();
+  });
 });

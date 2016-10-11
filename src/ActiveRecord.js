@@ -13,7 +13,7 @@ var deep = require('deep-diff').diff
  * @param name String Name of the Model (must be the same as described in 'ref' of others models relations.
  * @returns {$ES6_CLASS$}
  */
-export default function ActiveRecord (model, name, SManager=SessionManager(model)) {
+export default function ActiveRecord (model, name, SManager = SessionManager(model)) {
   let sl = ServiceLocator.instance;
   let session = new SManager()
 
@@ -64,8 +64,20 @@ export default function ActiveRecord (model, name, SManager=SessionManager(model
             this[ key ] = this.buildField(field, options[ key ])
           }
         }
-        if (options && options._id) {
-          sess[ key ] = _.cloneDeep(this[ key ])
+        /** Save state of the object for diff purpose */
+        if (options && options._id && this[ key ]) {
+          let toSave
+          /** If the field is a ref, only save id or the ids array */
+          if (_.isArray(field) && field[ 0 ].ref || field.ref) {
+            if (_.isArray(field)) {
+              toSave = this[ key ].map(entry => (typeof entry === 'string') ? entry : entry._id)
+            } else {
+              toSave = typeof this[ key ] === 'string' ? this[ key ] : this[ key ]._id
+            }
+          } else {
+            toSave = this[ key ]
+          }
+          sess[ key ] = _.cloneDeep(toSave)
         }
       });
       session.save(sess)
@@ -203,14 +215,10 @@ export default function ActiveRecord (model, name, SManager=SessionManager(model
 
     }
 
-    beforeSave (obj, opts={}) {
+    beforeSave (obj, opts = {}) {
       obj = obj || _.cloneDeep(this);
       let old = session.retrieve(this._id) || {}
       _.each(model, (field, key)=> {
-        if (!opts.force && !deep(obj[ key ], old[ key ])) {
-          delete obj[ key ]
-          return
-        }
         if (obj[ key ] && (field.ref || (_.isArray(field) && field[ 0 ].ref))) {
 
           if (_.isArray(obj[ key ])) {
@@ -227,6 +235,9 @@ export default function ActiveRecord (model, name, SManager=SessionManager(model
         } else if (obj[ key ] && (field.type === Date || (_.isArray(field) && field[ 0 ].type === Date))) {
           obj[ key ] = new Date(moment(obj[ key ])).toISOString();
         }
+        if (!opts.force && !deep(obj[ key ], old[ key ])) {
+          delete obj[ key ]
+        }
       });
       delete obj.rootUrl;
       delete obj.$injector;
@@ -235,10 +246,10 @@ export default function ActiveRecord (model, name, SManager=SessionManager(model
 
     }
 
-    save (opts={}) {
+    save (opts = {}) {
       var toSave = this.beforeSave(null, opts);
       if (_.isEmpty(toSave)) {
-        return this.$injector.get('$q')(resolve => resolve({data: this}))
+        return this.$injector.get('$q')(resolve => resolve({ data: this }))
       }
       var callback;
       if (opts.populate) {
@@ -332,7 +343,7 @@ export default function ActiveRecord (model, name, SManager=SessionManager(model
       return model;
     }
 
-    static getSession(){
+    static getSession () {
       return session;
     }
 
