@@ -235,7 +235,7 @@ export default function ActiveRecord (model, name, SManager = SessionManager(mod
           } else {
             obj[ key ] = obj[ key ]._id || obj[ key ];
           }
-        } else if (obj[ key ] && (field.type === Date || (_.isArray(field) && field[ 0 ].type === Date))) {
+        } else if (obj[ key ] && _.isDate(obj[ key ])) {
           obj[ key ] = new Date(obj[ key ]).toISOString();
         }
         if (!opts.force && !deep(obj[ key ], old[ key ])) {
