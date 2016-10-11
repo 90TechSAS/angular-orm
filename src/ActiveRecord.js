@@ -236,7 +236,7 @@ export default function ActiveRecord (model, name, SManager = SessionManager(mod
             obj[ key ] = obj[ key ]._id || obj[ key ];
           }
         } else if (obj[ key ] && (field.type === Date || (_.isArray(field) && field[ 0 ].type === Date))) {
-          obj[ key ] = new Date(moment(obj[ key ])).toISOString();
+          obj[ key ] = new Date(obj[ key ]).toISOString();
         }
         if (!opts.force && !deep(obj[ key ], old[ key ])) {
           delete obj[ key ]
