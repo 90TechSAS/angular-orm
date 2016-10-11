@@ -216,7 +216,10 @@ export default function ActiveRecord (model, name, SManager = SessionManager(mod
     }
 
     beforeSave (obj, opts = {}) {
-      obj = obj || _.cloneDeep(this);
+      if (!obj){
+        obj = {}
+        _.each(_.keys(model), k => obj[k] = this[k])
+      }
       let old = session.retrieve(this._id) || {}
       _.each(model, (field, key)=> {
         if (obj[ key ] && (field.ref || (_.isArray(field) && field[ 0 ].ref))) {
@@ -239,11 +242,7 @@ export default function ActiveRecord (model, name, SManager = SessionManager(mod
           delete obj[ key ]
         }
       });
-      delete obj.rootUrl;
-      delete obj.$injector;
-      delete obj._injector;
       return obj;
-
     }
 
     save (opts = {}) {

@@ -508,4 +508,26 @@ describe('Angular DAO', function () {
     }).respond();
     model.save();
   });
+
+  it('Should not save irrelevant fields', function () {
+    var model = ModelManager.create({
+      _id: '1234656',
+      models2: ['888']
+    });
+    model.iShouldntBeThere = 'but I am';
+    model.save();
+  });
+
+  it('should not save irrelevant fields, but still save others', function () {
+    var model = ModelManager.createModel({
+      _id: '123456',
+      model2: '7777',
+      label: 'toto'
+    });
+    model.label = 'tutu';
+    model.iShouldntBeThere = 'but I am';
+    httpBackend.expectPUT('http://MOCKURL.com/model1/123456', { label: 'tutu' }).respond();
+    model.save();
+    httpBackend.flush();
+  });
 });
