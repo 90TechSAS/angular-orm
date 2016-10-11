@@ -386,6 +386,7 @@ describe('Angular DAO', function () {
       label: 'toto'
     });
     model.label = 'tutu';
+    expect(model.$$pristine).toBeFalsy();
     httpBackend.expectPUT('http://MOCKURL.com/model1/123456', { label: 'tutu' }).respond();
     model.save();
     httpBackend.flush();
@@ -398,6 +399,7 @@ describe('Angular DAO', function () {
       label: 'toto'
     });
     model.models2.push('8888');
+    expect(model.$$pristine).toBeFalsy();
     httpBackend.expectPUT('http://MOCKURL.com/model1/123456', { models2: ['7777', '8888'] }).respond();
     model.save();
     httpBackend.flush();
@@ -407,6 +409,7 @@ describe('Angular DAO', function () {
     var model = ModelManager.createModel({
       model2: '77777'
     });
+    expect(model.$$pristine).toBeFalsy();
     httpBackend.expectPOST('http://MOCKURL.com/model1', { model2: '77777' }).respond();
     model.save();
     httpBackend.flush();
@@ -417,6 +420,7 @@ describe('Angular DAO', function () {
       _id: '123456',
       model2: '77777'
     });
+    expect(model.$$pristine).toBeTruthy();
     model.save();
   });
 
@@ -441,8 +445,17 @@ describe('Angular DAO', function () {
   it('Should not make a diff with dates', function () {
     var model = ModelManager.create({
       _id: '007',
-      when: new Date()
+      when: new Date().toISOString()
     });
+    model.save();
+  });
+
+  it('Should not make a diff with JS dates', function () {
+    var model = ModelManager.create({
+      _id: '007',
+      when: new Date().toISOString()
+    });
+    model.when = new Date(model.when);
     model.save();
   });
 

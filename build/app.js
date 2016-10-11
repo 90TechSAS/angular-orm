@@ -280,10 +280,10 @@ function ActiveRecord(model, name) {
               } else {
                 obj[key] = obj[key]._id || obj[key];
               }
-            } else if (obj[key] && (field.type === Date || _.isArray(field) && field[0].type === Date)) {
+            } else if (obj[key] && _.isDate(obj[key])) {
               obj[key] = new Date(obj[key]).toISOString();
             }
-            if (!opts.force && !deep(obj[key], old[key])) {
+            if (!opts.force && !deep(old[key], obj[key])) {
               delete obj[key];
             }
           });
@@ -364,6 +364,11 @@ function ActiveRecord(model, name) {
         key: '$http',
         get: function get() {
           return this.$injector.get('$http');
+        }
+      }, {
+        key: '$$pristine',
+        get: function get() {
+          return _.isEmpty(this.beforeSave());
         }
       }], [{
         key: 'getName',

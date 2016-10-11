@@ -126,9 +126,12 @@ export default function ActiveRecord (model, name, SManager = SessionManager(mod
       return this.$injector.get('$http');
     }
 
+    get $$pristine(){
+      return _.isEmpty(this.beforeSave())
+    }
+
     buildField (model, value) {
       return _.clone(value);
-
     }
 
     archive () {
@@ -238,7 +241,7 @@ export default function ActiveRecord (model, name, SManager = SessionManager(mod
         } else if (obj[ key ] && _.isDate(obj[ key ])) {
           obj[ key ] = new Date(obj[ key ]).toISOString();
         }
-        if (!opts.force && !deep(obj[ key ], old[ key ])) {
+        if (!opts.force && !deep(old[ key ], obj[ key ])) {
           delete obj[ key ]
         }
       });
