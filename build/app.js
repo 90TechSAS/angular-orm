@@ -99,13 +99,23 @@ function ActiveRecord(model, name) {
             if (options && options._id && _this[key]) {
               var toSave = undefined;
               /** If the field is a ref, only save id or the ids array */
-              if (_.isArray(field) && field[0].ref || field.ref) {
+              if ((_.isArray(field) && field[0].ref || field.ref) &&
+              /** Unless it is marked nested */
+              !(field.nested || _.isArray(field) && field[0].nested)) {
                 if (_.isArray(field)) {
                   toSave = _this[key].map(function (entry) {
                     return typeof entry === 'string' ? entry : entry._id;
                   });
                 } else {
                   toSave = typeof _this[key] === 'string' ? _this[key] : _this[key]._id;
+                }
+              } else if (field.nested || _.isArray(field) && field[0].nested) {
+                if (_.isArray(field)) {
+                  toSave = _this[key].map(function (e) {
+                    return e.beforeSave(null, { force: true });
+                  });
+                } else {
+                  toSave = _this[key].beforeSave(null, { force: true });
                 }
               } else {
                 toSave = _this[key];

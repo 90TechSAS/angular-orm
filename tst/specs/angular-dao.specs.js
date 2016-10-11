@@ -1,6 +1,6 @@
 describe('Angular DAO', function () {
 
-  var ModelManager, httpBackend, $rootScope, $timeout;
+  var ModelManager, ModelManager3, httpBackend, $rootScope, $timeout;
 
   beforeEach(function () {
 
@@ -9,8 +9,9 @@ describe('Angular DAO', function () {
       ModelManager2Provider.setRootUrl('http://MOCKURL.com/model2');
     });
 
-    inject(function (_ModelManager_, $httpBackend, _$rootScope_, _$timeout_) {
+    inject(function (_ModelManager_,_ModelManager3_, $httpBackend, _$rootScope_, _$timeout_) {
       ModelManager = _ModelManager_;
+      ModelManager3 = _ModelManager3_;
       httpBackend = $httpBackend;
       $rootScope = _$rootScope_;
       $timeout = _$timeout_;
@@ -245,12 +246,22 @@ describe('Angular DAO', function () {
     var model = ModelManager.create({
       _id: '1234656',
       model2: {_id: '303030'},
+      models2: [ '77777', '4444', { _id: '888', toto: 'tutu' } ]
+    });
+    model.model3 = ModelManager3.create({_id: '00002'})
+    model.models3 = [ModelManager3.create({_id: '0001'})]
+    expect(model.beforeSave()).toEqual({model3:{_id:'00002'},models3:[{_id:'0001'}]})
+  })
+
+  it ('should diff nested refs correctly', function(){
+    var model = ModelManager.create({
+      _id: '1234656',
+      model2: {_id: '303030'},
       models2: [ '77777', '4444', { _id: '888', toto: 'tutu' } ],
       model3: {_id: '00002'},
       models3:[{_id: '0001'}]
     });
-    expect(model.beforeSave()).toEqual({model3:{_id:'00002'},models3:[{_id:'0001'}]})
-    console.log(model.beforeSave())
+    expect(model.beforeSave()).toEqual({})
   })
 
   it('Should make subPopulate queries on arrays', function () {

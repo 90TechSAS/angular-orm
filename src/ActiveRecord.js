@@ -68,11 +68,19 @@ export default function ActiveRecord (model, name, SManager = SessionManager(mod
         if (options && options._id && this[ key ]) {
           let toSave
           /** If the field is a ref, only save id or the ids array */
-          if (_.isArray(field) && field[ 0 ].ref || field.ref) {
+          if ((_.isArray(field) && field[ 0 ].ref || field.ref)
+            /** Unless it is marked nested */
+            && !(field.nested || (_.isArray(field) && field[ 0 ].nested))) {
             if (_.isArray(field)) {
               toSave = this[ key ].map(entry => (typeof entry === 'string') ? entry : entry._id)
             } else {
               toSave = typeof this[ key ] === 'string' ? this[ key ] : this[ key ]._id
+            }
+          } else if (field.nested || (_.isArray(field) && field[ 0 ].nested)) {
+            if (_.isArray(field)){
+              toSave = this[ key ].map(e => e.beforeSave(null, {force: true}))
+            } else {
+              toSave = this[ key ].beforeSave(null, {force: true})
             }
           } else {
             toSave = this[ key ]
