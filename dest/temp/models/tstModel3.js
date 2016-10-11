@@ -31,46 +31,22 @@ var model = {
     },
 
     //private: true
-    when: Date,
-
-    label: String,
-
-    num: Number,
-
-    models2: [{
-        type: String,
-        ref: 'Model2'
-    }],
-
-    model2: {
-        type: String,
-        ref: 'Model2'
-    },
-
-    model3: {
-        ref: 'Model3',
-        nested: true
-    },
-
-    models3: [{
-        ref: 'Model3',
-        nested: true
-    }]
+    name: String
 };
 
-var AR = (0, _ActiveRecord2['default'])(model, 'Model1');
+var AR = (0, _ActiveRecord2['default'])(model, 'Model3');
 
-var Model = (function (_AR) {
-    _inherits(Model, _AR);
+var Model3 = (function (_AR) {
+    _inherits(Model3, _AR);
 
-    function Model() {
-        _classCallCheck(this, Model);
+    function Model3() {
+        _classCallCheck(this, Model3);
 
-        _get(Object.getPrototypeOf(Model.prototype), 'constructor', this).apply(this, arguments);
+        _get(Object.getPrototypeOf(Model3.prototype), 'constructor', this).apply(this, arguments);
     }
 
-    return Model;
+    return Model3;
 })(AR);
 
-exports['default'] = Model;
+exports['default'] = Model3;
 module.exports = exports['default'];

@@ -259,30 +259,60 @@ function ActiveRecord(model, name) {
 
           var opts = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
+          /** If no object is provided, clone `this`
+           * by copying only relevant keys (keys in model)
+           * If you write your own beforeSave method, it is your responsibility to clone `this`
+           * the way you want it cloned
+           */
           if (!obj) {
             obj = {};
             _.each(_.keys(model), function (k) {
-              return obj[k] = _this3[k];
+              if (_this3[k]) {
+                obj[k] = _this3[k];
+              }
             });
           }
+          /** Retrieve object saved in session to perform the diff */
           var old = session.retrieve(this._id) || {};
-          _.each(model, function (field, key) {
-            if (obj[key] && (field.ref || _.isArray(field) && field[0].ref)) {
 
-              if (_.isArray(obj[key])) {
-                obj[key] = _.compact(obj[key].map(function (val) {
-                  if (typeof val === 'object') {
-                    return field.nested ? val : val._id;
-                  } else if (typeof val === 'string') {
-                    return val;
+          _.each(model, function (field, key) {
+            if (obj[key]) {
+              /** If the field is a ref to another field, replace it by its _id */
+              if ((field.ref || _.isArray(field) && field[0].ref) &&
+              /** Unless it is specifically marked as nested */
+              !(field.nested || _.isArray(field) && field[0].nested)) {
+                /** Transforms an array of refs to just an array of _ids
+                 * Handles mixed arrays */
+                if (_.isArray(obj[key])) {
+                  obj[key] = _.compact(obj[key].map(function (val) {
+                    if (typeof val === 'object') {
+                      return field.nested ? val : val._id;
+                    } else if (typeof val === 'string') {
+                      return val;
+                    }
+                  }));
+                } else {
+                  /** Transforms just a single ref into its _id if needed */
+                  obj[key] = obj[key]._id || obj[key];
+                }
+                /** Nested SubModel, pass it through beforeSave() so that
+                 * only relevant fields are kept
+                 * {force: true} so that all fields of the nested object are returned
+                 * */
+              } else if (field.nested || _.isArray(field) && field[0].nested) {
+                  if (_.isArray(field)) {
+                    obj[key] = obj[key].map(function (e) {
+                      return e.beforeSave(null, { force: true });
+                    });
+                  } else {
+                    obj[key] = obj[key].beforeSave(null, { force: true });
                   }
-                }));
-              } else {
-                obj[key] = obj[key]._id || obj[key];
-              }
-            } else if (obj[key] && _.isDate(obj[key])) {
-              obj[key] = new Date(obj[key]).toISOString();
+                } else if (_.isDate(obj[key])) {
+                  /** Make sure the date is an ISOString */
+                  obj[key] = new Date(obj[key]).toISOString();
+                }
             }
+            /** IMPORTANT this is where the diff is made. If we didn't force in the options*/
             if (!opts.force && !deep(old[key], obj[key])) {
               delete obj[key];
             }
@@ -437,7 +467,7 @@ function ActiveRecord(model, name) {
 }
 
 module.exports = exports['default'];
-},{"./ServiceLocator":5,"./SessionManager":6,"deep-diff":12}],2:[function(require,module,exports){
+},{"./ServiceLocator":5,"./SessionManager":6,"deep-diff":14}],2:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1026,11 +1056,16 @@ var _managersTstManager2 = require('./managers/tstManager2');
 
 var _managersTstManager22 = _interopRequireDefault(_managersTstManager2);
 
+var _managersTstManager3 = require('./managers/tstManager3');
+
+var _managersTstManager32 = _interopRequireDefault(_managersTstManager3);
+
 var _module = angular.module('tstModule', []);
 
 _DaoHelper2['default'].registerService(_module, 'ModelManager', _managersTstManager12['default']);
 _DaoHelper2['default'].registerService(_module, 'ModelManager2', _managersTstManager22['default']);
-},{"./DaoHelper":2,"./managers/tstManager1":8,"./managers/tstManager2":9}],8:[function(require,module,exports){
+_DaoHelper2['default'].registerService(_module, 'ModelManager3', _managersTstManager32['default']);
+},{"./DaoHelper":2,"./managers/tstManager1":8,"./managers/tstManager2":9,"./managers/tstManager3":10}],8:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1081,7 +1116,7 @@ var ModelManager = (function (_DAO) {
 exports['default'] = ModelManager;
 ;
 module.exports = exports['default'];
-},{"../GenericDao":3,"../QueryBuilder":4,"./../models/tstModel1.js":10}],9:[function(require,module,exports){
+},{"../GenericDao":3,"../QueryBuilder":4,"./../models/tstModel1.js":11}],9:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1132,7 +1167,58 @@ var ModelManager2 = (function (_DAO) {
 exports['default'] = ModelManager2;
 ;
 module.exports = exports['default'];
-},{"../GenericDao":3,"../QueryBuilder":4,"./../models/tstModel2.js":11}],10:[function(require,module,exports){
+},{"../GenericDao":3,"../QueryBuilder":4,"./../models/tstModel2.js":12}],10:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+// istanbul ignore next
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+// istanbul ignore next
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+// istanbul ignore next
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+// istanbul ignore next
+
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _modelsTstModel3Js = require('./../models/tstModel3.js');
+
+var _modelsTstModel3Js2 = _interopRequireDefault(_modelsTstModel3Js);
+
+var _GenericDao = require('../GenericDao');
+
+var _GenericDao2 = _interopRequireDefault(_GenericDao);
+
+var _QueryBuilder = require('../QueryBuilder');
+
+var _QueryBuilder2 = _interopRequireDefault(_QueryBuilder);
+
+var DAO = (0, _GenericDao2['default'])(_modelsTstModel3Js2['default']);
+
+var ModelManager3 = (function (_DAO) {
+  _inherits(ModelManager3, _DAO);
+
+  function ModelManager3() {
+    _classCallCheck(this, ModelManager3);
+
+    _get(Object.getPrototypeOf(ModelManager3.prototype), 'constructor', this).apply(this, arguments);
+  }
+
+  return ModelManager3;
+})(DAO);
+
+exports['default'] = ModelManager3;
+;
+module.exports = exports['default'];
+},{"../GenericDao":3,"../QueryBuilder":4,"./../models/tstModel3.js":13}],11:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1180,7 +1266,17 @@ var model = {
     model2: {
         type: String,
         ref: 'Model2'
-    }
+    },
+
+    model3: {
+        ref: 'Model3',
+        nested: true
+    },
+
+    models3: [{
+        ref: 'Model3',
+        nested: true
+    }]
 };
 
 var AR = (0, _ActiveRecord2['default'])(model, 'Model1');
@@ -1199,7 +1295,7 @@ var Model = (function (_AR) {
 
 exports['default'] = Model;
 module.exports = exports['default'];
-},{"../ActiveRecord":1}],11:[function(require,module,exports){
+},{"../ActiveRecord":1}],12:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1252,7 +1348,60 @@ var Model2 = (function (_AR) {
 
 exports['default'] = Model2;
 module.exports = exports['default'];
-},{"../ActiveRecord":1}],12:[function(require,module,exports){
+},{"../ActiveRecord":1}],13:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+    value: true
+});
+// istanbul ignore next
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+// istanbul ignore next
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+// istanbul ignore next
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+// istanbul ignore next
+
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _ActiveRecord = require('../ActiveRecord');
+
+var _ActiveRecord2 = _interopRequireDefault(_ActiveRecord);
+
+var model = {
+
+    _id: {
+        type: String,
+        unique: true
+    },
+
+    //private: true
+    name: String
+};
+
+var AR = (0, _ActiveRecord2['default'])(model, 'Model3');
+
+var Model3 = (function (_AR) {
+    _inherits(Model3, _AR);
+
+    function Model3() {
+        _classCallCheck(this, Model3);
+
+        _get(Object.getPrototypeOf(Model3.prototype), 'constructor', this).apply(this, arguments);
+    }
+
+    return Model3;
+})(AR);
+
+exports['default'] = Model3;
+module.exports = exports['default'];
+},{"../ActiveRecord":1}],14:[function(require,module,exports){
 (function (global){
 /*!
  * deep-diff.

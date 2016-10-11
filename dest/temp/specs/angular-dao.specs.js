@@ -235,6 +235,18 @@ describe('Angular DAO', function () {
     expect(clone.models2[2]).toEqual('444');
   });
 
+  it('should prepare to save refs and nested refs correctly', function () {
+    var model = ModelManager.create({
+      _id: '1234656',
+      model2: { _id: '303030' },
+      models2: ['77777', '4444', { _id: '888', toto: 'tutu' }],
+      model3: { _id: '00002' },
+      models3: [{ _id: '0001' }]
+    });
+    expect(model.beforeSave()).toEqual({ model3: { _id: '00002' }, models3: [{ _id: '0001' }] });
+    console.log(model.beforeSave());
+  });
+
   it('Should make subPopulate queries on arrays', function () {
     var model = ModelManager.create({
       _id: '1234656',

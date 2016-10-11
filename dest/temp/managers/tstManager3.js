@@ -1,7 +1,7 @@
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
-    value: true
+  value: true
 });
 // istanbul ignore next
 
@@ -19,58 +19,32 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var _ActiveRecord = require('../ActiveRecord');
+var _modelsTstModel3Js = require('./../models/tstModel3.js');
 
-var _ActiveRecord2 = _interopRequireDefault(_ActiveRecord);
+var _modelsTstModel3Js2 = _interopRequireDefault(_modelsTstModel3Js);
 
-var model = {
+var _GenericDao = require('../GenericDao');
 
-    _id: {
-        type: String,
-        unique: true
-    },
+var _GenericDao2 = _interopRequireDefault(_GenericDao);
 
-    //private: true
-    when: Date,
+var _QueryBuilder = require('../QueryBuilder');
 
-    label: String,
+var _QueryBuilder2 = _interopRequireDefault(_QueryBuilder);
 
-    num: Number,
+var DAO = (0, _GenericDao2['default'])(_modelsTstModel3Js2['default']);
 
-    models2: [{
-        type: String,
-        ref: 'Model2'
-    }],
+var ModelManager3 = (function (_DAO) {
+  _inherits(ModelManager3, _DAO);
 
-    model2: {
-        type: String,
-        ref: 'Model2'
-    },
+  function ModelManager3() {
+    _classCallCheck(this, ModelManager3);
 
-    model3: {
-        ref: 'Model3',
-        nested: true
-    },
+    _get(Object.getPrototypeOf(ModelManager3.prototype), 'constructor', this).apply(this, arguments);
+  }
 
-    models3: [{
-        ref: 'Model3',
-        nested: true
-    }]
-};
+  return ModelManager3;
+})(DAO);
 
-var AR = (0, _ActiveRecord2['default'])(model, 'Model1');
-
-var Model = (function (_AR) {
-    _inherits(Model, _AR);
-
-    function Model() {
-        _classCallCheck(this, Model);
-
-        _get(Object.getPrototypeOf(Model.prototype), 'constructor', this).apply(this, arguments);
-    }
-
-    return Model;
-})(AR);
-
-exports['default'] = Model;
+exports['default'] = ModelManager3;
+;
 module.exports = exports['default'];

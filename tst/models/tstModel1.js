@@ -28,7 +28,17 @@ var model = {
     model2: {
         type: String,
         ref: 'Model2'
-    }
+    },
+
+    model3: {
+        ref: 'Model3',
+        nested: true
+    },
+
+    models3: [{
+        ref: 'Model3',
+        nested: true
+    }]
 };
 
 

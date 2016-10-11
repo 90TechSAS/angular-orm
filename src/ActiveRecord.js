@@ -126,7 +126,7 @@ export default function ActiveRecord (model, name, SManager = SessionManager(mod
       return this.$injector.get('$http');
     }
 
-    get $$pristine(){
+    get $$pristine () {
       return _.isEmpty(this.beforeSave())
     }
 
@@ -219,28 +219,55 @@ export default function ActiveRecord (model, name, SManager = SessionManager(mod
     }
 
     beforeSave (obj, opts = {}) {
-      if (!obj){
+      /** If no object is provided, clone `this`
+       * by copying only relevant keys (keys in model)
+       * If you write your own beforeSave method, it is your responsibility to clone `this`
+       * the way you want it cloned
+       */
+      if (!obj) {
         obj = {}
-        _.each(_.keys(model), k => obj[k] = this[k])
+        _.each(_.keys(model), k => {if (this[ k ]) { obj[ k ] = this[ k ]}})
       }
+      /** Retrieve object saved in session to perform the diff */
       let old = session.retrieve(this._id) || {}
-      _.each(model, (field, key)=> {
-        if (obj[ key ] && (field.ref || (_.isArray(field) && field[ 0 ].ref))) {
 
-          if (_.isArray(obj[ key ])) {
-            obj[ key ] = _.compact(obj[ key ].map((val) => {
-              if (typeof(val) === 'object') {
-                return field.nested ? val : val._id;
-              } else if (typeof(val) === 'string') {
-                return val;
-              }
-            }));
-          } else {
-            obj[ key ] = obj[ key ]._id || obj[ key ];
+      _.each(model, (field, key)=> {
+        if (obj [ key ]) {
+          /** If the field is a ref to another field, replace it by its _id */
+          if ((field.ref || (_.isArray(field) && field[ 0 ].ref))
+            /** Unless it is specifically marked as nested */
+            && !(field.nested || (_.isArray(field) && field[ 0 ].nested ))
+          ) {
+            /** Transforms an array of refs to just an array of _ids
+             * Handles mixed arrays */
+            if (_.isArray(obj[ key ])) {
+              obj[ key ] = _.compact(obj[ key ].map((val) => {
+                if (typeof(val) === 'object') {
+                  return field.nested ? val : val._id;
+                } else if (typeof(val) === 'string') {
+                  return val;
+                }
+              }));
+            } else {
+              /** Transforms just a single ref into its _id if needed */
+              obj[ key ] = obj[ key ]._id || obj[ key ];
+            }
+            /** Nested SubModel, pass it through beforeSave() so that
+             * only relevant fields are kept
+             * {force: true} so that all fields of the nested object are returned
+             * */
+          } else if (field.nested || (_.isArray(field) && field[ 0 ].nested )) {
+            if (_.isArray(field)) {
+              obj[ key ] = obj[ key ].map(e => e.beforeSave(null, { force: true }))
+            } else {
+              obj[ key ] = obj[ key ].beforeSave(null, { force: true })
+            }
+          } else if (_.isDate(obj[ key ])) {
+            /** Make sure the date is an ISOString */
+            obj[ key ] = new Date(obj[ key ]).toISOString();
           }
-        } else if (obj[ key ] && _.isDate(obj[ key ])) {
-          obj[ key ] = new Date(obj[ key ]).toISOString();
         }
+        /** IMPORTANT this is where the diff is made. If we didn't force in the options*/
         if (!opts.force && !deep(old[ key ], obj[ key ])) {
           delete obj[ key ]
         }
