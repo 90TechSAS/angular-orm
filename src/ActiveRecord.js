@@ -1,5 +1,6 @@
 //_ = require('lodash');
 import ServiceLocator from './ServiceLocator'
+import SessionManager from './SessionManager'
 var deep = require('deep-diff').diff
 
 /**
@@ -12,18 +13,19 @@ var deep = require('deep-diff').diff
  * @param name String Name of the Model (must be the same as described in 'ref' of others models relations.
  * @returns {$ES6_CLASS$}
  */
-export default function ActiveRecord (model, name) {
+export default function ActiveRecord (model, name, SManager=SessionManager(model)) {
   let sl = ServiceLocator.instance;
+  let session = new SManager()
+
   let ActiveRecord = class {
     constructor ($injector, rootUrl, options) {
       this.$injector = $injector;
-      //  this.$http     = $injector.get('$http');
       this.rootUrl = rootUrl;
       this.build(options);
     }
 
     build (options) {
-      this.__old = {}
+      let sess = {}
       _.each(model, (field, key)=> {
         if (options && (options[ key ] || options[ key ] === 0)) {
           var name = _.isArray(field) ? field[ 0 ].ref : field.ref;
@@ -62,13 +64,11 @@ export default function ActiveRecord (model, name) {
             this[ key ] = this.buildField(field, options[ key ])
           }
         }
-        /*else if (_.isArray(field)) {
-         this[ key ] = [];
-         } */
         if (options && options._id) {
-          this.__old[ key ] = _.cloneDeep(this[ key ])
+          sess[ key ] = _.cloneDeep(this[ key ])
         }
       });
+      session.save(sess)
       return this;
 
     }
@@ -205,8 +205,9 @@ export default function ActiveRecord (model, name) {
 
     beforeSave (obj, opts={}) {
       obj = obj || _.cloneDeep(this);
+      let old = session.retrieve(this._id) || {}
       _.each(model, (field, key)=> {
-        if (!opts.force && !deep(obj[ key ], this.__old[ key ])) {
+        if (!opts.force && !deep(obj[ key ], old[ key ])) {
           delete obj[ key ]
           return
         }
@@ -230,7 +231,6 @@ export default function ActiveRecord (model, name) {
       delete obj.rootUrl;
       delete obj.$injector;
       delete obj._injector;
-      delete obj.__old;
       return obj;
 
     }
@@ -332,7 +332,11 @@ export default function ActiveRecord (model, name) {
       return model;
     }
 
+    static getSession(){
+      return session;
+    }
+
   };
-  //   sl.registerModel(name, ActiveRecord);
+
   return ActiveRecord;
 }
