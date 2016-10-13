@@ -277,7 +277,7 @@ function ActiveRecord(model, name) {
           if (!obj) {
             obj = {};
             _.each(_.keys(model), function (k) {
-              if (_this3[k]) {
+              if (!_.isUndefined(_this3[k])) {
                 obj[k] = _this3[k];
               }
             });
@@ -286,7 +286,7 @@ function ActiveRecord(model, name) {
           var old = session.retrieve(this._id) || {};
 
           _.each(model, function (field, key) {
-            if (obj[key]) {
+            if (!_.isUndefined(obj[key])) {
               /** If the field is a ref to another field, replace it by its _id */
               if ((field.ref || _.isArray(field) && field[0].ref) &&
               /** Unless it is specifically marked as nested */
