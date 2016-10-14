@@ -83,4 +83,15 @@ describe('Angular DAO Basics', function () {
     httpBackend.flush();
   });
 
+  it('Should build an empty array when server return 204', function () {
+    httpBackend.expectGET(encodeURI('http://MOCKURL.com/model1')).respond(function(method, url, data) {
+      return [204, undefined, {'X-Total-Count': 0}]
+    });
+    ModelManager.get().then(function (data) {
+      expect(data).toEqual({data: [], meta: {total: '0'}})
+    });
+    httpBackend.flush();
+
+  })
+
 });

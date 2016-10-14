@@ -36,6 +36,9 @@ export default function GenericDao(model, qb){
         get(qb = this.query()){
             var self = this;
             return this.$http.get(this.url, {params: qb.opts}).then((data)=>{
+                if (!data.data) {
+                  data.data = []
+                }
                 return {
                     data: data.data.map(this.build, this), meta: {total: data.headers('X-Total-Count')}
                 };
@@ -123,7 +126,9 @@ export default function GenericDao(model, qb){
                     qb.setQuery(obj);
                 }
                 return this.$http.get(this.url, {params: qb.opts}).then((data)=>{
-
+                    if (!data.data) {
+                      data.data = []
+                    }
                     return {
                         data: data.data.map(this.build, this), meta: {total: data.headers('X-Total-Count')}
                     };
