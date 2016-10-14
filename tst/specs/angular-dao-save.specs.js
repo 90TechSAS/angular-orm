@@ -91,6 +91,20 @@ describe('Angular DAO', function () {
     model.save();
   });
 
+  it('Should detect change when change is falsy', function () {
+    var model = ModelManager.createModel({
+      _id: '123456',
+      label: 'AZE',
+      num: 10
+    })
+    model.label = ''
+    model.num = 0
+    expect(model.$$pristine).toBeFalsy()
+    httpBackend.expectPUT('http://MOCKURL.com/model1/123456', { label: '', num: 0}).respond()
+    model.save();
+    httpBackend.flush()
+  })
+
   it('Should deep nested objects', function () {
     var model = ModelManager.createModel({
       label: 'toto',

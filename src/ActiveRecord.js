@@ -234,13 +234,13 @@ export default function ActiveRecord (model, name, SManager = SessionManager(mod
        */
       if (!obj) {
         obj = {}
-        _.each(_.keys(model), k => {if (this[ k ]) { obj[ k ] = this[ k ]}})
+        _.each(_.keys(model), k => {if (!_.isUndefined(this[ k ])) { obj[ k ] = this[ k ]}})
       }
       /** Retrieve object saved in session to perform the diff */
       let old = session.retrieve(this._id) || {}
 
       _.each(model, (field, key)=> {
-        if (obj [ key ]) {
+        if (!_.isUndefined(obj [ key ])) {
           /** If the field is a ref to another field, replace it by its _id */
           if ((field.ref || (_.isArray(field) && field[ 0 ].ref))
             /** Unless it is specifically marked as nested */
