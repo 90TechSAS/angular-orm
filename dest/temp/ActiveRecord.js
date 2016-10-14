@@ -245,6 +245,8 @@ function ActiveRecord(model, name) {
             obj[key] = new Date(moment(obj[key])).toISOString();
           }
         });
+        delete obj.rootUrl;
+        delete obj.$injector;
         return obj;
       }
     }, {

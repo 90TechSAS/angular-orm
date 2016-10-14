@@ -246,6 +246,8 @@ function ActiveRecord(model, name) {
             obj[key] = new Date(moment(obj[key])).toISOString();
           }
         });
+        delete obj.rootUrl;
+        delete obj.$injector;
         return obj;
       }
     }, {
@@ -525,6 +527,9 @@ function GenericDao(model, qb) {
 
                 var self = this;
                 return this.$http.get(this.url, { params: qb.opts }).then(function (data) {
+                    if (!data.data) {
+                        data.data = [];
+                    }
                     return {
                         data: data.data.map(_this.build, _this), meta: { total: data.headers('X-Total-Count') }
                     };
@@ -641,7 +646,9 @@ function GenericDao(model, qb) {
                     qb.setQuery(obj);
                 }
                 return this.$http.get(this.url, { params: qb.opts }).then(function (data) {
-
+                    if (!data.data) {
+                        data.data = [];
+                    }
                     return {
                         data: data.data.map(_this4.build, _this4), meta: { total: data.headers('X-Total-Count') }
                     };
