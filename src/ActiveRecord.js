@@ -268,7 +268,9 @@ export default function ActiveRecord (model, name, SManager = SessionManager(mod
             if (_.isArray(field)) {
               obj[ key ] = obj[ key ].map(e => e.beforeSave(null, { force: true }))
             } else {
-              obj[ key ] = obj[ key ].beforeSave(null, { force: true })
+              if (obj[ key ] && obj[ key ] !== null) {
+                obj[ key ] = obj[ key ].beforeSave(null, { force: true })
+              }
             }
           } else if (_.isDate(obj[ key ])) {
             /** Make sure the date is an ISOString */

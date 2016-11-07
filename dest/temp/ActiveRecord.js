@@ -315,7 +315,9 @@ function ActiveRecord(model, name) {
                       return e.beforeSave(null, { force: true });
                     });
                   } else {
-                    obj[key] = obj[key].beforeSave(null, { force: true });
+                    if (obj[key] && obj[key] !== null) {
+                      obj[key] = obj[key].beforeSave(null, { force: true });
+                    }
                   }
                 } else if (_.isDate(obj[key])) {
                   /** Make sure the date is an ISOString */

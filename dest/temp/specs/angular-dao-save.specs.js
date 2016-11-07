@@ -224,4 +224,19 @@ describe('Angular DAO', function () {
     model.save();
     httpBackend.flush();
   });
+
+  it('should allow to save a nested field as null', function () {
+    var model = ModelManager.createModel({
+      _id: '123456',
+      model3: {
+        _id: '23456',
+        name: 'toto'
+      }
+    });
+
+    model.model3 = null;
+    httpBackend.expectPUT('http://MOCKURL.com/model1/123456', { model3: null }).respond();
+    model.save();
+    httpBackend.flush();
+  });
 });
