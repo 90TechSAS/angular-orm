@@ -15,6 +15,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
+var _ = require('lodash');
+
 var QueryBuilder = (function () {
   function QueryBuilder(dao) {
     var query = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];

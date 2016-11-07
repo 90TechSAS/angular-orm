@@ -24,6 +24,8 @@ var _QueryBuilder = require('./QueryBuilder');
 
 var _QueryBuilder2 = _interopRequireDefault(_QueryBuilder);
 
+var _ = require('lodash');
+
 function GenericDao(model, qb) {
     var sl = _ServiceLocator2['default'].instance;
     sl.registerModel(model.getName(), model);

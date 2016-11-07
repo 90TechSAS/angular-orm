@@ -1,4 +1,3 @@
-//_ = require('lodash');
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -24,6 +23,8 @@ var _ServiceLocator2 = _interopRequireDefault(_ServiceLocator);
 var _SessionManager = require('./SessionManager');
 
 var _SessionManager2 = _interopRequireDefault(_SessionManager);
+
+var _ = require('lodash');
 
 var deep = require('deep-diff').diff;
 
@@ -441,7 +442,7 @@ function ActiveRecord(model, name) {
         value: function populateParams(populateArray) {
 
           // Get from the model the fields that reference another object
-          var pop = _.pick(model, function (v) {
+          var pop = _.pickBy(model, function (v) {
             if (_.isArray(v)) return v[0].ref;
             return v.ref;
           });
@@ -449,8 +450,8 @@ function ActiveRecord(model, name) {
           if (populateArray === 'all') {
             return ActiveRecord.makePopObject(pop);
           }
-          var toPopulate = populateArray ? _.pick(pop, function (p, k) {
-            return _.contains(populateArray, k);
+          var toPopulate = populateArray ? _.pickBy(pop, function (p, k) {
+            return _.includes(populateArray, k);
           }) : _.pick(pop, function (v) {
             return v.populateDefault || v[0] && v[0].populateDefault;
           });

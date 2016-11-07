@@ -1,4 +1,4 @@
-//_ = require('lodash');
+let _ = require('lodash');
 import ServiceLocator from './ServiceLocator'
 import SessionManager from './SessionManager'
 var deep = require('deep-diff').diff
@@ -358,7 +358,7 @@ export default function ActiveRecord (model, name, SManager = SessionManager(mod
     static populateParams (populateArray) {
 
       // Get from the model the fields that reference another object
-      var pop = _.pick(model, function (v) {
+      var pop = _.pickBy(model, function (v) {
         if (_.isArray(v))
           return v[ 0 ].ref;
         return v.ref;
@@ -367,8 +367,8 @@ export default function ActiveRecord (model, name, SManager = SessionManager(mod
       if (populateArray === 'all') {
         return ActiveRecord.makePopObject(pop);
       }
-      var toPopulate = populateArray ? _.pick(pop, function (p, k) {
-        return _.contains(populateArray, k);
+      var toPopulate = populateArray ? _.pickBy(pop, function (p, k) {
+        return _.includes(populateArray, k);
       }) : _.pick(pop, function (v) {
         return v.populateDefault || (v[ 0 ] && v[ 0 ].populateDefault);
       });

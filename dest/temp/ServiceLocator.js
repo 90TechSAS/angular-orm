@@ -1,15 +1,16 @@
 'use strict';
-
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
     value: true
 });
 // istanbul ignore next
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 // istanbul ignore next
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+var _ = require('lodash');
 
 var singleton = Symbol();
 var singletonEnforcer = Symbol();
@@ -33,27 +34,27 @@ var ServiceLocator = (function () {
     }
 
     _createClass(ServiceLocator, [{
-        key: "getModel",
+        key: 'getModel',
         value: function getModel(name) {
             return this.modelRegistry[name];
         }
     }, {
-        key: "getDao",
+        key: 'getDao',
         value: function getDao(name) {
             return this.daoRegistry[name];
         }
     }, {
-        key: "registerDao",
+        key: 'registerDao',
         value: function registerDao(name, dao) {
             this.daoRegistry[name] = dao;
         }
     }, {
-        key: "registerModel",
+        key: 'registerModel',
         value: function registerModel(name, model) {
             this.modelRegistry[name] = model;
         }
     }], [{
-        key: "instance",
+        key: 'instance',
         get: function get() {
             if (!this[singleton]) {
                 this[singleton] = new ServiceLocator(singletonEnforcer);
@@ -65,5 +66,5 @@ var ServiceLocator = (function () {
     return ServiceLocator;
 })();
 
-exports["default"] = ServiceLocator;
-module.exports = exports["default"];
+exports['default'] = ServiceLocator;
+module.exports = exports['default'];

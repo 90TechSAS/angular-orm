@@ -1,4 +1,5 @@
 'use strict';
+let _ = require('lodash')
 
 let singleton         = Symbol();
 let singletonEnforcer = Symbol();

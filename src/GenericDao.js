@@ -1,3 +1,4 @@
+let _ = require('lodash')
 import ServiceLocator from './ServiceLocator';
 import QueryBuilder from './QueryBuilder';
 

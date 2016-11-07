@@ -1,3 +1,5 @@
+let _ = require('lodash')
+
 export default class QueryBuilder {
 
   constructor (dao, query = {}) {
