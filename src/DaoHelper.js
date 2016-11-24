@@ -24,6 +24,14 @@ export default class DaoHelper{
                 this.dao.url = url;
             }
 
+            setDiscriminatorUrl(type, url) {
+              _.each(this.dao.discriminators, (discriminator) => {
+                if (discriminator.type === type) {
+                  discriminator.discriminatorUrl = url
+                }
+              })
+            }
+
             $get(){
                 return this.dao;
             }

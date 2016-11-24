@@ -1,4 +1,5 @@
 //_ = require('lodash');
+import Discriminator from './Discriminator'
 import ServiceLocator from './ServiceLocator'
 import SessionManager from './SessionManager'
 var deep = require('deep-diff').diff

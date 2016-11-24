@@ -24,7 +24,7 @@ var _QueryBuilder = require('./QueryBuilder');
 
 var _QueryBuilder2 = _interopRequireDefault(_QueryBuilder);
 
-function GenericDao(model, qb) {
+function GenericDao(model, qb, discriminators) {
     var sl = _ServiceLocator2['default'].instance;
     sl.registerModel(model.getName(), model);
     var myClass = (function () {
@@ -35,6 +35,7 @@ function GenericDao(model, qb) {
             //   this.$http     = $injector.get('$http');
             this.url = url;
             this.model = model;
+            this.discriminators = discriminators;
         }
 
         _createClass(myClass, [{
@@ -94,6 +95,12 @@ function GenericDao(model, qb) {
                 if (Array.isArray(data)) {
                     return data.map(this.build, this);
                 }
+                if (this.discriminators && data.__t) {
+                    var disc = _.find(this.discriminators, { type: data.__t });
+                    if (disc) {
+                        return new disc(this.$injector, disc.discriminatorUrl, data);
+                    }
+                }
                 return new model(this.$injector, this.url, data);
             }
         }, {
@@ -129,8 +136,18 @@ function GenericDao(model, qb) {
         }, {
             key: 'create',
             value: function create(params) {
+                if (this.discriminators && params.__t) {
+                    var disc = _.find(this.discriminators, { type: params.__t });
+                    if (disc) {
+                        return new disc(this.$injector, disc.discriminatorUrl, params);
+                    }
+                }
                 return new this.model(this.$injector, this.url, params);
             }
+
+            // get discriminators(){
+            //   return discriminators
+            // }
         }, {
             key: '$http',
             get: function get() {

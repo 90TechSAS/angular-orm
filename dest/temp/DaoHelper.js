@@ -50,6 +50,15 @@ var DaoHelper = (function () {
                         this.dao.url = url;
                     }
                 }, {
+                    key: 'setDiscriminatorUrl',
+                    value: function setDiscriminatorUrl(type, url) {
+                        _.each(this.dao.discriminators, function (discriminator) {
+                            if (discriminator.type === type) {
+                                discriminator.discriminatorUrl = url;
+                            }
+                        });
+                    }
+                }, {
                     key: '$get',
                     value: function $get() {
                         return this.dao;

@@ -18,6 +18,10 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'd
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
+var _Discriminator = require('./Discriminator');
+
+var _Discriminator2 = _interopRequireDefault(_Discriminator);
+
 var _ServiceLocator = require('./ServiceLocator');
 
 var _ServiceLocator2 = _interopRequireDefault(_ServiceLocator);
@@ -479,7 +483,7 @@ function ActiveRecord(model, name) {
 }
 
 module.exports = exports['default'];
-},{"./ServiceLocator":5,"./SessionManager":6,"deep-diff":14}],2:[function(require,module,exports){
+},{"./Discriminator":3,"./ServiceLocator":6,"./SessionManager":7,"deep-diff":17}],2:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -532,6 +536,15 @@ var DaoHelper = (function () {
                         this.dao.url = url;
                     }
                 }, {
+                    key: 'setDiscriminatorUrl',
+                    value: function setDiscriminatorUrl(type, url) {
+                        _.each(this.dao.discriminators, function (discriminator) {
+                            if (discriminator.type === type) {
+                                discriminator.discriminatorUrl = url;
+                            }
+                        });
+                    }
+                }, {
                     key: '$get',
                     value: function $get() {
                         return this.dao;
@@ -555,7 +568,68 @@ var DaoHelper = (function () {
 
 exports['default'] = DaoHelper;
 module.exports = exports['default'];
-},{"./ServiceLocator":5}],3:[function(require,module,exports){
+},{"./ServiceLocator":6}],3:[function(require,module,exports){
+//_ = require('lodash');
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+// istanbul ignore next
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+// istanbul ignore next
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+exports['default'] = Discriminator;
+// istanbul ignore next
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+// istanbul ignore next
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+// istanbul ignore next
+
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _ServiceLocator = require('./ServiceLocator');
+
+var _ServiceLocator2 = _interopRequireDefault(_ServiceLocator);
+
+var _SessionManager = require('./SessionManager');
+
+var _SessionManager2 = _interopRequireDefault(_SessionManager);
+
+function Discriminator(Model, type) {
+
+  var Discriminator = (function (_Model) {
+    _inherits(Discriminator, _Model);
+
+    function Discriminator() {
+      _classCallCheck(this, Discriminator);
+
+      _get(Object.getPrototypeOf(Discriminator.prototype), 'constructor', this).apply(this, arguments);
+    }
+
+    _createClass(Discriminator, null, [{
+      key: 'type',
+      get: function get() {
+        return type;
+      }
+    }]);
+
+    return Discriminator;
+  })(Model);
+
+  return Discriminator;
+}
+
+module.exports = exports['default'];
+},{"./ServiceLocator":6,"./SessionManager":7}],4:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -582,7 +656,7 @@ var _QueryBuilder = require('./QueryBuilder');
 
 var _QueryBuilder2 = _interopRequireDefault(_QueryBuilder);
 
-function GenericDao(model, qb) {
+function GenericDao(model, qb, discriminators) {
     var sl = _ServiceLocator2['default'].instance;
     sl.registerModel(model.getName(), model);
     var myClass = (function () {
@@ -593,6 +667,7 @@ function GenericDao(model, qb) {
             //   this.$http     = $injector.get('$http');
             this.url = url;
             this.model = model;
+            this.discriminators = discriminators;
         }
 
         _createClass(myClass, [{
@@ -652,6 +727,12 @@ function GenericDao(model, qb) {
                 if (Array.isArray(data)) {
                     return data.map(this.build, this);
                 }
+                if (this.discriminators && data.__t) {
+                    var disc = _.find(this.discriminators, { type: data.__t });
+                    if (disc) {
+                        return new disc(this.$injector, disc.discriminatorUrl, data);
+                    }
+                }
                 return new model(this.$injector, this.url, data);
             }
         }, {
@@ -687,8 +768,18 @@ function GenericDao(model, qb) {
         }, {
             key: 'create',
             value: function create(params) {
+                if (this.discriminators && params.__t) {
+                    var disc = _.find(this.discriminators, { type: params.__t });
+                    if (disc) {
+                        return new disc(this.$injector, disc.discriminatorUrl, params);
+                    }
+                }
                 return new this.model(this.$injector, this.url, params);
             }
+
+            // get discriminators(){
+            //   return discriminators
+            // }
         }, {
             key: '$http',
             get: function get() {
@@ -761,7 +852,7 @@ function GenericDao(model, qb) {
 }
 
 module.exports = exports['default'];
-},{"./QueryBuilder":4,"./ServiceLocator":5}],4:[function(require,module,exports){
+},{"./QueryBuilder":5,"./ServiceLocator":6}],5:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -923,7 +1014,7 @@ var QueryBuilder = (function () {
 
 exports['default'] = QueryBuilder;
 module.exports = exports['default'];
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -993,7 +1084,7 @@ var ServiceLocator = (function () {
 
 exports["default"] = ServiceLocator;
 module.exports = exports["default"];
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1054,7 +1145,7 @@ function SessionManager(model) {
 }
 
 module.exports = exports['default'];
-},{"./ServiceLocator":5}],7:[function(require,module,exports){
+},{"./ServiceLocator":6}],8:[function(require,module,exports){
 'use strict';
 
 // istanbul ignore next
@@ -1077,12 +1168,17 @@ var _managersTstManager3 = require('./managers/tstManager3');
 
 var _managersTstManager32 = _interopRequireDefault(_managersTstManager3);
 
+var _managersTstManager4 = require('./managers/tstManager4');
+
+var _managersTstManager42 = _interopRequireDefault(_managersTstManager4);
+
 var _module = angular.module('tstModule', []);
 
 _DaoHelper2['default'].registerService(_module, 'ModelManager', _managersTstManager12['default']);
 _DaoHelper2['default'].registerService(_module, 'ModelManager2', _managersTstManager22['default']);
 _DaoHelper2['default'].registerService(_module, 'ModelManager3', _managersTstManager32['default']);
-},{"./DaoHelper":2,"./managers/tstManager1":8,"./managers/tstManager2":9,"./managers/tstManager3":10}],8:[function(require,module,exports){
+_DaoHelper2['default'].registerService(_module, 'ModelManager4', _managersTstManager42['default']);
+},{"./DaoHelper":2,"./managers/tstManager1":9,"./managers/tstManager2":10,"./managers/tstManager3":11,"./managers/tstManager4":12}],9:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1133,7 +1229,7 @@ var ModelManager = (function (_DAO) {
 exports['default'] = ModelManager;
 ;
 module.exports = exports['default'];
-},{"../GenericDao":3,"../QueryBuilder":4,"./../models/tstModel1.js":11}],9:[function(require,module,exports){
+},{"../GenericDao":4,"../QueryBuilder":5,"./../models/tstModel1.js":13}],10:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1184,7 +1280,7 @@ var ModelManager2 = (function (_DAO) {
 exports['default'] = ModelManager2;
 ;
 module.exports = exports['default'];
-},{"../GenericDao":3,"../QueryBuilder":4,"./../models/tstModel2.js":12}],10:[function(require,module,exports){
+},{"../GenericDao":4,"../QueryBuilder":5,"./../models/tstModel2.js":14}],11:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1235,7 +1331,61 @@ var ModelManager3 = (function (_DAO) {
 exports['default'] = ModelManager3;
 ;
 module.exports = exports['default'];
-},{"../GenericDao":3,"../QueryBuilder":4,"./../models/tstModel3.js":13}],11:[function(require,module,exports){
+},{"../GenericDao":4,"../QueryBuilder":5,"./../models/tstModel3.js":15}],12:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+// istanbul ignore next
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+// istanbul ignore next
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+// istanbul ignore next
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+// istanbul ignore next
+
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _modelsTstModel4Js = require('./../models/tstModel4.js');
+
+var _modelsTstModel4Js2 = _interopRequireDefault(_modelsTstModel4Js);
+
+var _GenericDao = require('../GenericDao');
+
+var _GenericDao2 = _interopRequireDefault(_GenericDao);
+
+var _Discriminator = require('../Discriminator');
+
+var _Discriminator2 = _interopRequireDefault(_Discriminator);
+
+var D1 = (0, _Discriminator2['default'])(_modelsTstModel4Js2['default'], 'Type1');
+var D2 = (0, _Discriminator2['default'])(_modelsTstModel4Js2['default'], 'Type2');
+
+var DAO = (0, _GenericDao2['default'])(_modelsTstModel4Js2['default'], undefined, [D1, D2]);
+
+var ModelManager4 = (function (_DAO) {
+  _inherits(ModelManager4, _DAO);
+
+  function ModelManager4() {
+    _classCallCheck(this, ModelManager4);
+
+    _get(Object.getPrototypeOf(ModelManager4.prototype), 'constructor', this).apply(this, arguments);
+  }
+
+  return ModelManager4;
+})(DAO);
+
+exports['default'] = ModelManager4;
+;
+module.exports = exports['default'];
+},{"../Discriminator":3,"../GenericDao":4,"./../models/tstModel4.js":16}],13:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1312,7 +1462,7 @@ var Model = (function (_AR) {
 
 exports['default'] = Model;
 module.exports = exports['default'];
-},{"../ActiveRecord":1}],12:[function(require,module,exports){
+},{"../ActiveRecord":1}],14:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1365,7 +1515,7 @@ var Model2 = (function (_AR) {
 
 exports['default'] = Model2;
 module.exports = exports['default'];
-},{"../ActiveRecord":1}],13:[function(require,module,exports){
+},{"../ActiveRecord":1}],15:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1418,7 +1568,62 @@ var Model3 = (function (_AR) {
 
 exports['default'] = Model3;
 module.exports = exports['default'];
-},{"../ActiveRecord":1}],14:[function(require,module,exports){
+},{"../ActiveRecord":1}],16:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+    value: true
+});
+// istanbul ignore next
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+// istanbul ignore next
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+// istanbul ignore next
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+// istanbul ignore next
+
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _ActiveRecord = require('../ActiveRecord');
+
+var _ActiveRecord2 = _interopRequireDefault(_ActiveRecord);
+
+var model = {
+
+    _id: {
+        type: String,
+        unique: true
+    },
+
+    //private: true
+    name: String,
+
+    __t: String
+};
+
+var AR = (0, _ActiveRecord2['default'])(model, 'Model4');
+
+var Model4 = (function (_AR) {
+    _inherits(Model4, _AR);
+
+    function Model4() {
+        _classCallCheck(this, Model4);
+
+        _get(Object.getPrototypeOf(Model4.prototype), 'constructor', this).apply(this, arguments);
+    }
+
+    return Model4;
+})(AR);
+
+exports['default'] = Model4;
+module.exports = exports['default'];
+},{"../ActiveRecord":1}],17:[function(require,module,exports){
 (function (global){
 /*!
  * deep-diff.
@@ -1844,4 +2049,4 @@ module.exports = exports['default'];
 }));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}]},{},[7]);
+},{}]},{},[8]);

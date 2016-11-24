@@ -1,7 +1,7 @@
 import ServiceLocator from './ServiceLocator';
 import QueryBuilder from './QueryBuilder';
 
-export default function GenericDao(model, qb){
+export default function GenericDao(model, qb, discriminators){
     let sl           = ServiceLocator.instance;
     sl.registerModel(model.getName(), model);
     let myClass = class {
@@ -10,6 +10,7 @@ export default function GenericDao(model, qb){
             //   this.$http     = $injector.get('$http');
             this.url   = url;
             this.model = model
+            this.discriminators = discriminators
         }
 
         get $http(){
@@ -58,6 +59,12 @@ export default function GenericDao(model, qb){
             if (Array.isArray(data)){
                 return data.map(this.build, this);
             }
+            if (this.discriminators && data.__t) {
+              let disc = _.find(this.discriminators, {type: data.__t});
+              if (disc) {
+                return new disc(this.$injector, disc.discriminatorUrl, data);
+              }
+            }
             return new model(this.$injector, this.url, data);
         }
 
@@ -85,8 +92,18 @@ export default function GenericDao(model, qb){
         }
 
         create(params){
-            return new this.model(this.$injector, this.url, params);
+          if (this.discriminators && params.__t) {
+            let disc = _.find(this.discriminators,{type: params.__t});
+            if (disc) {
+              return new disc(this.$injector, disc.discriminatorUrl, params);
+            }
+          }
+          return new this.model(this.$injector, this.url, params);
         }
+
+        // get discriminators(){
+        //   return discriminators
+        // }
     };
 
 
