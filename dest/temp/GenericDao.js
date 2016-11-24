@@ -24,7 +24,7 @@ var _QueryBuilder = require('./QueryBuilder');
 
 var _QueryBuilder2 = _interopRequireDefault(_QueryBuilder);
 
-function GenericDao(model, qb) {
+function GenericDao(model, qb, discriminators) {
     var sl = _ServiceLocator2['default'].instance;
     sl.registerModel(model.getName(), model);
     var myClass = (function () {
@@ -35,6 +35,7 @@ function GenericDao(model, qb) {
             //   this.$http     = $injector.get('$http');
             this.url = url;
             this.model = model;
+            this.discriminators = discriminators;
         }
 
         _createClass(myClass, [{
@@ -94,7 +95,15 @@ function GenericDao(model, qb) {
                 if (Array.isArray(data)) {
                     return data.map(this.build, this);
                 }
-                return new model(this.$injector, this.url, data);
+                var url = this.url;
+                if (data.__t) {
+                    _.each(this.discriminators, function (discriminator) {
+                        if (discriminator.type == data.__t) {
+                            url = discriminator.discriminatorUrl;
+                        }
+                    });
+                }
+                return new model(this.$injector, url, data);
             }
         }, {
             key: 'post',
@@ -129,8 +138,21 @@ function GenericDao(model, qb) {
         }, {
             key: 'create',
             value: function create(params) {
-                return new this.model(this.$injector, this.url, params);
+                var url = this.url;
+                if (params.__t) {
+                    _.each(this.discriminators, function (discriminator) {
+                        if (discriminator.type == params.__t) {
+
+                            url = discriminator.discriminatorUrl;
+                        }
+                    });
+                }
+                return new this.model(this.$injector, url, params);
             }
+
+            // get discriminators(){
+            //   return discriminators
+            // }
         }, {
             key: '$http',
             get: function get() {

@@ -20,8 +20,13 @@ var _managersTstManager3 = require('./managers/tstManager3');
 
 var _managersTstManager32 = _interopRequireDefault(_managersTstManager3);
 
+var _managersTstManager4 = require('./managers/tstManager4');
+
+var _managersTstManager42 = _interopRequireDefault(_managersTstManager4);
+
 var _module = angular.module('tstModule', []);
 
 _DaoHelper2['default'].registerService(_module, 'ModelManager', _managersTstManager12['default']);
 _DaoHelper2['default'].registerService(_module, 'ModelManager2', _managersTstManager22['default']);
 _DaoHelper2['default'].registerService(_module, 'ModelManager3', _managersTstManager32['default']);
+_DaoHelper2['default'].registerService(_module, 'ModelManager4', _managersTstManager42['default']);
