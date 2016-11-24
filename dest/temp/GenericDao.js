@@ -95,15 +95,13 @@ function GenericDao(model, qb, discriminators) {
                 if (Array.isArray(data)) {
                     return data.map(this.build, this);
                 }
-                var url = this.url;
-                if (data.__t) {
-                    _.each(this.discriminators, function (discriminator) {
-                        if (discriminator.type == data.__t) {
-                            url = discriminator.discriminatorUrl;
-                        }
-                    });
+                if (this.discriminators && data.__t) {
+                    var disc = _.find(this.discriminators, { type: data.__t });
+                    if (disc) {
+                        return new disc(this.$injector, disc.discriminatorUrl, data);
+                    }
                 }
-                return new model(this.$injector, url, data);
+                return new model(this.$injector, this.url, data);
             }
         }, {
             key: 'post',
@@ -138,16 +136,13 @@ function GenericDao(model, qb, discriminators) {
         }, {
             key: 'create',
             value: function create(params) {
-                var url = this.url;
-                if (params.__t) {
-                    _.each(this.discriminators, function (discriminator) {
-                        if (discriminator.type == params.__t) {
-
-                            url = discriminator.discriminatorUrl;
-                        }
-                    });
+                if (this.discriminators && params.__t) {
+                    var disc = _.find(this.discriminators, { type: params.__t });
+                    if (disc) {
+                        return new disc(this.$injector, disc.discriminatorUrl, params);
+                    }
                 }
-                return new this.model(this.$injector, url, params);
+                return new this.model(this.$injector, this.url, params);
             }
 
             // get discriminators(){

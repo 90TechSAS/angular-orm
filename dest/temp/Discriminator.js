@@ -33,10 +33,16 @@ var _SessionManager = require('./SessionManager');
 
 var _SessionManager2 = _interopRequireDefault(_SessionManager);
 
-function Discriminator(Model, type, url) {
+function Discriminator(Model, type) {
 
   var Discriminator = (function (_Model) {
     _inherits(Discriminator, _Model);
+
+    function Discriminator() {
+      _classCallCheck(this, Discriminator);
+
+      _get(Object.getPrototypeOf(Discriminator.prototype), 'constructor', this).apply(this, arguments);
+    }
 
     _createClass(Discriminator, null, [{
       key: 'type',
@@ -45,16 +51,6 @@ function Discriminator(Model, type, url) {
       }
     }]);
 
-    function Discriminator($injector, rootUrl, options) {
-      _classCallCheck(this, Discriminator);
-
-      _get(Object.getPrototypeOf(Discriminator.prototype), 'constructor', this).call(this, $injector, rootUrl, options);
-      this.rootUrl = url;
-    }
-
-    // static get discriminatorUrl(){
-    //   return url
-    // }
     return Discriminator;
   })(Model);
 
