@@ -115,10 +115,18 @@ function ActiveRecord(model, name) {
               } else if (field.nested || _.isArray(field) && field[0].nested) {
                 if (_.isArray(field)) {
                   toSave = _this[key].map(function (e) {
-                    return e.beforeSave(null, { force: true });
+                    if (e.beforeSave) return e.beforeSave(null, { force: true });else {
+                      console.warn('The values at ' + key + ' should be an ActiveRecord instance for diff purpose');
+                      return e;
+                    }
                   });
                 } else {
-                  toSave = _this[key].beforeSave(null, { force: true });
+                  if (_this[key].beforeSave) {
+                    toSave = _this[key].beforeSave(null, { force: true });
+                  } else {
+                    toSave = _this[key];
+                    console.warn('The value at ' + key + ' should be an ActiveRecord instance for diff purpose');
+                  }
                 }
               } else {
                 toSave = _this[key];

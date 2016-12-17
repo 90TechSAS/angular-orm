@@ -79,9 +79,21 @@ export default function ActiveRecord (model, name, SManager = SessionManager(mod
             }
           } else if (field.nested || (_.isArray(field) && field[ 0 ].nested)) {
             if (_.isArray(field)){
-              toSave = this[ key ].map(e => e.beforeSave(null, {force: true}))
+              toSave = this[ key ].map(e => {
+                if (e.beforeSave)
+                  return e.beforeSave(null, {force: true})
+                else {
+                  console.warn(`The values at ${key} should be an ActiveRecord instance for diff purpose`);
+                  return e;
+                }
+                })
             } else {
-              toSave = this[ key ].beforeSave(null, {force: true})
+              if (this[ key ].beforeSave){
+                toSave = this[ key ].beforeSave(null, {force: true})
+              } else {
+                toSave = this[ key ]
+                console.warn(`The value at ${key} should be an ActiveRecord instance for diff purpose`);
+              }
             }
           } else {
             toSave = this[ key ]
