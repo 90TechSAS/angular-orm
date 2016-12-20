@@ -45,11 +45,6 @@ describe('Angular DAO', function () {
     httpBackend.flush();
   });
 
-  it('should make a post query', function () {
-    httpBackend.expectPOST('http://MOCKURL.com/model1/filters').respond();
-    ModelManager.post();
-  });
-
   it('should provide with a query builder', function () {
     var qb = ModelManager.query();
     expect(qb).toBeDefined();
@@ -412,7 +407,7 @@ describe('Angular DAO', function () {
       return [204, undefined, { 'X-Total-Count': 0 }];
     });
     ModelManager.get().then(function (data) {
-      expect(data).toEqual({ data: [], meta: { total: '0' } });
+      expect(data).toEqual({ data: [] });
     });
     httpBackend.flush();
   });

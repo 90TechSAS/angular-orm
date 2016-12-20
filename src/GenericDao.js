@@ -33,21 +33,34 @@ export default function GenericDao(model, qb){
             return qb ? new qb(this, q) : new QueryBuilder(this, q);
         }
 
-        get(qb = this.query()){
-            var self = this;
-            return this.$http.get(this.url, {params: qb.opts}).then((data)=>{
-                if (!data.data) {
-                  data.data = []
-                }
-                return {
-                    data: data.data.map(this.build, this), meta: {total: data.headers('X-Total-Count')}
-                };
-            })
+        getHeaders(){
+
         }
 
-        count(qb= this.query()){
-            var params = _.merge(qb.opts, {count:true});
-            return this.$http.get(this.url, {params: params});
+        getOptions(opts={}){
+            opts.headers = this.getHeaders();
+            return opts;
+        }
+
+        get(qb = this.query(), opts={}){
+            opts = this.getOptions(opts)
+            let params = _.merge(opts, {params: qb.opts})
+            return this.$http.get(this.url, params)
+              .then(data =>this.extractData(data))
+        }
+
+        extractData(data){
+            if (!data.data) {
+                data.data = []
+            }
+            return { data: data.data.map(this.build, this)}
+        }
+
+        count(qb=this.query(), opts={}){
+            opts = this.getOptions();
+            let query = this.query(qb.opts)
+            query.count()
+            return this.get(query, opts);
         }
 
         build(data){
@@ -59,29 +72,6 @@ export default function GenericDao(model, qb){
                 return data.map(this.build, this);
             }
             return new model(this.$injector, this.url, data);
-        }
-
-        post(qb = this.query()){
-            var options = _.clone(qb.opts) || {};
-            var condition;
-            switch (options.archived){
-                case 'both':
-                    condition = '(this.isArchived == false || this.isArchived == true) && (this.isDeleted == false)';
-                    break;
-                case 'true':
-                    condition = '(this.isArchived == true) && (this.isDeleted == false)';
-                    break;
-                default:
-                    condition = '(this.isArchived == false) && (this.isDeleted == false)';
-            }
-            _.set(options, ['conditions', '$where'], condition);
-            return this.$http.post(this.url + '/filters', options).then((response)=>{
-                if (typeof response.data == 'number') {
-                    return {meta: {total: response.headers('X-Total-Count')}, data: response.data};
-                } else {
-                    return {meta: {total: response.headers('X-Total-Count')}, data: response.data.map(this.build, this)};
-                }
-            })
         }
 
         create(params){
