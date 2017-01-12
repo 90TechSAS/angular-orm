@@ -65,6 +65,12 @@ var QueryBuilder = (function () {
       return this;
     }
   }, {
+    key: 'count',
+    value: function count() {
+      this.opts = this.opts || {};
+      this.opts.count = true;
+    }
+  }, {
     key: 'populate',
     value: function populate(populateArray) {
       if (populateArray) {

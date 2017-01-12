@@ -40,6 +40,11 @@ export default class QueryBuilder {
     return this;
   }
 
+  count(){
+    this.opts = this.opts || {};
+    this.opts.count = true;
+  }
+
   populate (populateArray) {
     if (populateArray) {
       this.opts = this.opts || {};
