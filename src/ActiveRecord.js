@@ -271,7 +271,7 @@ export default function ActiveRecord (model, name, SManager = SessionManager(mod
               }));
             } else {
               /** Transforms just a single ref into its _id if needed */
-              obj[ key ] = obj[ key ]._id || obj[ key ];
+              obj[ key ] = _.get(obj, [ key , '_id']) || obj[ key ];
             }
             /** Nested SubModel, pass it through beforeSave() so that
              * only relevant fields are kept

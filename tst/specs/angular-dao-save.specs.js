@@ -243,4 +243,19 @@ describe('Angular DAO', function () {
     httpBackend.flush()
   })
 
+  it('should allow to save a populated field as null', function () {
+    var model = ModelManager.createModel({
+      _id: '123456',
+      model2: {
+        _id: '234567',
+        name: 'toto'
+      }
+    })
+
+    model.model2 = null
+    httpBackend.expectPUT('http://MOCKURL.com/model1/123456', { model2: null }).respond()
+    model.save()
+    httpBackend.flush()
+  })
+
 });
