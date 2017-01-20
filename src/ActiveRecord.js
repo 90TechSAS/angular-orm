@@ -73,7 +73,7 @@ export default function ActiveRecord (model, name, SManager = SessionManager(mod
             /** Unless it is marked nested */
             && !(field.nested || (_.isArray(field) && field[ 0 ].nested))) {
             if (_.isArray(field)) {
-              toSave = this[ key ].map(entry => (typeof entry === 'string') ? entry : entry._id)
+              toSave = this[ key ].filter(e => !_.isUndefined(e)).map(entry => (typeof entry === 'string') ? entry : entry._id)
             } else {
               toSave = typeof this[ key ] === 'string' ? this[ key ] : this[ key ]._id
             }
@@ -279,7 +279,9 @@ export default function ActiveRecord (model, name, SManager = SessionManager(mod
              * */
           } else if (field.nested || (_.isArray(field) && field[ 0 ].nested )) {
             if (_.isArray(field)) {
-              obj[ key ] = obj[ key ].map(e => e.beforeSave(null, { force: true }))
+              obj[ key ] = obj[ key ]
+                .filter(e => !_.isUndefined(e))
+                .map(e => e.beforeSave ? e.beforeSave(null, { force: true }) : e)
             } else {
               if (obj[ key ] && obj[ key ] !== null) {
                 obj[ key ] = obj[ key ].beforeSave(null, { force: true })

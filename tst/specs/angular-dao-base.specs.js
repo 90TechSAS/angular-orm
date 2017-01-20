@@ -86,7 +86,14 @@ describe('Angular DAO Basics', function () {
       expect(data).toEqual({data: []})
     });
     httpBackend.flush();
+  })
 
+  it ('Should not fail when a nested property is undefined', function(){
+    var m = ModelManager.create({
+        _id: "111",
+        models2: [{_id: "121212"}, undefined, {_id: null}, null],
+        model2: undefined
+      })
   })
 
 });

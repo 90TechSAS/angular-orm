@@ -106,7 +106,9 @@ function ActiveRecord(model, name) {
               /** Unless it is marked nested */
               !(field.nested || _.isArray(field) && field[0].nested)) {
                 if (_.isArray(field)) {
-                  toSave = _this[key].map(function (entry) {
+                  toSave = _this[key].filter(function (e) {
+                    return !_.isUndefined(e);
+                  }).map(function (entry) {
                     return typeof entry === 'string' ? entry : entry._id;
                   });
                 } else {
@@ -322,8 +324,10 @@ function ActiveRecord(model, name) {
                  * */
               } else if (field.nested || _.isArray(field) && field[0].nested) {
                   if (_.isArray(field)) {
-                    obj[key] = obj[key].map(function (e) {
-                      return e.beforeSave(null, { force: true });
+                    obj[key] = obj[key].filter(function (e) {
+                      return !_.isUndefined(e);
+                    }).map(function (e) {
+                      return e.beforeSave ? e.beforeSave(null, { force: true }) : e;
                     });
                   } else {
                     if (obj[key] && obj[key] !== null) {
