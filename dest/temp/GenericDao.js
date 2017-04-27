@@ -164,19 +164,17 @@ function GenericDao(model, qb, discriminators) {
 
                 var _this2 = this;
 
-                var qb = arguments.length <= 1 || arguments[1] === undefined ? this.query : arguments[1];
+                var qb = arguments.length <= 1 || arguments[1] === undefined ? this.query() : arguments[1];
+                var opts = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
 
-                return this.$http.get(this.url + '/' + value, { params: qb.opts }).then(function (data) {
+                return this.$http.get(this.url + '/' + value, _.merge(opts, { params: qb.opts })).then(function (data) {
                     return new model(_this2.$injector, _this2.url, data.data);
                 });
             };
         } else {
             myClass.prototype['selectBy' + _.capitalize(key)] = function (toSelect) {
-                // istanbul ignore next
-
-                var _this3 = this;
-
                 var qb = arguments.length <= 1 || arguments[1] === undefined ? this.query() : arguments[1];
+                var opts = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
 
                 if (toSelect && toSelect.length) {
                     if (value.ref) {
@@ -192,14 +190,7 @@ function GenericDao(model, qb, discriminators) {
                     }
                     qb.setQuery(obj);
                 }
-                return this.$http.get(this.url, { params: qb.opts }).then(function (data) {
-                    if (!data.data) {
-                        data.data = [];
-                    }
-                    return {
-                        data: data.data.map(_this3.build, _this3), meta: { total: data.headers('X-Total-Count') }
-                    };
-                });
+                return this.get(qb, opts);
             };
         }
         //myClass.prototype

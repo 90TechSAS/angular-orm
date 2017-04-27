@@ -171,7 +171,7 @@ export default function ActiveRecord (model, name, SManager = SessionManager(mod
       return this.$http.delete(this.rootUrl + '/' + this._id);
     }
 
-    populate (field, query) {
+    populate (field, query, opts) {
       var $q = this.$injector.get('$q');
 
       if (Array.isArray(field)) {
@@ -199,7 +199,7 @@ export default function ActiveRecord (model, name, SManager = SessionManager(mod
             if (!dao) {
               deferred.reject('Cannot Populate: unknown DAO');
             } else {
-              return dao.get(dao.query(query).select(grouped.string)).then((d)=> {
+              return dao.get(dao.query(query).select(grouped.string), opts).then((d)=> {
                 /** To preserve order, we map the existing field, replacing only the populated values */
                 self[ field ] = self[ field ].map((f) => {
                   if (typeof f === 'string') {
@@ -226,7 +226,7 @@ export default function ActiveRecord (model, name, SManager = SessionManager(mod
           if (!dao) {
             deferred.reject('Cannot Populate: unknown DAO');
           } else {
-            return dao.getById(this[ field ]).then(function (sub) {
+            return dao.getById(this[ field ], query, opts).then(function (sub) {
               self[ field ] = sub;
               return self;
             });

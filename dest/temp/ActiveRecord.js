@@ -200,7 +200,7 @@ function ActiveRecord(model, name) {
         }
       }, {
         key: 'populate',
-        value: function populate(field, query) {
+        value: function populate(field, query, opts) {
           // istanbul ignore next
 
           var _this2 = this;
@@ -236,7 +236,7 @@ function ActiveRecord(model, name) {
                 if (!dao) {
                   deferred.reject('Cannot Populate: unknown DAO');
                 } else {
-                  return dao.get(dao.query(query).select(grouped.string)).then(function (d) {
+                  return dao.get(dao.query(query).select(grouped.string), opts).then(function (d) {
                     /** To preserve order, we map the existing field, replacing only the populated values */
                     self[field] = self[field].map(function (f) {
                       if (typeof f === 'string') {
@@ -263,7 +263,7 @@ function ActiveRecord(model, name) {
               if (!dao) {
                 deferred.reject('Cannot Populate: unknown DAO');
               } else {
-                return dao.getById(this[field]).then(function (sub) {
+                return dao.getById(this[field], query, opts).then(function (sub) {
                   self[field] = sub;
                   return self;
                 });
