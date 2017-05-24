@@ -377,8 +377,8 @@ export default function ActiveRecord (model, name, SManager = SessionManager(mod
       // Get from the model the fields that reference another object
       var pop = _.pick(model, function (v) {
         if (_.isArray(v))
-          return v[ 0 ].ref;
-        return v.ref;
+          return v[ 0 ].ref && !v[ 0 ].nested;
+        return v.ref && !v.nested;
       });
 
       if (populateArray === 'all') {
