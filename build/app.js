@@ -234,7 +234,7 @@ function ActiveRecord(model, name) {
             if (_.isArray(obj[key])) {
               obj[key] = _.compact(obj[key].map(function (val) {
                 if (typeof val === 'object') {
-                  return field.nested ? val : val._id;
+                  return field.nested || _.get(field, [0, 'nested']) ? val : val._id;
                 } else if (typeof val === 'string') {
                   return val;
                 }
