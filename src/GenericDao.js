@@ -34,12 +34,12 @@ export default function GenericDao(model, qb, discriminators){
             return qb ? new qb(this, q) : new QueryBuilder(this, q);
         }
 
-        getHeaders(){
-
+        getHeaders(opts={}){
+            return opts.headers
         }
 
         getOptions(opts={}){
-            opts.headers = this.getHeaders();
+            opts.headers = this.getHeaders(opts);
             return opts;
         }
 
@@ -112,12 +112,14 @@ export default function GenericDao(model, qb, discriminators){
         var v = Array.isArray(value) ? value[0] : value;
         if (key === '_id'){
             myClass.prototype['findById'] = myClass.prototype['getById'] = function(value, qb = this.query(), opts = {}){
+                opts = this.getOptions(opts)
                 return this.$http.get(this.url + '/' + value, _.merge(opts, {params: qb.opts})).then((data)=>{
                     return new model(this.$injector, this.url, data.data);
                 })
             }
         } else{
             myClass.prototype['selectBy' + _.capitalize(key)] = function(toSelect, qb = this.query(), opts={}){
+                opts = this.getOptions(opts)
                 if (toSelect && toSelect.length){
                     if (value.ref){
                         toSelect = extractId(toSelect);
