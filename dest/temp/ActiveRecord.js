@@ -331,7 +331,7 @@ function ActiveRecord(model, name) {
                     });
                   } else {
                     if (obj[key] && obj[key] !== null) {
-                      obj[key] = obj[key].beforeSave(null, { force: true });
+                      obj[key] = obj[key].beforeSave ? obj[key].beforeSave(null, { force: true }) : obj[key];
                     }
                   }
                 } else if (_.isDate(obj[key])) {
@@ -460,8 +460,8 @@ function ActiveRecord(model, name) {
 
           // Get from the model the fields that reference another object
           var pop = _.pick(model, function (v) {
-            if (_.isArray(v)) return v[0].ref;
-            return v.ref;
+            if (_.isArray(v)) return v[0].ref && !v[0].nested;
+            return v.ref && !v.nested;
           });
 
           if (populateArray === 'all') {

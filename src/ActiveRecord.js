@@ -284,7 +284,7 @@ export default function ActiveRecord (model, name, SManager = SessionManager(mod
                 .map(e => e.beforeSave ? e.beforeSave(null, { force: true }) : e)
             } else {
               if (obj[ key ] && obj[ key ] !== null) {
-                obj[ key ] = obj[ key ].beforeSave(null, { force: true })
+                obj[ key ] = obj[ key ].beforeSave ? obj[ key ].beforeSave(null, { force: true }) : obj[ key ]
               }
             }
           } else if (_.isDate(obj[ key ])) {

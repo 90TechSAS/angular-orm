@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.0.5
+
+- Fix `beforeSave` on object with nested model without `beforeSave` function
+
 ## 2.0.0
 
 - Diff on save
