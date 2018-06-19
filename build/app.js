@@ -53,8 +53,20 @@ function ActiveRecord(model, name) {
       function ActiveRecord($injector, rootUrl, options) {
         _classCallCheck(this, ActiveRecord);
 
-        this.$injector = $injector;
-        this.rootUrl = rootUrl;
+        //this.$injector = $injector;
+        Object.defineProperty(this, '$injector', {
+          get: function get() {
+            return $injector;
+          },
+          enumerable: false
+        });
+        Object.defineProperty(this, 'rootUrl', {
+          get: function get() {
+            return rootUrl;
+          },
+          enumerable: false
+        });
+
         this.build(options);
       }
 
@@ -405,18 +417,10 @@ function ActiveRecord(model, name) {
               }
             }
           });
-          var $q = this._injector.get('$q');
+          var $q = this.$injector.get('$q');
           return $q.all(promises).then(function () {
             return _this5.save(populate);
           });
-        }
-      }, {
-        key: '$injector',
-        get: function get() {
-          return this._injector;
-        },
-        set: function set($injector) {
-          this._injector = $injector;
         }
       }, {
         key: '$http',

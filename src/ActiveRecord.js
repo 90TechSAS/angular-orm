@@ -20,8 +20,14 @@ export default function ActiveRecord (model, name, SManager = SessionManager(mod
 
   let ActiveRecord = class {
     constructor ($injector, rootUrl, options) {
-      this.$injector = $injector;
-      this.rootUrl = rootUrl;
+      Object.defineProperty(this, '$injector', {
+        get: function(){return $injector},
+        enumerable: false
+      })
+      Object.defineProperty(this, 'rootUrl', {
+        get: function(){return rootUrl},
+        enumerable: false
+      })
       this.build(options);
     }
 
@@ -133,14 +139,6 @@ export default function ActiveRecord (model, name, SManager = SessionManager(mod
         }
       })
       return clone
-    }
-
-    get $injector () {
-      return this._injector;
-    }
-
-    set $injector ($injector) {
-      this._injector = $injector;
     }
 
     get $http () {
@@ -342,7 +340,7 @@ export default function ActiveRecord (model, name, SManager = SessionManager(mod
           }
         }
       })
-      var $q = this._injector.get('$q')
+      var $q = this.$injector.get('$q')
       return $q.all(promises).then(() => {
         return this.save(populate)
       })
