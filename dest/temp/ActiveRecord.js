@@ -52,20 +52,8 @@ function ActiveRecord(model, name) {
       function ActiveRecord($injector, rootUrl, options) {
         _classCallCheck(this, ActiveRecord);
 
-        //this.$injector = $injector;
-        Object.defineProperty(this, '$injector', {
-          get: function get() {
-            return $injector;
-          },
-          enumerable: false
-        });
-        Object.defineProperty(this, 'rootUrl', {
-          get: function get() {
-            return rootUrl;
-          },
-          enumerable: false
-        });
-
+        this.$injector = $injector;
+        this.rootUrl = rootUrl;
         this.build(options);
       }
 

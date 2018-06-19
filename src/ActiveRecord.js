@@ -20,14 +20,8 @@ export default function ActiveRecord (model, name, SManager = SessionManager(mod
 
   let ActiveRecord = class {
     constructor ($injector, rootUrl, options) {
-      Object.defineProperty(this, '$injector', {
-        get: function(){return $injector},
-        enumerable: false
-      })
-      Object.defineProperty(this, 'rootUrl', {
-        get: function(){return rootUrl},
-        enumerable: false
-      })
+      this.$injector = $injector
+      this.rootUrl = rootUrl
       this.build(options);
     }
 
