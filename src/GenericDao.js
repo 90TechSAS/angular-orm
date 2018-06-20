@@ -6,19 +6,15 @@ export default function GenericDao(model, qb, discriminators){
     sl.registerModel(model.getName(), model);
     let myClass = class {
         constructor(url){
-            //  this.$injector = $injector;
-            //   this.$http     = $injector.get('$http');
             this.url   = url;
             this.model = model
             this.discriminators = discriminators
         }
-
-        get $http(){
-            return this.$injector.get('$http');
+        get $injector () {
+            return sl.getInjector()
         }
-
-        setInjector($injector){
-            this.$injector = $injector;
+        get $http(){
+            return sl.getInjector().get('$http');
         }
 
         getModel(){
@@ -75,20 +71,20 @@ export default function GenericDao(model, qb, discriminators){
             if (this.discriminators && data.__t) {
               let disc = _.find(this.discriminators, {type: data.__t});
               if (disc) {
-                return new disc(this.$injector, disc.discriminatorUrl, data);
+                return new disc(disc.discriminatorUrl, data);
               }
             }
-            return new model(this.$injector, this.url, data);
+            return new model(this.url, data);
         }
 
         create(params){
           if (this.discriminators && params.__t) {
             let disc = _.find(this.discriminators,{type: params.__t});
             if (disc) {
-              return new disc(this.$injector, disc.discriminatorUrl, params);
+              return new disc(disc.discriminatorUrl, params);
             }
           }
-          return new this.model(this.$injector, this.url, params);
+          return new this.model(this.url, params);
         }
 
         // get discriminators(){
@@ -114,7 +110,7 @@ export default function GenericDao(model, qb, discriminators){
             myClass.prototype['findById'] = myClass.prototype['getById'] = function(value, qb = this.query(), opts = {}){
                 opts = this.getOptions(opts)
                 return this.$http.get(this.url + '/' + value, _.merge(opts, {params: qb.opts})).then((data)=>{
-                    return new model(this.$injector, this.url, data.data);
+                    return new model(this.url, data.data);
                 })
             }
         } else{

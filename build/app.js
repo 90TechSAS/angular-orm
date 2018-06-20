@@ -50,10 +50,10 @@ function ActiveRecord(model, name) {
     var session = new SManager();
 
     var ActiveRecord = (function () {
-      function ActiveRecord($injector, rootUrl, options) {
+      function ActiveRecord(rootUrl, options) {
         _classCallCheck(this, ActiveRecord);
 
-        this.$injector = $injector;
+        //this.$injector = $injector
         this.rootUrl = rootUrl;
         this.build(options);
       }
@@ -144,7 +144,7 @@ function ActiveRecord(model, name) {
         key: 'clone',
         value: function clone() {
           var m = sl.getModel(name);
-          var ob = new m(this.$injector, this.rootUrl, this);
+          var ob = new m(this.rootUrl, this);
           delete ob._id;
           return ob;
         }
@@ -411,6 +411,11 @@ function ActiveRecord(model, name) {
           });
         }
       }, {
+        key: '$injector',
+        get: function get() {
+          return sl.getInjector();
+        }
+      }, {
         key: '$http',
         get: function get() {
           return this.$injector.get('$http');
@@ -562,7 +567,8 @@ var DaoHelper = (function () {
         key: 'registerService',
         value: function registerService(module, name, dao) {
             module.provider(name, DaoHelper.getProvider(dao)).run([name, '$injector', function (service, $injector) {
-                service.setInjector($injector);
+                _ServiceLocator2['default'].instance.registerInjector($injector);
+                //service.setInjector($injector);
             }]);
         }
     }]);
@@ -667,19 +673,12 @@ function GenericDao(model, qb, discriminators) {
         function myClass(url) {
             _classCallCheck(this, myClass);
 
-            //  this.$injector = $injector;
-            //   this.$http     = $injector.get('$http');
             this.url = url;
             this.model = model;
             this.discriminators = discriminators;
         }
 
         _createClass(myClass, [{
-            key: 'setInjector',
-            value: function setInjector($injector) {
-                this.$injector = $injector;
-            }
-        }, {
             key: 'getModel',
             value: function getModel() {
                 return model;
@@ -757,10 +756,10 @@ function GenericDao(model, qb, discriminators) {
                 if (this.discriminators && data.__t) {
                     var disc = _.find(this.discriminators, { type: data.__t });
                     if (disc) {
-                        return new disc(this.$injector, disc.discriminatorUrl, data);
+                        return new disc(disc.discriminatorUrl, data);
                     }
                 }
-                return new model(this.$injector, this.url, data);
+                return new model(this.url, data);
             }
         }, {
             key: 'create',
@@ -768,19 +767,24 @@ function GenericDao(model, qb, discriminators) {
                 if (this.discriminators && params.__t) {
                     var disc = _.find(this.discriminators, { type: params.__t });
                     if (disc) {
-                        return new disc(this.$injector, disc.discriminatorUrl, params);
+                        return new disc(disc.discriminatorUrl, params);
                     }
                 }
-                return new this.model(this.$injector, this.url, params);
+                return new this.model(this.url, params);
             }
 
             // get discriminators(){
             //   return discriminators
             // }
         }, {
+            key: '$injector',
+            get: function get() {
+                return sl.getInjector();
+            }
+        }, {
             key: '$http',
             get: function get() {
-                return this.$injector.get('$http');
+                return sl.getInjector().get('$http');
             }
         }]);
 
@@ -809,7 +813,7 @@ function GenericDao(model, qb, discriminators) {
 
                 opts = this.getOptions(opts);
                 return this.$http.get(this.url + '/' + value, _.merge(opts, { params: qb.opts })).then(function (data) {
-                    return new model(_this2.$injector, _this2.url, data.data);
+                    return new model(_this2.url, data.data);
                 });
             };
         } else {
@@ -1056,6 +1060,11 @@ var ServiceLocator = (function () {
             return this.daoRegistry[name];
         }
     }, {
+        key: "getInjector",
+        value: function getInjector() {
+            return this.injector;
+        }
+    }, {
         key: "registerDao",
         value: function registerDao(name, dao) {
             this.daoRegistry[name] = dao;
@@ -1064,6 +1073,11 @@ var ServiceLocator = (function () {
         key: "registerModel",
         value: function registerModel(name, model) {
             this.modelRegistry[name] = model;
+        }
+    }, {
+        key: "registerInjector",
+        value: function registerInjector(injector) {
+            this.injector = injector;
         }
     }], [{
         key: "instance",

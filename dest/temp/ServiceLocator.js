@@ -43,6 +43,11 @@ var ServiceLocator = (function () {
             return this.daoRegistry[name];
         }
     }, {
+        key: "getInjector",
+        value: function getInjector() {
+            return this.injector;
+        }
+    }, {
         key: "registerDao",
         value: function registerDao(name, dao) {
             this.daoRegistry[name] = dao;
@@ -51,6 +56,11 @@ var ServiceLocator = (function () {
         key: "registerModel",
         value: function registerModel(name, model) {
             this.modelRegistry[name] = model;
+        }
+    }, {
+        key: "registerInjector",
+        value: function registerInjector(injector) {
+            this.injector = injector;
         }
     }], [{
         key: "instance",

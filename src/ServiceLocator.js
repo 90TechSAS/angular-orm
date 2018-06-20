@@ -34,12 +34,20 @@ class ServiceLocator {
         return this.daoRegistry[name];
     }
 
+    getInjector(){
+        return this.injector
+    }
+
     registerDao(name, dao){
         this.daoRegistry[name] = dao;
     }
 
     registerModel(name, model){
         this.modelRegistry[name] = model;
+    }
+
+    registerInjector(injector){
+        this.injector = injector
     }
 
 }

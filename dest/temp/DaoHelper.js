@@ -72,7 +72,8 @@ var DaoHelper = (function () {
         key: 'registerService',
         value: function registerService(module, name, dao) {
             module.provider(name, DaoHelper.getProvider(dao)).run([name, '$injector', function (service, $injector) {
-                service.setInjector($injector);
+                _ServiceLocator2['default'].instance.registerInjector($injector);
+                //service.setInjector($injector);
             }]);
         }
     }]);

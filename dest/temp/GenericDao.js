@@ -31,19 +31,12 @@ function GenericDao(model, qb, discriminators) {
         function myClass(url) {
             _classCallCheck(this, myClass);
 
-            //  this.$injector = $injector;
-            //   this.$http     = $injector.get('$http');
             this.url = url;
             this.model = model;
             this.discriminators = discriminators;
         }
 
         _createClass(myClass, [{
-            key: 'setInjector',
-            value: function setInjector($injector) {
-                this.$injector = $injector;
-            }
-        }, {
             key: 'getModel',
             value: function getModel() {
                 return model;
@@ -121,10 +114,10 @@ function GenericDao(model, qb, discriminators) {
                 if (this.discriminators && data.__t) {
                     var disc = _.find(this.discriminators, { type: data.__t });
                     if (disc) {
-                        return new disc(this.$injector, disc.discriminatorUrl, data);
+                        return new disc(disc.discriminatorUrl, data);
                     }
                 }
-                return new model(this.$injector, this.url, data);
+                return new model(this.url, data);
             }
         }, {
             key: 'create',
@@ -132,19 +125,24 @@ function GenericDao(model, qb, discriminators) {
                 if (this.discriminators && params.__t) {
                     var disc = _.find(this.discriminators, { type: params.__t });
                     if (disc) {
-                        return new disc(this.$injector, disc.discriminatorUrl, params);
+                        return new disc(disc.discriminatorUrl, params);
                     }
                 }
-                return new this.model(this.$injector, this.url, params);
+                return new this.model(this.url, params);
             }
 
             // get discriminators(){
             //   return discriminators
             // }
         }, {
+            key: '$injector',
+            get: function get() {
+                return sl.getInjector();
+            }
+        }, {
             key: '$http',
             get: function get() {
-                return this.$injector.get('$http');
+                return sl.getInjector().get('$http');
             }
         }]);
 
@@ -173,7 +171,7 @@ function GenericDao(model, qb, discriminators) {
 
                 opts = this.getOptions(opts);
                 return this.$http.get(this.url + '/' + value, _.merge(opts, { params: qb.opts })).then(function (data) {
-                    return new model(_this2.$injector, _this2.url, data.data);
+                    return new model(_this2.url, data.data);
                 });
             };
         } else {

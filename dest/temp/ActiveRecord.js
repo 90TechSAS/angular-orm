@@ -49,10 +49,10 @@ function ActiveRecord(model, name) {
     var session = new SManager();
 
     var ActiveRecord = (function () {
-      function ActiveRecord($injector, rootUrl, options) {
+      function ActiveRecord(rootUrl, options) {
         _classCallCheck(this, ActiveRecord);
 
-        this.$injector = $injector;
+        //this.$injector = $injector
         this.rootUrl = rootUrl;
         this.build(options);
       }
@@ -143,7 +143,7 @@ function ActiveRecord(model, name) {
         key: 'clone',
         value: function clone() {
           var m = sl.getModel(name);
-          var ob = new m(this.$injector, this.rootUrl, this);
+          var ob = new m(this.rootUrl, this);
           delete ob._id;
           return ob;
         }
@@ -408,6 +408,11 @@ function ActiveRecord(model, name) {
           return $q.all(promises).then(function () {
             return _this5.save(populate);
           });
+        }
+      }, {
+        key: '$injector',
+        get: function get() {
+          return sl.getInjector();
         }
       }, {
         key: '$http',

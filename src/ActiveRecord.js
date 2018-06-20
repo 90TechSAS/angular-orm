@@ -19,10 +19,14 @@ export default function ActiveRecord (model, name, SManager = SessionManager(mod
   let session = new SManager()
 
   let ActiveRecord = class {
-    constructor ($injector, rootUrl, options) {
-      this.$injector = $injector
+    constructor (rootUrl, options) {
+      //this.$injector = $injector
       this.rootUrl = rootUrl
       this.build(options);
+    }
+
+    get $injector(){
+      return sl.getInjector()
     }
 
     build (options) {
@@ -108,7 +112,7 @@ export default function ActiveRecord (model, name, SManager = SessionManager(mod
 
     clone () {
       var m = sl.getModel(name);
-      var ob = new m(this.$injector, this.rootUrl, this);
+      var ob = new m(this.rootUrl, this);
       delete ob._id;
       return ob;
     }

@@ -43,7 +43,8 @@ export default class DaoHelper{
         module
             .provider(name, DaoHelper.getProvider(dao))
             .run([name, '$injector', function(service, $injector){
-                service.setInjector($injector);
+                ServiceLocator.instance.registerInjector($injector)
+                //service.setInjector($injector);
             }])
     }
 
