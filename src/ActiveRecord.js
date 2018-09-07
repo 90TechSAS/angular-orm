@@ -315,9 +315,9 @@ export default function ActiveRecord (model, name, SManager = SessionManager(mod
       }
 
       if (this._id) {
-        return this.$http.put(this.rootUrl + '/' + this._id, toSave).then(callback)
+        return this.$http.put(this.rootUrl + '/' + this._id, toSave, opts).then(callback)
       } else {
-        return this.$http.post(this.rootUrl, toSave).then(callback);
+        return this.$http.post(this.rootUrl, toSave, opts).then(callback);
       }
     }
 
